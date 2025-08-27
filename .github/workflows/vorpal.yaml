@@ -13,6 +13,7 @@ jobs:
       matrix:
         artifact:
           - dev
+          - nginx
         runner:
           - macos-latest
     steps:
