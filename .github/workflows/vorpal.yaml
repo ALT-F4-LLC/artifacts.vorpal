@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  dev:
+  build-dev:
     runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
@@ -29,7 +29,7 @@ jobs:
           AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - run: vorpal artifact make '${{ matrix.artifact }}' .
+      - run: vorpal artifact make 'dev' .
 
       - uses: actions/upload-artifact@v4
         with:
@@ -38,7 +38,7 @@ jobs:
 
   build:
     needs:
-      - dev
+      - build-dev
     runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
