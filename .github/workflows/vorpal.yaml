@@ -102,9 +102,4 @@ jobs:
           AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: vorpal-lock-${{ runner.arch }}-${{ runner.os }}
-          path: Vorpal.lock
-
       - run: vorpal artifact make '${{ matrix.artifact }}' .
