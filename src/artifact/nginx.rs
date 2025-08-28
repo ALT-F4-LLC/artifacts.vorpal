@@ -10,8 +10,10 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
     let name = "nginx";
 
     let source_version = "1.27.5";
+
     let source_path =
         format!("https://github.com/nginx/nginx/archive/refs/tags/release-{source_version}.tar.gz");
+
     let source = ArtifactSourceBuilder::new(name, source_path.as_str()).build();
 
     let step_script = formatdoc! {"

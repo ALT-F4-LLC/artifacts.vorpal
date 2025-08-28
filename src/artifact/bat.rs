@@ -11,25 +11,23 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
     let source_version = "0.25.0";
 
     let source_system = match context.get_system() {
-        X8664Darwin => "x86_64-apple-darwin",
         Aarch64Darwin => "aarch64-apple-darwin",
-        X8664Linux => "x86_64-unknown-linux-musl",
         Aarch64Linux => "aarch64-unknown-linux-gnu",
+        X8664Darwin => "x86_64-apple-darwin",
+        X8664Linux => "x86_64-unknown-linux-musl",
         _ => return Err(anyhow::anyhow!("Unsupported system for bat artifact")),
     };
 
     let source_path = format!(
         "https://github.com/sharkdp/bat/releases/download/v{source_version}/bat-v{source_version}-{source_system}.tar.gz"
     );
+
     let source = ArtifactSourceBuilder::new(name, &source_path).build();
 
     let step_script = formatdoc! {"
         mkdir -pv \"$VORPAL_OUTPUT/bin\"
-
         pushd ./source/{name}
-
-        # Extract and install the binary (tar.gz is already extracted by Vorpal)
-        cp */bat \"$VORPAL_OUTPUT/bin/bat\"
+        cp bat \"$VORPAL_OUTPUT/bin/bat\"
         chmod +x \"$VORPAL_OUTPUT/bin/bat\"",
     };
 

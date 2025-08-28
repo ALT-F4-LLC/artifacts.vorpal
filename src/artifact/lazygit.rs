@@ -11,10 +11,10 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
     let source_version = "0.44.1";
 
     let source_system = match context.get_system() {
-        X8664Darwin => "Darwin_x86_64",
         Aarch64Darwin => "Darwin_arm64",
-        X8664Linux => "Linux_x86_64",
         Aarch64Linux => "Linux_arm64",
+        X8664Darwin => "Darwin_x86_64",
+        X8664Linux => "Linux_x86_64",
         _ => return Err(anyhow::anyhow!("Unsupported system for lazygit artifact")),
     };
 
@@ -41,4 +41,3 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
         .build(context)
         .await
 }
-

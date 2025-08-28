@@ -11,10 +11,10 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
     let source_version = "1.21.1";
 
     let source_system = match context.get_system() {
-        X8664Darwin => "x86_64-apple-darwin",
         Aarch64Darwin => "aarch64-apple-darwin",
-        X8664Linux => "x86_64-unknown-linux-musl",
         Aarch64Linux => "aarch64-unknown-linux-musl",
+        X8664Darwin => "x86_64-apple-darwin",
+        X8664Linux => "x86_64-unknown-linux-musl",
         _ => return Err(anyhow::anyhow!("Unsupported system for starship artifact")),
     };
 
@@ -41,4 +41,3 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
         .build(context)
         .await
 }
-

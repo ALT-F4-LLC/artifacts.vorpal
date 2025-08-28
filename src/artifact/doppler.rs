@@ -11,16 +11,17 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
     let source_version = "3.75.1";
 
     let source_system = match context.get_system() {
-        X8664Darwin => "macOS_amd64",
         Aarch64Darwin => "macOS_arm64",
-        X8664Linux => "linux_amd64",
         Aarch64Linux => "linux_arm64",
+        X8664Darwin => "macOS_amd64",
+        X8664Linux => "linux_amd64",
         _ => return Err(anyhow::anyhow!("Unsupported system for doppler artifact")),
     };
 
     let source_path = format!(
         "https://github.com/DopplerHQ/cli/releases/download/{source_version}/doppler_{source_version}_{source_system}.tar.gz"
     );
+
     let source = ArtifactSourceBuilder::new(name, &source_path).build();
 
     let step_script = formatdoc! {"
@@ -40,4 +41,3 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
         .build(context)
         .await
 }
-

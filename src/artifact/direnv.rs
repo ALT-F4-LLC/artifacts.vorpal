@@ -18,9 +18,14 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
         _ => return Err(anyhow::anyhow!("Unsupported system for direnv artifact")),
     };
 
+    let source_path = format!("https://github.com/direnv/direnv/releases/download/{source_version}/direnv.{source_system}");
+
+    let source = ArtifactSourceBuilder::new(name, &source_path).build();
+
     let step_script = formatdoc! {"
         mkdir -pv \"$VORPAL_OUTPUT/bin\"
-        curl -L \"https://github.com/direnv/direnv/releases/download/{source_version}/direnv.{source_system}\" -o \"$VORPAL_OUTPUT/bin/direnv\"
+        pushd ./source/{name}
+        cp direnv.{source_system} \"$VORPAL_OUTPUT/bin/direnv\"
         chmod +x \"$VORPAL_OUTPUT/bin/direnv\"",
     };
 
@@ -30,7 +35,7 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
 
     ArtifactBuilder::new(name, steps, systems)
         .with_aliases(vec![format!("{name}:{source_version}")])
+        .with_sources(vec![source])
         .build(context)
         .await
 }
-

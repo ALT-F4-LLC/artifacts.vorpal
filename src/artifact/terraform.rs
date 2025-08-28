@@ -11,10 +11,10 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
     let source_version = "1.13.1";
 
     let source_system = match context.get_system() {
-        X8664Darwin => "darwin_amd64",
         Aarch64Darwin => "darwin_arm64",
-        X8664Linux => "linux_amd64",
         Aarch64Linux => "linux_arm64",
+        X8664Darwin => "darwin_amd64",
+        X8664Linux => "linux_amd64",
         _ => return Err(anyhow::anyhow!("Unsupported system for terraform artifact")),
     };
 
@@ -41,4 +41,3 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
         .build(context)
         .await
 }
-

@@ -209,6 +209,14 @@ digest = "5045e29e7fa0ffe017f63da7741c800cbc0f89e04aebd78efcd661d6e5673326"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "direnv"
+path = "https://github.com/direnv/direnv/releases/download/v2.37.1/direnv.darwin-arm64"
+includes = []
+excludes = []
+digest = "8204ab746effc28aa1dd329c50b585e86ff322607f255bea09e2bd654b4fcdb8"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "doppler"
 path = "https://github.com/DopplerHQ/cli/releases/download/3.75.1/doppler_3.75.1_macOS_arm64.tar.gz"
 includes = []
