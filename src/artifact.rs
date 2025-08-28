@@ -1,1 +1,10 @@
+pub mod bat;
+pub mod bottom;
+pub mod direnv;
+pub mod doppler;
+pub mod fd;
+pub mod lazygit;
 pub mod nginx;
+pub mod ripgrep;
+pub mod starship;
+pub mod terraform;

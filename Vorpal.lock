@@ -17,6 +17,14 @@ digest = "19a8087c947a587b491508a6675a5349e23992d5dfca40a0bd0735bbd81e0438"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "bat"
+path = "https://github.com/sharkdp/bat/releases/download/v0.25.0/bat-v0.25.0-aarch64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "3abca7df1be4d52ef37ccd22f0b01da87f149f4ca1f74633d53deba87d98b078"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "binutils"
 path = "https://ftpmirror.gnu.org/gnu/binutils/binutils-2.43.1.tar.gz"
 includes = []
@@ -47,6 +55,14 @@ includes = []
 excludes = []
 digest = "cb18c2c8562fc01bf3ae17ffe9cf8274e3dd49d39f89397c1a8bac7ee14ce85f"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "bottom"
+path = "https://github.com/ClementTsang/bottom/releases/download/0.11.1/bottom_aarch64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "baefba5765f348b83567b41101960588d2ae04512ecaf4f65ecd01ad3b67dfcc"
+platform = "aarch64-darwin"
 
 [[sources]]
 name = "cargo"
@@ -177,6 +193,22 @@ digest = "5045e29e7fa0ffe017f63da7741c800cbc0f89e04aebd78efcd661d6e5673326"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "doppler"
+path = "https://github.com/DopplerHQ/cli/releases/download/3.75.1/doppler_3.75.1_macOS_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "cc2860da598bb056f8f1a11a781f56ddf194ab3b2b5976a881b93465ec0d2274"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "fd"
+path = "https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-aarch64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "0908501901ff99232aa75a18bf9409e80dae10742dc3759a67249bca5a459490"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "file"
 path = "https://astron.com/pub/file/file-5.45.tar.gz"
 includes = []
@@ -335,6 +367,14 @@ includes = []
 excludes = []
 digest = "25e51d46402bab819045d452ded6c4558ef980f5249c470d9499e9eae34b59b1"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "lazygit"
+path = "https://github.com/jesseduffield/lazygit/releases/download/v0.44.1/lazygit_0.44.1_Darwin_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "42dd9183e9692a5a73ad4dfa109f06e67c1c7cd172afdb3d66a1fc4a5ee4c892"
+platform = "aarch64-darwin"
 
 [[sources]]
 name = "libidn2"
@@ -609,6 +649,14 @@ digest = "8359773924d33702ecd6f9fab01973e53d929d46d7cdc4b0df31eb1282c68b67"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "ripgrep"
+path = "https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep-14.1.1-aarch64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "eb0c1779060a651e1288e5a3a6f3d5e3460a2955b64f9d71feefa444ceb52b54"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "rust-analyzer"
 path = "https://static.rust-lang.org/dist/rust-analyzer-1.89.0-x86_64-unknown-linux-gnu.tar.gz"
 includes = []
@@ -785,6 +833,14 @@ digest = "434ff552af89340088e0d8cb206c251761297909bbee401176bc8f655e8e7cf2"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "starship"
+path = "https://github.com/starship/starship/releases/download/v1.21.1/starship-aarch64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "38aa27a0ae3eed8a6ebf1039caf1b01dd849380fd26f41bcad989476665251ee"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "tar"
 path = "https://ftpmirror.gnu.org/gnu/tar/tar-1.35.tar.gz"
 includes = []
@@ -799,6 +855,14 @@ includes = []
 excludes = []
 digest = "f9bb5f39ed45b1c6a324470515d2ef73e74422c5f345503106d861576d3f02f3"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "terraform"
+path = "https://releases.hashicorp.com/terraform/1.13.1/terraform_1.13.1_darwin_arm64.zip"
+includes = []
+excludes = []
+digest = "a67245b7b54156f38f6df535e4bdf0154195f1a47a0a0bf692d4f80f260d200b"
+platform = "aarch64-darwin"
 
 [[sources]]
 name = "texinfo"

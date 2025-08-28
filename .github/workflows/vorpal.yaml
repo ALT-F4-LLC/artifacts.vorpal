@@ -43,7 +43,16 @@ jobs:
     strategy:
       matrix:
         artifact:
+          - bat
+          - bottom
+          - direnv
+          - doppler
+          - fd
+          - lazygit
           - nginx
+          - ripgrep
+          - starship
+          - terraform
         runner:
           - macos-latest
           - macos-latest-large
