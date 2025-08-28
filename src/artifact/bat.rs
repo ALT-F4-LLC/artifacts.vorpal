@@ -26,7 +26,7 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
 
     let step_script = formatdoc! {"
         mkdir -pv \"$VORPAL_OUTPUT/bin\"
-        pushd ./source/{name}
+        pushd ./source/{name}/bat-v{source_version}-{source_system}
         cp bat \"$VORPAL_OUTPUT/bin/bat\"
         chmod +x \"$VORPAL_OUTPUT/bin/bat\"",
     };
