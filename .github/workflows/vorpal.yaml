@@ -7,21 +7,16 @@ on:
       - main
 
 jobs:
-  build:
+  dev:
     runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
-        artifact:
-          - dev
-          - nginx
         runner:
           - macos-latest
           - macos-latest-large
           - ubuntu-latest
           - ubuntu-latest-arm64
     steps:
-      - uses: actions/checkout@v5
-
       - uses: ALT-F4-LLC/setup-vorpal-action@main
         with:
           registry-backend: s3
@@ -32,9 +27,44 @@ jobs:
           AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      - uses: actions/checkout@v5
+
       - run: vorpal artifact make '${{ matrix.artifact }}' .
 
       - uses: actions/upload-artifact@v4
         with:
           name: vorpal-lock-${{ env.ARCH }}-${{ env.OS }}
           path: Vorpal.lock
+
+  build:
+    needs:
+      - dev
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        artifact:
+          - nginx
+        runner:
+          - macos-latest
+          - macos-latest-large
+          - ubuntu-latest
+          - ubuntu-latest-arm64
+    steps:
+      - uses: ALT-F4-LLC/setup-vorpal-action@main
+        with:
+          registry-backend: s3
+          registry-backend-s3-bucket: altf4llc-vorpal-registry
+          version: nightly
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: vorpal-lock-${{ env.ARCH }}-${{ env.OS }}
+          path: Vorpal.lock
+
+      - run: vorpal artifact make '${{ matrix.artifact }}' .
