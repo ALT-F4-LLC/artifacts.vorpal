@@ -18,6 +18,14 @@ platform = "aarch64-linux"
 
 [[sources]]
 name = "bat"
+path = "https://github.com/sharkdp/bat/releases/download/v0.25.0/bat-v0.25.0-aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "1ba594e9b7f1e817e3359300173282fccae09f3360e37568161d86e8d0f087b0"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "bat"
 path = "https://github.com/sharkdp/bat/releases/download/v0.25.0/bat-v0.25.0-aarch64-apple-darwin.tar.gz"
 includes = []
 excludes = []
@@ -63,6 +71,14 @@ includes = []
 excludes = []
 digest = "baefba5765f348b83567b41101960588d2ae04512ecaf4f65ecd01ad3b67dfcc"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "bottom"
+path = "https://github.com/ClementTsang/bottom/releases/download/0.11.1/bottom_aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "ca2abfdadc1c5df2c87cf8fbcf56ef0d7b38ac29277ace74d4ff257c516d3894"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "cargo"
@@ -201,12 +217,28 @@ digest = "cc2860da598bb056f8f1a11a781f56ddf194ab3b2b5976a881b93465ec0d2274"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "doppler"
+path = "https://github.com/DopplerHQ/cli/releases/download/3.75.1/doppler_3.75.1_linux_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "dfbd6548b0d00423291ab72c41ae2b4ee8b501df44b93ce1b75eaed95971352f"
+platform = "aarch64-linux"
+
+[[sources]]
 name = "fd"
 path = "https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-aarch64-apple-darwin.tar.gz"
 includes = []
 excludes = []
 digest = "0908501901ff99232aa75a18bf9409e80dae10742dc3759a67249bca5a459490"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "fd"
+path = "https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "fb1c351d076c7ed9e68ba63ed4647af730c4ee277f283c82fe3a84d784829ded"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "file"
@@ -375,6 +407,14 @@ includes = []
 excludes = []
 digest = "42dd9183e9692a5a73ad4dfa109f06e67c1c7cd172afdb3d66a1fc4a5ee4c892"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "lazygit"
+path = "https://github.com/jesseduffield/lazygit/releases/download/v0.44.1/lazygit_0.44.1_Linux_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "754ecef628fe8e8f1978129ff1799d698a293bab3b518406f202da7ec1d1c663"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "libidn2"
@@ -650,6 +690,14 @@ platform = "aarch64-linux"
 
 [[sources]]
 name = "ripgrep"
+path = "https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep-14.1.1-aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "c6e2bc6e6daf12082671e8f6a9f76ace407976d3886f7a504159faac1383f721"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "ripgrep"
 path = "https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep-14.1.1-aarch64-apple-darwin.tar.gz"
 includes = []
 excludes = []
@@ -841,6 +889,14 @@ digest = "38aa27a0ae3eed8a6ebf1039caf1b01dd849380fd26f41bcad989476665251ee"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "starship"
+path = "https://github.com/starship/starship/releases/download/v1.21.1/starship-aarch64-unknown-linux-musl.tar.gz"
+includes = []
+excludes = []
+digest = "d8556139752336799737c98ebacbadc0c8c1c7268da2f0b89110b391bd93b19c"
+platform = "aarch64-linux"
+
+[[sources]]
 name = "tar"
 path = "https://ftpmirror.gnu.org/gnu/tar/tar-1.35.tar.gz"
 includes = []
@@ -854,6 +910,14 @@ path = "https://ftpmirror.gnu.org/gnu/tar/tar-1.35.tar.gz"
 includes = []
 excludes = []
 digest = "f9bb5f39ed45b1c6a324470515d2ef73e74422c5f345503106d861576d3f02f3"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "terraform"
+path = "https://releases.hashicorp.com/terraform/1.13.1/terraform_1.13.1_linux_arm64.zip"
+includes = []
+excludes = []
+digest = "94e5c8f5364c28c86aa4e7b862b371273999931137beaee2278542e2a39ce9f9"
 platform = "aarch64-linux"
 
 [[sources]]
