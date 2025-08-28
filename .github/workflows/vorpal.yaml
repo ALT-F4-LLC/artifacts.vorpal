@@ -17,6 +17,11 @@ jobs:
           - ubuntu-latest
           - ubuntu-latest-arm64
     steps:
+      - if: contains(matrix.runner, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes bubblewrap
+
       - uses: actions/checkout@v5
 
       - uses: ALT-F4-LLC/setup-vorpal-action@main
@@ -50,6 +55,11 @@ jobs:
           - ubuntu-latest
           - ubuntu-latest-arm64
     steps:
+      - if: contains(matrix.runner, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes bubblewrap
+
       - uses: actions/checkout@v5
 
       - uses: ALT-F4-LLC/setup-vorpal-action@main
