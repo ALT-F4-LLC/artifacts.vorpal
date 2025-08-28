@@ -22,6 +22,21 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes bubblewrap
 
+          cat > bwrap << EOF
+          abi <abi/4.0>,
+          include <tunables/global>
+
+          profile bwrap /usr/bin/bwrap flags=(unconfined) {
+            userns,
+
+            # Site-specific additions and overrides. See local/README for details.
+            include if exists <local/bwrap>
+          }
+          EOF
+
+          sudo mv bwrap /etc/apparmor.d/bwrap
+          sudo systemctl restart apparmor.service
+
       - uses: actions/checkout@v5
 
       - uses: ALT-F4-LLC/setup-vorpal-action@main
@@ -59,6 +74,21 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --yes bubblewrap
+
+          cat > bwrap << EOF
+          abi <abi/4.0>,
+          include <tunables/global>
+
+          profile bwrap /usr/bin/bwrap flags=(unconfined) {
+            userns,
+
+            # Site-specific additions and overrides. See local/README for details.
+            include if exists <local/bwrap>
+          }
+          EOF
+
+          sudo mv bwrap /etc/apparmor.d/bwrap
+          sudo systemctl restart apparmor.service
 
       - uses: actions/checkout@v5
 
