@@ -45,7 +45,7 @@ impl DevEnvBuilder {
 
         // Artifact
 
-        devenv::DevenvBuilder::new(&self.name, self.systems)
+        devenv::DevEnvBuilder::new(&self.name, self.systems)
             .with_artifacts(vec![protoc, rust_toolchain.clone()])
             .with_environments(vec![
                 format!("PATH={}", rust_toolchain_bin),
