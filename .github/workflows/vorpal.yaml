@@ -49,10 +49,13 @@ jobs:
           - doppler
           - fd
           - lazygit
+          - libevent
+          - ncurses
           - nginx
           - ripgrep
           - starship
           - terraform
+          - tmux
         runner:
           - macos-latest
           - macos-latest-large

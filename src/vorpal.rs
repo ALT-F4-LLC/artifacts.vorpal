@@ -1,6 +1,9 @@
 use anyhow::Result;
 use vorpal_artifacts::{
-    artifact::{bat, bottom, direnv, doppler, fd, lazygit, nginx, ripgrep, starship, terraform},
+    artifact::{
+        bat, bottom, direnv, doppler, fd, lazygit, libevent, ncurses, nginx, ripgrep, starship,
+        terraform, tmux,
+    },
     DevEnvBuilder, DEFAULT_SYSTEMS,
 };
 use vorpal_sdk::context::get_context;
@@ -23,10 +26,13 @@ async fn main() -> Result<()> {
     doppler::build(context).await?;
     fd::build(context).await?;
     lazygit::build(context).await?;
+    libevent::build(context).await?;
+    ncurses::build(context).await?;
     nginx::build(context).await?;
     ripgrep::build(context).await?;
     starship::build(context).await?;
     terraform::build(context).await?;
+    tmux::build(context).await?;
 
     context.run().await
 }

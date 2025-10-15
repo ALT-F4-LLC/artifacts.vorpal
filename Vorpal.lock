@@ -425,6 +425,14 @@ digest = "754ecef628fe8e8f1978129ff1799d698a293bab3b518406f202da7ec1d1c663"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "libevent"
+path = "https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz"
+includes = []
+excludes = []
+digest = "22fdbe5a18db114046227ccde47cc8fbe11fa9ee2170b235f949275a161853ee"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "libidn2"
 path = "https://ftpmirror.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz"
 includes = []
@@ -567,6 +575,14 @@ includes = []
 excludes = []
 digest = "aab234a3b7a22e2632151fbe550cb36e371d3ee5318a633ee43af057f9f112fb"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "ncurses"
+path = "https://invisible-island.net/archives/ncurses/ncurses-6.5.tar.gz"
+includes = []
+excludes = []
+digest = "aab234a3b7a22e2632151fbe550cb36e371d3ee5318a633ee43af057f9f112fb"
+platform = "aarch64-darwin"
 
 [[sources]]
 name = "nginx"
@@ -951,6 +967,14 @@ includes = []
 excludes = []
 digest = "6e34604552af91db0b4ccf0bcceba63dd3073da2a492ebcf33c6e188a64d2b63"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "tmux"
+path = "https://github.com/tmux/tmux/releases/download/3.5a/tmux-3.5a.tar.gz"
+includes = []
+excludes = []
+digest = "70691bfbbe623d25d99561192dfb52211ca7e1fa120271c57ae56fe24ca97521"
+platform = "aarch64-darwin"
 
 [[sources]]
 name = "unzip"
