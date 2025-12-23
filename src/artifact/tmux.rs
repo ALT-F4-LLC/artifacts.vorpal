@@ -3,7 +3,7 @@ use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
     api::artifact::ArtifactSystem::{Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux},
-    artifact::{get_env_key, step, ArtifactBuilder, ArtifactSourceBuilder},
+    artifact::{get_env_key, step, Artifact, ArtifactSource},
     context::ConfigContext,
 };
 
@@ -17,7 +17,7 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
     let path =
         format!("https://github.com/tmux/tmux/releases/download/{version}/tmux-{version}.tar.gz");
 
-    let source = ArtifactSourceBuilder::new(name, &path).build();
+    let source = ArtifactSource::new(name, &path).build();
 
     let script = formatdoc! {"
         mkdir -pv \"$VORPAL_OUTPUT\"
@@ -39,7 +39,7 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
 
     let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 
-    ArtifactBuilder::new(name, steps, systems)
+    Artifact::new(name, steps, systems)
         .with_aliases(vec![format!("{name}:{version}")])
         .with_sources(vec![source])
         .build(context)

@@ -4,7 +4,7 @@ use vorpal_sdk::{
         ArtifactSystem,
         ArtifactSystem::{Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux},
     },
-    artifact::{devenv, get_env_key, protoc, rust_toolchain},
+    artifact::{get_env_key, protoc, rust_toolchain},
     context::ConfigContext,
 };
 
@@ -13,14 +13,14 @@ pub mod artifact;
 pub const DEFAULT_SYSTEMS: [ArtifactSystem; 4] =
     [Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 
-pub struct DevEnvBuilder {
+pub struct ProjectEnvironment {
     name: String,
     systems: Vec<ArtifactSystem>,
 }
 
-impl DevEnvBuilder {
+impl ProjectEnvironment {
     pub fn new(name: &str, systems: Vec<ArtifactSystem>) -> Self {
-        DevEnvBuilder {
+        ProjectEnvironment {
             name: name.to_string(),
             systems,
         }
@@ -45,7 +45,7 @@ impl DevEnvBuilder {
 
         // Artifact
 
-        devenv::DevEnvBuilder::new(&self.name, self.systems)
+        vorpal_sdk::artifact::ProjectEnvironment::new(&self.name, self.systems)
             .with_artifacts(vec![protoc, rust_toolchain.clone()])
             .with_environments(vec![
                 format!("PATH={}", rust_toolchain_bin),

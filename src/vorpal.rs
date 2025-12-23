@@ -4,7 +4,7 @@ use vorpal_artifacts::{
         bat, bottom, direnv, doppler, fd, lazygit, libevent, ncurses, nginx, ripgrep, starship,
         terraform, tmux,
     },
-    DevEnvBuilder, DEFAULT_SYSTEMS,
+    ProjectEnvironment, DEFAULT_SYSTEMS,
 };
 use vorpal_sdk::context::get_context;
 
@@ -14,7 +14,7 @@ async fn main() -> Result<()> {
 
     // Development Environment
 
-    DevEnvBuilder::new("dev", DEFAULT_SYSTEMS.to_vec())
+    ProjectEnvironment::new("dev", DEFAULT_SYSTEMS.to_vec())
         .build(context)
         .await?;
 

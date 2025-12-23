@@ -2,7 +2,7 @@ use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
     api::artifact::ArtifactSystem::{Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux},
-    artifact::{step, ArtifactBuilder, ArtifactSourceBuilder},
+    artifact::{step, Artifact, ArtifactSource},
     context::ConfigContext,
 };
 
@@ -20,7 +20,7 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
 
     let source_path = format!("https://github.com/direnv/direnv/releases/download/{source_version}/direnv.{source_system}");
 
-    let source = ArtifactSourceBuilder::new(name, &source_path).build();
+    let source = ArtifactSource::new(name, &source_path).build();
 
     let step_script = formatdoc! {"
         mkdir -pv \"$VORPAL_OUTPUT/bin\"
@@ -33,7 +33,7 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
 
     let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 
-    ArtifactBuilder::new(name, steps, systems)
+    Artifact::new(name, steps, systems)
         .with_aliases(vec![format!("{name}:{source_version}")])
         .with_sources(vec![source])
         .build(context)
