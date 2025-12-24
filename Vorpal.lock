@@ -697,6 +697,22 @@ digest = "35764d85e27eac8e8c9eebfe6c5a593224ef63fdd1f2ea0916bf8b4d2335acc0"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "openapi-generator-cli"
+path = "https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/7.18.0/openapi-generator-cli-7.18.0.jar"
+includes = []
+excludes = []
+digest = "1b456d6486772837afb3419ea13ed20a91567b85b5ef1771bba4d8b3ab7c530c"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "openjdk"
+path = "https://download.java.net/java/GA/jdk25.0.1/2fbf10d8c78e40bd87641c434705079d/8/GPL/openjdk-25.0.1_macos-aarch64_bin.tar.gz"
+includes = []
+excludes = []
+digest = "af75905894be8d3cc29e9494a352f60fcdaa62b1993281619061a5097eaf6d7b"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "openssl"
 path = "https://www.openssl.org/source/openssl-3.5.2.tar.gz"
 includes = []

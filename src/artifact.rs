@@ -9,6 +9,8 @@ pub mod lazygit;
 pub mod libevent;
 pub mod ncurses;
 pub mod nginx;
+pub mod openapi_generator_cli;
+pub mod openjdk;
 pub mod ripgrep;
 pub mod starship;
 pub mod terraform;

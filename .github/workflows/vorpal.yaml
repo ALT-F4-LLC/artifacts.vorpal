@@ -53,6 +53,8 @@ jobs:
           - libevent
           - ncurses
           - nginx
+          - openapi-generator-cli
+          - openjdk
           - ripgrep
           - starship
           - terraform
