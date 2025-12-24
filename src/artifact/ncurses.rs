@@ -8,9 +8,9 @@ use vorpal_sdk::{
 
 pub async fn build(context: &mut ConfigContext) -> Result<String> {
     let name = "ncurses";
-    let version = "6.5";
+    let version = "6.5-20250809";
 
-    let path = format!("https://invisible-island.net/archives/ncurses/ncurses-{version}.tar.gz");
+    let path = format!("https://invisible-mirror.net/archives/ncurses/current/ncurses-{version}.tgz");
     let source = ArtifactSource::new(name, &path).build();
 
     let step_script = formatdoc! {"
