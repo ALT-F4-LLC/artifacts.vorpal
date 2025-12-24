@@ -19,6 +19,8 @@ pub async fn build(context: &mut ConfigContext, openjdk: String) -> Result<Strin
     let env_openjdk = get_env_key(&openjdk);
 
     let step_script = formatdoc! {"
+        mkdir -p \"$VORPAL_OUTPUT/bin\"
+
         pushd ./source/{name}
 
         cp META-INF/MANIFEST.MF ../MANIFEST.MF
@@ -27,14 +29,14 @@ pub async fn build(context: &mut ConfigContext, openjdk: String) -> Result<Strin
 
         mv -v ../openapi-generator-cli.jar \"$VORPAL_OUTPUT/openapi-generator-cli.jar\"
 
-        cat << 'EOF' > \"$VORPAL_OUTPUT/openapi-generator-cli\"
+        cat << 'EOF' > \"$VORPAL_OUTPUT/bin/openapi-generator-cli\"
         #!/bin/sh
         JAVA_HOME={env_openjdk}/Contents/Home
         PATH=$JAVA_HOME/bin:$PATH
         java -jar \"$VORPAL_OUTPUT/openapi-generator-cli.jar\" \"$@\"
         EOF
 
-        chmod +x \"$VORPAL_OUTPUT/openapi-generator-cli\""
+        chmod +x \"$VORPAL_OUTPUT/bin/openapi-generator-cli\""
     };
 
     let environments = [
