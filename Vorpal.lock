@@ -210,6 +210,14 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "direnv"
+path = "https://github.com/direnv/direnv/releases/download/v2.37.1/direnv.linux-arm64"
+includes = []
+excludes = []
+digest = "0f9955b53d1017d2f64fa78943b48ab0d4e50b39f8aa3838b7e4b1ea2e6d121c"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "direnv"
 path = "https://github.com/direnv/direnv/releases/download/v2.37.1/direnv.darwin-arm64"
 includes = []
 excludes = []
@@ -433,6 +441,14 @@ digest = "22fdbe5a18db114046227ccde47cc8fbe11fa9ee2170b235f949275a161853ee"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "libevent"
+path = "https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz"
+includes = []
+excludes = []
+digest = "22fdbe5a18db114046227ccde47cc8fbe11fa9ee2170b235f949275a161853ee"
+platform = "aarch64-linux"
+
+[[sources]]
 name = "libidn2"
 path = "https://ftpmirror.gnu.org/gnu/libidn/libidn2-2.3.8.tar.gz"
 includes = []
@@ -618,10 +634,10 @@ platform = "aarch64-linux"
 
 [[sources]]
 name = "openssl"
-path = "https://www.openssl.org/source/openssl-3.3.1.tar.gz"
+path = "https://www.openssl.org/source/openssl-3.5.2.tar.gz"
 includes = []
 excludes = []
-digest = "a53e2254e36124452582477935a680f07f9884fe1d6e9ec03c28ac71b750d84a"
+digest = "c18db5dccbd9ee71d1454dbf275b508c1fa452b133f0e8e9812d6f8135c29362"
 platform = "aarch64-linux"
 
 [[sources]]
@@ -642,10 +658,10 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "patch"
-path = "https://ftpmirror.gnu.org/gnu/patch/patch-2.7.6.tar.gz"
+path = "https://ftpmirror.gnu.org/gnu/patch/patch-2.8.tar.gz"
 includes = []
 excludes = []
-digest = "af8c281a05a6802075799c0c179e5fb3a218be6a21b726d8b672cd0f4c37eae9"
+digest = "a003cf376248ecf2dc3edbce55f672f7677ff95ef94dd7ce6fdcef8353ecde7c"
 platform = "aarch64-linux"
 
 [[sources]]
@@ -658,10 +674,10 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "perl"
-path = "https://www.cpan.org/src/5.0/perl-5.40.0.tar.xz"
+path = "https://www.cpan.org/src/5.0/perl-5.42.0.tar.xz"
 includes = []
 excludes = []
-digest = "59b6437a3da1d9de0126135b31f1f16aee9c3b7a0f61f6364b2da3e8bb5f771f"
+digest = "43a6f8cf15fcedeb66e95c4957ec8bc43db40515de89483e507c01c255fce853"
 platform = "aarch64-linux"
 
 [[sources]]
@@ -706,10 +722,10 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "python"
-path = "https://www.python.org/ftp/python/3.12.5/Python-3.12.5.tar.xz"
+path = "https://www.python.org/ftp/python/3.13.7/Python-3.13.7.tar.xz"
 includes = []
 excludes = []
-digest = "8359773924d33702ecd6f9fab01973e53d929d46d7cdc4b0df31eb1282c68b67"
+digest = "2118e11e9ee7b73a88e2fb7c9122455c314660de29beb4d4f15af2d21e15ec42"
 platform = "aarch64-linux"
 
 [[sources]]
@@ -962,10 +978,10 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "texinfo"
-path = "https://ftpmirror.gnu.org/gnu/texinfo/texinfo-7.1.1.tar.gz"
+path = "https://ftpmirror.gnu.org/gnu/texinfo/texinfo-7.2.tar.gz"
 includes = []
 excludes = []
-digest = "6e34604552af91db0b4ccf0bcceba63dd3073da2a492ebcf33c6e188a64d2b63"
+digest = "6bc4aa1be570367196b2488d4783f02dae702822db9d2aa9e5d650339e0f770e"
 platform = "aarch64-linux"
 
 [[sources]]
@@ -975,6 +991,14 @@ includes = []
 excludes = []
 digest = "70691bfbbe623d25d99561192dfb52211ca7e1fa120271c57ae56fe24ca97521"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "tmux"
+path = "https://github.com/tmux/tmux/releases/download/3.5a/tmux-3.5a.tar.gz"
+includes = []
+excludes = []
+digest = "70691bfbbe623d25d99561192dfb52211ca7e1fa120271c57ae56fe24ca97521"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "unzip"
@@ -1002,7 +1026,7 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "unzip-patch-fixes"
-path = "https://www.linuxfromscratch.org/patches/blfs/12.2/unzip-6.0-consolidated_fixes-1.patch"
+path = "https://www.linuxfromscratch.org/patches/downloads/unzip/unzip-6.0-consolidated_fixes-1.patch"
 includes = []
 excludes = []
 digest = "11350935be5bbb743f1a97ec069b78fc2904f92b24abbc7fb3d7f0ff8bb889ea"
@@ -1018,7 +1042,7 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "unzip-patch-gcc14"
-path = "https://www.linuxfromscratch.org/patches/blfs/12.2/unzip-6.0-gcc14-1.patch"
+path = "https://www.linuxfromscratch.org/patches/downloads/unzip/unzip-6.0-gcc14-1.patch"
 includes = []
 excludes = []
 digest = "d6ac941672086ea4c8d5047d550b40047825a685cc7c48626d2f0939e1a0c797"
@@ -1034,10 +1058,10 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "util-linux"
-path = "https://www.kernel.org/pub/linux/utils/util-linux/v2.40/util-linux-2.40.2.tar.xz"
+path = "https://www.kernel.org/pub/linux/utils/util-linux/v2.41/util-linux-2.41.1.tar.xz"
 includes = []
 excludes = []
-digest = "7db19a1819ac5c743b52887a4571e42325b2bfded63d93b6a1797ae2b1f8019a"
+digest = "1f10bfbd4ac7b3e8058fe837b0ed9274d2b3f603dc2d7cbc3d325dc612b06aaa"
 platform = "aarch64-linux"
 
 [[sources]]
@@ -1050,10 +1074,10 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "xz"
-path = "https://github.com/tukaani-project/xz/releases/download/v5.6.2/xz-5.6.2.tar.xz"
+path = "https://github.com/tukaani-project/xz/releases/download/v5.8.1/xz-5.8.1.tar.xz"
 includes = []
 excludes = []
-digest = "7a02b1278ed9a59b332657d613c5549b39afe34e315197f4da95c5322524ec26"
+digest = "24827cfbd8504ed6499a08262caf7d4c4584a5ee2505843526f0f020daf9ab93"
 platform = "aarch64-linux"
 
 [[sources]]
