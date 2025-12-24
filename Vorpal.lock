@@ -33,6 +33,14 @@ digest = "3abca7df1be4d52ef37ccd22f0b01da87f149f4ca1f74633d53deba87d98b078"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "bat"
+path = "https://github.com/sharkdp/bat/releases/download/v0.25.0/bat-v0.25.0-x86_64-unknown-linux-musl.tar.gz"
+includes = []
+excludes = []
+digest = "3ed3a7e93b208399749a2b4b55318f39a8376922173a8af75cfba26890adfc48"
+platform = "x86_64-linux"
+
+[[sources]]
 name = "binutils"
 path = "https://ftpmirror.gnu.org/gnu/binutils/binutils-2.45.tar.gz"
 includes = []
@@ -63,6 +71,14 @@ includes = []
 excludes = []
 digest = "cb18c2c8562fc01bf3ae17ffe9cf8274e3dd49d39f89397c1a8bac7ee14ce85f"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "bottom"
+path = "https://github.com/ClementTsang/bottom/releases/download/0.11.1/bottom_x86_64-unknown-linux-musl.tar.gz"
+includes = []
+excludes = []
+digest = "21dff7913b3ac0da4e7c8f0381f54fb56ec9c9046b8d92dc181e7e9aa9410b21"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "bottom"
@@ -218,11 +234,27 @@ platform = "aarch64-linux"
 
 [[sources]]
 name = "direnv"
+path = "https://github.com/direnv/direnv/releases/download/v2.37.1/direnv.linux-amd64"
+includes = []
+excludes = []
+digest = "7a2107aa88782cc841a4fb65ec5ba43d2bdcde400337d87cdd930b3dd35b66b1"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "direnv"
 path = "https://github.com/direnv/direnv/releases/download/v2.37.1/direnv.darwin-arm64"
 includes = []
 excludes = []
 digest = "8204ab746effc28aa1dd329c50b585e86ff322607f255bea09e2bd654b4fcdb8"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "doppler"
+path = "https://github.com/DopplerHQ/cli/releases/download/3.75.1/doppler_3.75.1_linux_amd64.tar.gz"
+includes = []
+excludes = []
+digest = "74c431039e5395ef554a718efb927e237cc732c11b9f7b87821f6b92ef37a6b7"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "doppler"
@@ -255,6 +287,14 @@ includes = []
 excludes = []
 digest = "fb1c351d076c7ed9e68ba63ed4647af730c4ee277f283c82fe3a84d784829ded"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "fd"
+path = "https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-x86_64-unknown-linux-musl.tar.gz"
+includes = []
+excludes = []
+digest = "fdaa40fadd825cb5a895baee0b353e569006fef98dae2c84190e53c1775ed88f"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "file"
@@ -433,6 +473,14 @@ digest = "754ecef628fe8e8f1978129ff1799d698a293bab3b518406f202da7ec1d1c663"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "lazygit"
+path = "https://github.com/jesseduffield/lazygit/releases/download/v0.44.1/lazygit_0.44.1_Linux_x86_64.tar.gz"
+includes = []
+excludes = []
+digest = "a96d8b341ccf9fe456c43ae04ecbc08a885f344d6f1ea5e6b805de3cb0ba8b53"
+platform = "x86_64-linux"
+
+[[sources]]
 name = "libevent"
 path = "https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz"
 includes = []
@@ -447,6 +495,14 @@ includes = []
 excludes = []
 digest = "22fdbe5a18db114046227ccde47cc8fbe11fa9ee2170b235f949275a161853ee"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "libevent"
+path = "https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz"
+includes = []
+excludes = []
+digest = "22fdbe5a18db114046227ccde47cc8fbe11fa9ee2170b235f949275a161853ee"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "libidn2"
@@ -590,7 +646,7 @@ path = "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.5-202508
 includes = []
 excludes = []
 digest = "e67077219f4e56cc6cc56958104a9271871ef65ef7985081aced1fd5024f9f47"
-platform = "aarch64-linux"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "ncurses"
@@ -598,7 +654,7 @@ path = "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.5-202508
 includes = []
 excludes = []
 digest = "e67077219f4e56cc6cc56958104a9271871ef65ef7985081aced1fd5024f9f47"
-platform = "x86_64-linux"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "nginx"
@@ -727,6 +783,14 @@ includes = []
 excludes = []
 digest = "2118e11e9ee7b73a88e2fb7c9122455c314660de29beb4d4f15af2d21e15ec42"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "ripgrep"
+path = "https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep-14.1.1-x86_64-unknown-linux-musl.tar.gz"
+includes = []
+excludes = []
+digest = "57d61ac3324ba6486b798c8e9dfbab9835a595a8d4ace6342886a20b50fde13a"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "ripgrep"
@@ -930,6 +994,14 @@ platform = "aarch64-darwin"
 
 [[sources]]
 name = "starship"
+path = "https://github.com/starship/starship/releases/download/v1.21.1/starship-x86_64-unknown-linux-musl.tar.gz"
+includes = []
+excludes = []
+digest = "c1de2c33b37d6d72bf65e4416e050fec3ca952bf472a835ca178526ed9a79c2f"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "starship"
 path = "https://github.com/starship/starship/releases/download/v1.21.1/starship-aarch64-unknown-linux-musl.tar.gz"
 includes = []
 excludes = []
@@ -969,6 +1041,14 @@ digest = "a67245b7b54156f38f6df535e4bdf0154195f1a47a0a0bf692d4f80f260d200b"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "terraform"
+path = "https://releases.hashicorp.com/terraform/1.13.1/terraform_1.13.1_linux_amd64.zip"
+includes = []
+excludes = []
+digest = "b4a4bd942ba8007adc5261c7611dca53cc5b5e10f9bbb334a6ec8b1645f13bd0"
+platform = "x86_64-linux"
+
+[[sources]]
 name = "texinfo"
 path = "https://ftpmirror.gnu.org/gnu/texinfo/texinfo-7.2.tar.gz"
 includes = []
@@ -999,6 +1079,14 @@ includes = []
 excludes = []
 digest = "70691bfbbe623d25d99561192dfb52211ca7e1fa120271c57ae56fe24ca97521"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "tmux"
+path = "https://github.com/tmux/tmux/releases/download/3.5a/tmux-3.5a.tar.gz"
+includes = []
+excludes = []
+digest = "70691bfbbe623d25d99561192dfb52211ca7e1fa120271c57ae56fe24ca97521"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "unzip"
