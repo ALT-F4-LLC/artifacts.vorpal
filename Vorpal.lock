@@ -177,6 +177,14 @@ digest = "a7abdad032ae6c318dbb4c9b444d9031ab34d1308700005c4bd5eb5156cad523"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "cue"
+path = "https://github.com/cue-lang/cue/releases/download/v0.15.1/cue_v0.15.1_darwin_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "b22048682013f1d2e1e3fe2ecadf6fb4c1c87232283d18f07d8e148b3791d68e"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "curl"
 path = "https://curl.se/download/curl-8.15.0.tar.xz"
 includes = []

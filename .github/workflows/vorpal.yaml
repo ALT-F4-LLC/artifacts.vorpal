@@ -45,6 +45,7 @@ jobs:
         artifact:
           - bat
           - bottom
+          - cue
           - direnv
           - doppler
           - fd
