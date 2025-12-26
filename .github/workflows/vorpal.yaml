@@ -17,7 +17,7 @@ jobs:
           - ubuntu-latest
           - ubuntu-latest-arm64
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: ALT-F4-LLC/setup-vorpal-action@main
         with:
@@ -67,7 +67,7 @@ jobs:
           - ubuntu-latest
           - ubuntu-latest-arm64
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: ALT-F4-LLC/setup-vorpal-action@main
         with:
