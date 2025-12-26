@@ -23,9 +23,13 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
     );
 
     let source = ArtifactSource::new(name, &source_path).build();
+    let source_affix = match context.get_system() {
+        Aarch64Darwin | X8664Darwin => ".jdk",
+        _ => "",
+    };
 
     let step_script = formatdoc! {"
-        pushd ./source/{name}/jdk-{source_version}.jdk
+        pushd ./source/{name}/jdk-{source_version}{source_affix}
         cp -Rv * \"$VORPAL_OUTPUT/.\""
     };
 
