@@ -5,6 +5,7 @@ pub mod direnv;
 pub mod doppler;
 pub mod fd;
 pub mod file;
+pub mod golangci_lint;
 pub mod just;
 pub mod lazygit;
 pub mod libevent;

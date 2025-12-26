@@ -49,6 +49,7 @@ jobs:
           - direnv
           - doppler
           - fd
+          - golangci-lint
           - just
           - lazygit
           - libevent

@@ -433,6 +433,14 @@ digest = "191226cef6e9ce60e291e178db47682aadea28cb3e92f35f006ba317f3e10195"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "golangci-lint"
+path = "https://github.com/golangci/golangci-lint/releases/download/v2.7.2/golangci-lint-2.7.2-darwin-arm64.tar.gz"
+includes = []
+excludes = []
+digest = "5b7e0183ef994ccb5449df34a9c6d119ded02b840f1961cedc03e169c1d53239"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "grep"
 path = "https://ftpmirror.gnu.org/gnu/grep/grep-3.12.tar.gz"
 includes = []
