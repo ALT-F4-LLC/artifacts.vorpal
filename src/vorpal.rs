@@ -1,7 +1,7 @@
 use anyhow::Result;
 use vorpal_artifacts::{
     artifact::{
-        bat, bottom, cue, direnv, doppler, fd, lazygit, libevent, ncurses, nginx,
+        bat, bottom, cue, direnv, doppler, fd, just, lazygit, libevent, ncurses, nginx,
         openapi_generator_cli, openjdk, ripgrep, starship, terraform, tmux,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
@@ -28,6 +28,7 @@ async fn main() -> Result<()> {
     direnv::build(context).await?;
     doppler::build(context).await?;
     fd::build(context).await?;
+    just::build(context).await?;
     lazygit::build(context).await?;
     libevent::build(context).await?;
     ncurses::build(context).await?;
