@@ -178,6 +178,14 @@ platform = "aarch64-linux"
 
 [[sources]]
 name = "cue"
+path = "https://github.com/cue-lang/cue/releases/download/v0.15.1/cue_v0.15.1_linux_amd64.tar.gz"
+includes = []
+excludes = []
+digest = "2bc26da522822b50fe3cfbba1cd035e8fa03fb0b6205710f197ae4101f1a602e"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "cue"
 path = "https://github.com/cue-lang/cue/releases/download/v0.15.1/cue_v0.15.1_darwin_arm64.tar.gz"
 includes = []
 excludes = []
@@ -441,6 +449,14 @@ digest = "5b7e0183ef994ccb5449df34a9c6d119ded02b840f1961cedc03e169c1d53239"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "golangci-lint"
+path = "https://github.com/golangci/golangci-lint/releases/download/v2.7.2/golangci-lint-2.7.2-linux-amd64.tar.gz"
+includes = []
+excludes = []
+digest = "b701d9c54e242620de6013a0ca00f9a2efa9b3e07807363519385f45da44fb97"
+platform = "x86_64-linux"
+
+[[sources]]
 name = "grep"
 path = "https://ftpmirror.gnu.org/gnu/grep/grep-3.12.tar.gz"
 includes = []
@@ -470,6 +486,14 @@ path = "https://ftpmirror.gnu.org/gnu/gzip/gzip-1.14.tar.gz"
 includes = []
 excludes = []
 digest = "82c708cb0f1ae98c1bcd38edb744ece2cc13cbbd65379a11ff030f86a140ce3d"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "just"
+path = "https://github.com/casey/just/releases/download/1.45.0/just-1.45.0-x86_64-unknown-linux-musl.tar.gz"
+includes = []
+excludes = []
+digest = "52cf02b0cae7ca331c7ae345e233a216cf1e9d2ac2cfe17e00895ca3715a21af"
 platform = "x86_64-linux"
 
 [[sources]]
@@ -719,6 +743,22 @@ includes = []
 excludes = []
 digest = "1b456d6486772837afb3419ea13ed20a91567b85b5ef1771bba4d8b3ab7c530c"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "openapi-generator-cli"
+path = "https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/7.18.0/openapi-generator-cli-7.18.0.jar"
+includes = []
+excludes = []
+digest = "1b456d6486772837afb3419ea13ed20a91567b85b5ef1771bba4d8b3ab7c530c"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "openjdk"
+path = "https://download.java.net/java/GA/jdk25.0.1/2fbf10d8c78e40bd87641c434705079d/8/GPL/openjdk-25.0.1_linux-x64_bin.tar.gz"
+includes = []
+excludes = []
+digest = "44e3ba14d14663e83d28194c409bf8e27cb7597fdb14aa26c155b6ba9c69ee4d"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "openjdk"
