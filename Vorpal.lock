@@ -1,6 +1,14 @@
 lockfile = 1
 
 [[sources]]
+name = "argocd"
+path = "https://github.com/argoproj/argo-cd/releases/download/v3.2.3/argocd-darwin-arm64"
+includes = []
+excludes = []
+digest = "bd4b2683005fe932123093d357e8bb2c38048e0371cd27156ebb8a83de8a9bd5"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "bash"
 path = "https://ftpmirror.gnu.org/gnu/bash/bash-5.3.tar.gz"
 includes = []
@@ -345,6 +353,14 @@ digest = "242f804d87a5036bb0fab99966227dc61e853e5a67e1b10c3cc45681c792657e"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "fluxcd"
+path = "https://github.com/fluxcd/flux2/releases/download/v2.7.5/flux_2.7.5_darwin_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "ecedc4b5837e842153c6f8b1723b39481a847c980d8c79f80a50d15d29cc30d2"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "gawk"
 path = "https://ftpmirror.gnu.org/gnu/gawk/gawk-5.3.2.tar.gz"
 includes = []
@@ -489,6 +505,14 @@ digest = "82c708cb0f1ae98c1bcd38edb744ece2cc13cbbd65379a11ff030f86a140ce3d"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "helm"
+path = "https://get.helm.sh/helm-v4.0.4-darwin-arm64.tar.gz"
+includes = []
+excludes = []
+digest = "17b33b5b816e1353b1b4d9071b1306960e5670e430fa5df4b4ea57f7100f85f4"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "just"
 path = "https://github.com/casey/just/releases/download/1.45.0/just-1.45.0-x86_64-unknown-linux-musl.tar.gz"
 includes = []
@@ -502,6 +526,22 @@ path = "https://github.com/casey/just/releases/download/1.45.0/just-1.45.0-aarch
 includes = []
 excludes = []
 digest = "8f34d86872a3a379ca58b96f1d5c2cf06076212fc8c1f8e4edbc794c523f4f49"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "kn"
+path = "https://github.com/knative/client/releases/download/knative-v1.20.0/kn-darwin-arm64"
+includes = []
+excludes = []
+digest = "c5cca3e1326e263a50278407fb8688f8cb677bcd65a49d3ad6b6721cbf9d1ae5"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "kubeseal"
+path = "https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.34.0/kubeseal-0.34.0-darwin-arm64.tar.gz"
+includes = []
+excludes = []
+digest = "5e29215d8bc7eb4713d6cb7c609bd8d0a4c8c2648b009492ea59135569359a77"
 platform = "aarch64-darwin"
 
 [[sources]]
@@ -1247,6 +1287,14 @@ includes = []
 excludes = []
 digest = "24827cfbd8504ed6499a08262caf7d4c4584a5ee2505843526f0f020daf9ab93"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "yq"
+path = "https://github.com/mikefarah/yq/releases/download/v4.50.1/yq_darwin_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "912df91581dee3a047324b107a08977d1d51a55b099a6690dc832c6fc7eac100"
+platform = "aarch64-darwin"
 
 [[sources]]
 name = "zlib"
