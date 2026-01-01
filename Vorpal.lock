@@ -9,6 +9,14 @@ digest = "bd4b2683005fe932123093d357e8bb2c38048e0371cd27156ebb8a83de8a9bd5"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "argocd"
+path = "https://github.com/argoproj/argo-cd/releases/download/v3.2.3/argocd-linux-amd64"
+includes = []
+excludes = []
+digest = "fd3e8c5a2e3ea125133dcdd8cd24208ea3a9f17156e89def83449ef655295f54"
+platform = "x86_64-linux"
+
+[[sources]]
 name = "bash"
 path = "https://ftpmirror.gnu.org/gnu/bash/bash-5.3.tar.gz"
 includes = []
@@ -361,6 +369,14 @@ digest = "ecedc4b5837e842153c6f8b1723b39481a847c980d8c79f80a50d15d29cc30d2"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "fluxcd"
+path = "https://github.com/fluxcd/flux2/releases/download/v2.7.5/flux_2.7.5_linux_amd64.tar.gz"
+includes = []
+excludes = []
+digest = "f3e1e375e03e68a70f1ca70fe30977a65ebb9778f11748d668e8457a9d329053"
+platform = "x86_64-linux"
+
+[[sources]]
 name = "gawk"
 path = "https://ftpmirror.gnu.org/gnu/gawk/gawk-5.3.2.tar.gz"
 includes = []
@@ -415,6 +431,14 @@ includes = []
 excludes = []
 digest = "c7811ed4fe8c1c5afcecea15929178c33dcef4fa885086df96cb558cd9466f29"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "git"
+path = "https://www.kernel.org/pub/software/scm/git/git-2.52.0.tar.gz"
+includes = []
+excludes = []
+digest = "c7811ed4fe8c1c5afcecea15929178c33dcef4fa885086df96cb558cd9466f29"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "glibc"
@@ -521,6 +545,14 @@ digest = "17b33b5b816e1353b1b4d9071b1306960e5670e430fa5df4b4ea57f7100f85f4"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "helm"
+path = "https://get.helm.sh/helm-v4.0.4-linux-amd64.tar.gz"
+includes = []
+excludes = []
+digest = "1ea0d7ec3aa3ba0671ffc52ed88dc2676766d823f0930921802045af1eb78c05"
+platform = "x86_64-linux"
+
+[[sources]]
 name = "just"
 path = "https://github.com/casey/just/releases/download/1.45.0/just-1.45.0-x86_64-unknown-linux-musl.tar.gz"
 includes = []
@@ -543,6 +575,22 @@ includes = []
 excludes = []
 digest = "c5cca3e1326e263a50278407fb8688f8cb677bcd65a49d3ad6b6721cbf9d1ae5"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "kn"
+path = "https://github.com/knative/client/releases/download/knative-v1.20.0/kn-linux-amd64"
+includes = []
+excludes = []
+digest = "f2b898cc8ab8ee92fbdd423f4dd32cc0f4c94757dba5decccda2941401b0e976"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "kubeseal"
+path = "https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.34.0/kubeseal-0.34.0-linux-amd64.tar.gz"
+includes = []
+excludes = []
+digest = "1090807578d6f784e8e790dd730d7cdb683e34f285c253244affc0b1f38f7b8d"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "kubeseal"
@@ -1295,6 +1343,14 @@ includes = []
 excludes = []
 digest = "24827cfbd8504ed6499a08262caf7d4c4584a5ee2505843526f0f020daf9ab93"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "yq"
+path = "https://github.com/mikefarah/yq/releases/download/v4.50.1/yq_linux_amd64.tar.gz"
+includes = []
+excludes = []
+digest = "72cb8d9181ec9c8e5819df6ac70751fd2cd06cb54d7625bc5f670bd32e0dd42f"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "yq"
