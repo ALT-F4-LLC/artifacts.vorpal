@@ -10,6 +10,14 @@ platform = "x86_64-darwin"
 
 [[sources]]
 name = "argocd"
+path = "https://github.com/argoproj/argo-cd/releases/download/v3.2.3/argocd-linux-arm64"
+includes = []
+excludes = []
+digest = "62e67821d0a32b3d22b7a8efb821ab068e6eb2e1202cc81448ec0fffb8a0e775"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "argocd"
 path = "https://github.com/argoproj/argo-cd/releases/download/v3.2.3/argocd-darwin-arm64"
 includes = []
 excludes = []
@@ -234,6 +242,14 @@ platform = "x86_64-darwin"
 
 [[sources]]
 name = "cue"
+path = "https://github.com/cue-lang/cue/releases/download/v0.15.1/cue_v0.15.1_linux_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "6cf9a17adc98198f721a514c131b297fbd904e4003a4e446dc49cdb336ccd571"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "cue"
 path = "https://github.com/cue-lang/cue/releases/download/v0.15.1/cue_v0.15.1_darwin_arm64.tar.gz"
 includes = []
 excludes = []
@@ -426,6 +442,14 @@ platform = "x86_64-darwin"
 
 [[sources]]
 name = "fluxcd"
+path = "https://github.com/fluxcd/flux2/releases/download/v2.7.5/flux_2.7.5_linux_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "9f1fa13565b6a7ced7ca3bfc5f5d4799c9d15e59b87aad4aa9318b11ce4f0608"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "fluxcd"
 path = "https://github.com/fluxcd/flux2/releases/download/v2.7.5/flux_2.7.5_darwin_arm64.tar.gz"
 includes = []
 excludes = []
@@ -570,6 +594,14 @@ platform = "aarch64-darwin"
 
 [[sources]]
 name = "golangci-lint"
+path = "https://github.com/golangci/golangci-lint/releases/download/v2.7.2/golangci-lint-2.7.2-linux-arm64.tar.gz"
+includes = []
+excludes = []
+digest = "636fd76202a8ba2d6fcaab99bb4a3c8ddcdcd6ea8ab4bd47000a2ac1a3922413"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "golangci-lint"
 path = "https://github.com/golangci/golangci-lint/releases/download/v2.7.2/golangci-lint-2.7.2-linux-amd64.tar.gz"
 includes = []
 excludes = []
@@ -610,6 +642,14 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "helm"
+path = "https://get.helm.sh/helm-v4.0.4-linux-arm64.tar.gz"
+includes = []
+excludes = []
+digest = "0ac4e0c87f93fcd2aafe9c16e55a294b80dc2fcd1e49162f86f9a436f5452779"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "helm"
 path = "https://get.helm.sh/helm-v4.0.4-darwin-arm64.tar.gz"
 includes = []
 excludes = []
@@ -642,6 +682,14 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "just"
+path = "https://github.com/casey/just/releases/download/1.45.0/just-1.45.0-aarch64-unknown-linux-musl.tar.gz"
+includes = []
+excludes = []
+digest = "52f7c625632197fe658fa5a6cd8fd4743efb2009618c9756c91914ca12a8a67b"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "just"
 path = "https://github.com/casey/just/releases/download/1.45.0/just-1.45.0-x86_64-apple-darwin.tar.gz"
 includes = []
 excludes = []
@@ -655,6 +703,14 @@ includes = []
 excludes = []
 digest = "8f34d86872a3a379ca58b96f1d5c2cf06076212fc8c1f8e4edbc794c523f4f49"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "kn"
+path = "https://github.com/knative/client/releases/download/knative-v1.20.0/kn-linux-arm64"
+includes = []
+excludes = []
+digest = "29542b176a88fa67967a69052fde28c067f635f1ed5d4a437ea2dac9e5dc41b3"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "kn"
@@ -679,6 +735,14 @@ includes = []
 excludes = []
 digest = "f2b898cc8ab8ee92fbdd423f4dd32cc0f4c94757dba5decccda2941401b0e976"
 platform = "x86_64-linux"
+
+[[sources]]
+name = "kubeseal"
+path = "https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.34.0/kubeseal-0.34.0-linux-arm64.tar.gz"
+includes = []
+excludes = []
+digest = "0284edc86e4d0d5f5a5d15f439eef4abbf7adb7d5d98fceecd93d6eb49af2f08"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "kubeseal"
@@ -985,6 +1049,14 @@ digest = "1b456d6486772837afb3419ea13ed20a91567b85b5ef1771bba4d8b3ab7c530c"
 platform = "x86_64-darwin"
 
 [[sources]]
+name = "openapi-generator-cli"
+path = "https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/7.18.0/openapi-generator-cli-7.18.0.jar"
+includes = []
+excludes = []
+digest = "1b456d6486772837afb3419ea13ed20a91567b85b5ef1771bba4d8b3ab7c530c"
+platform = "aarch64-linux"
+
+[[sources]]
 name = "openjdk"
 path = "https://download.java.net/java/GA/jdk25.0.1/2fbf10d8c78e40bd87641c434705079d/8/GPL/openjdk-25.0.1_macos-x64_bin.tar.gz"
 includes = []
@@ -1007,6 +1079,14 @@ includes = []
 excludes = []
 digest = "af75905894be8d3cc29e9494a352f60fcdaa62b1993281619061a5097eaf6d7b"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "openjdk"
+path = "https://download.java.net/java/GA/jdk25.0.1/2fbf10d8c78e40bd87641c434705079d/8/GPL/openjdk-25.0.1_linux-aarch64_bin.tar.gz"
+includes = []
+excludes = []
+digest = "b285b7e878eff9dda0dde3d6cb3d78ddb28355b6d39b907f53f56210672e88d3"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "openssl"
@@ -1518,6 +1598,14 @@ path = "https://github.com/tukaani-project/xz/releases/download/v5.8.1/xz-5.8.1.
 includes = []
 excludes = []
 digest = "24827cfbd8504ed6499a08262caf7d4c4584a5ee2505843526f0f020daf9ab93"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "yq"
+path = "https://github.com/mikefarah/yq/releases/download/v4.50.1/yq_linux_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "104f4445863bcc41156ff9036b8e860de7dc9d1a96d0571becc85ada8e0c62e1"
 platform = "aarch64-linux"
 
 [[sources]]
