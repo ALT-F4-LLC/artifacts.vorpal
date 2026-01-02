@@ -7,7 +7,38 @@ on:
       - main
 
 jobs:
+  build-dev:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        runner:
+          - macos-latest
+          - macos-latest-large
+          - ubuntu-latest
+          - ubuntu-latest-arm64
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ALT-F4-LLC/setup-vorpal-action@main
+        with:
+          registry-backend: s3
+          registry-backend-s3-bucket: altf4llc-vorpal-registry
+          version: nightly
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - run: vorpal artifact make 'dev'
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: vorpal-lock
+          path: Vorpal.lock
+
   build:
+    needs:
+      - build-dev
     runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
@@ -16,7 +47,6 @@ jobs:
           - bat
           - bottom
           - cue
-          - dev
           - direnv
           - doppler
           - fd
