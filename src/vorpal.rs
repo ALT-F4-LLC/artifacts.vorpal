@@ -1,7 +1,7 @@
 use anyhow::Result;
 use vorpal_artifacts::{
     artifact::{
-        argocd, bat, bottom, cue, direnv, doppler, fd, fluxcd, git, golangci_lint, helm, just, kn,
+        argocd, bat, bottom, cue, direnv, doppler, fd, fluxcd, golangci_lint, helm, just, kn,
         kubeseal, lazygit, libevent, ncurses, nginx, openapi_generator_cli, openjdk, ripgrep,
         starship, terraform, tmux, yq,
     },
@@ -31,7 +31,6 @@ async fn main() -> Result<()> {
     doppler::build(context).await?;
     fd::build(context).await?;
     fluxcd::build(context).await?;
-    git::build(context).await?;
     golangci_lint::build(context).await?;
     helm::build(context).await?;
     just::build(context).await?;
