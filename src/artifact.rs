@@ -7,7 +7,6 @@ pub mod doppler;
 pub mod fd;
 pub mod file;
 pub mod fluxcd;
-pub mod git;
 pub mod golangci_lint;
 pub mod helm;
 pub mod just;

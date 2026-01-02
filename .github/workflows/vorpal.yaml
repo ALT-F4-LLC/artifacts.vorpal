@@ -21,7 +21,6 @@ jobs:
           - doppler
           - fd
           - fluxcd
-          - git
           - golangci-lint
           - helm
           - just
