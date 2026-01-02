@@ -2,6 +2,14 @@ lockfile = 1
 
 [[sources]]
 name = "argocd"
+path = "https://github.com/argoproj/argo-cd/releases/download/v3.2.3/argocd-darwin-amd64"
+includes = []
+excludes = []
+digest = "1ef724533580a0011ff20f172119065214470aa7fca80eb10c9e11a26489f6cc"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "argocd"
 path = "https://github.com/argoproj/argo-cd/releases/download/v3.2.3/argocd-darwin-arm64"
 includes = []
 excludes = []
@@ -39,6 +47,14 @@ includes = []
 excludes = []
 digest = "1ba594e9b7f1e817e3359300173282fccae09f3360e37568161d86e8d0f087b0"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "bat"
+path = "https://github.com/sharkdp/bat/releases/download/v0.25.0/bat-v0.25.0-x86_64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "2c5b079394e7e7379e2787a5ecd4cae072ee346cd87f10cd262495e658122310"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "bat"
@@ -95,6 +111,14 @@ includes = []
 excludes = []
 digest = "21dff7913b3ac0da4e7c8f0381f54fb56ec9c9046b8d92dc181e7e9aa9410b21"
 platform = "x86_64-linux"
+
+[[sources]]
+name = "bottom"
+path = "https://github.com/ClementTsang/bottom/releases/download/0.11.1/bottom_x86_64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "ac639e7311b3eb2fcc8d22c9b0bb82424081965404a9f760dede1ab64cfa630d"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "bottom"
@@ -202,6 +226,14 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "cue"
+path = "https://github.com/cue-lang/cue/releases/download/v0.15.1/cue_v0.15.1_darwin_amd64.tar.gz"
+includes = []
+excludes = []
+digest = "3f91419fbc916466ae835787957507e12e7150069ec8890fa7f0d7ba29880acb"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "cue"
 path = "https://github.com/cue-lang/cue/releases/download/v0.15.1/cue_v0.15.1_darwin_arm64.tar.gz"
 includes = []
 excludes = []
@@ -266,6 +298,14 @@ platform = "aarch64-linux"
 
 [[sources]]
 name = "direnv"
+path = "https://github.com/direnv/direnv/releases/download/v2.37.1/direnv.darwin-amd64"
+includes = []
+excludes = []
+digest = "3a9dfebde7d15e91c1a89e58b720da76c093ba77714767217db3af19514cd599"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "direnv"
 path = "https://github.com/direnv/direnv/releases/download/v2.37.1/direnv.linux-amd64"
 includes = []
 excludes = []
@@ -305,12 +345,28 @@ digest = "dfbd6548b0d00423291ab72c41ae2b4ee8b501df44b93ce1b75eaed95971352f"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "doppler"
+path = "https://github.com/DopplerHQ/cli/releases/download/3.75.1/doppler_3.75.1_macOS_amd64.tar.gz"
+includes = []
+excludes = []
+digest = "f0b43420b8238bcacaa8aadb37f2a99447d1690f2e4f817877b595c396c53628"
+platform = "x86_64-darwin"
+
+[[sources]]
 name = "fd"
 path = "https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-aarch64-apple-darwin.tar.gz"
 includes = []
 excludes = []
 digest = "0908501901ff99232aa75a18bf9409e80dae10742dc3759a67249bca5a459490"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "fd"
+path = "https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-x86_64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "5de9ad944bd8937d8a2f823328d7d29ded794a9f845febffd86c55fdff7a5453"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "fd"
@@ -359,6 +415,14 @@ includes = []
 excludes = []
 digest = "242f804d87a5036bb0fab99966227dc61e853e5a67e1b10c3cc45681c792657e"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "fluxcd"
+path = "https://github.com/fluxcd/flux2/releases/download/v2.7.5/flux_2.7.5_darwin_amd64.tar.gz"
+includes = []
+excludes = []
+digest = "0c665dec2180214b14bd2f870100cffe2e0bba9b2fcfcec5fc5efe4f5804b275"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "fluxcd"
@@ -490,6 +554,14 @@ platform = "aarch64-linux"
 
 [[sources]]
 name = "golangci-lint"
+path = "https://github.com/golangci/golangci-lint/releases/download/v2.7.2/golangci-lint-2.7.2-darwin-amd64.tar.gz"
+includes = []
+excludes = []
+digest = "2e17419b3c14b471f1ae177753030dfef10d7d1f802af61b4158a4430bb01754"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "golangci-lint"
 path = "https://github.com/golangci/golangci-lint/releases/download/v2.7.2/golangci-lint-2.7.2-darwin-arm64.tar.gz"
 includes = []
 excludes = []
@@ -553,6 +625,14 @@ digest = "1ea0d7ec3aa3ba0671ffc52ed88dc2676766d823f0930921802045af1eb78c05"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "helm"
+path = "https://get.helm.sh/helm-v4.0.4-darwin-amd64.tar.gz"
+includes = []
+excludes = []
+digest = "8c47e48f689bd861177c77171f491f4301e938ce39e8d6c1e88f27af7c347e7b"
+platform = "x86_64-darwin"
+
+[[sources]]
 name = "just"
 path = "https://github.com/casey/just/releases/download/1.45.0/just-1.45.0-x86_64-unknown-linux-musl.tar.gz"
 includes = []
@@ -562,11 +642,27 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "just"
+path = "https://github.com/casey/just/releases/download/1.45.0/just-1.45.0-x86_64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "612686fbcf969b1c473f16b2bf87210d234a9d3204d3e7d55994b080091e39af"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "just"
 path = "https://github.com/casey/just/releases/download/1.45.0/just-1.45.0-aarch64-apple-darwin.tar.gz"
 includes = []
 excludes = []
 digest = "8f34d86872a3a379ca58b96f1d5c2cf06076212fc8c1f8e4edbc794c523f4f49"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "kn"
+path = "https://github.com/knative/client/releases/download/knative-v1.20.0/kn-darwin-amd64"
+includes = []
+excludes = []
+digest = "a167778b0efc465aadafaaa63632979a8eeb504f791ea6f2a8b431e3316375cb"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "kn"
@@ -601,6 +697,14 @@ digest = "5e29215d8bc7eb4713d6cb7c609bd8d0a4c8c2648b009492ea59135569359a77"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "kubeseal"
+path = "https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.34.0/kubeseal-0.34.0-darwin-amd64.tar.gz"
+includes = []
+excludes = []
+digest = "7e49bc7e4af82131776ede4cc6bbcff2cdaaa1ccdafea7df81f577c9d0bfad94"
+platform = "x86_64-darwin"
+
+[[sources]]
 name = "lazygit"
 path = "https://github.com/jesseduffield/lazygit/releases/download/v0.44.1/lazygit_0.44.1_Darwin_arm64.tar.gz"
 includes = []
@@ -615,6 +719,14 @@ includes = []
 excludes = []
 digest = "754ecef628fe8e8f1978129ff1799d698a293bab3b518406f202da7ec1d1c663"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "lazygit"
+path = "https://github.com/jesseduffield/lazygit/releases/download/v0.44.1/lazygit_0.44.1_Darwin_x86_64.tar.gz"
+includes = []
+excludes = []
+digest = "7b7d802c593d98dcf73332090fa66191cd1caca2eaa0de8c5c23367cd52241f0"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "lazygit"
@@ -649,6 +761,14 @@ digest = "22fdbe5a18db114046227ccde47cc8fbe11fa9ee2170b235f949275a161853ee"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "libevent"
+path = "https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz"
+includes = []
+excludes = []
+digest = "22fdbe5a18db114046227ccde47cc8fbe11fa9ee2170b235f949275a161853ee"
+platform = "x86_64-darwin"
+
+[[sources]]
 name = "libidn2"
 path = "https://ftpmirror.gnu.org/gnu/libidn/libidn2-2.3.8.tar.gz"
 includes = []
@@ -799,6 +919,14 @@ includes = []
 excludes = []
 digest = "e67077219f4e56cc6cc56958104a9271871ef65ef7985081aced1fd5024f9f47"
 platform = "x86_64-linux"
+
+[[sources]]
+name = "ncurses"
+path = "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.5-20250809.tgz"
+includes = []
+excludes = []
+digest = "e67077219f4e56cc6cc56958104a9271871ef65ef7985081aced1fd5024f9f47"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "nginx"
@@ -847,6 +975,22 @@ includes = []
 excludes = []
 digest = "1b456d6486772837afb3419ea13ed20a91567b85b5ef1771bba4d8b3ab7c530c"
 platform = "x86_64-linux"
+
+[[sources]]
+name = "openapi-generator-cli"
+path = "https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/7.18.0/openapi-generator-cli-7.18.0.jar"
+includes = []
+excludes = []
+digest = "1b456d6486772837afb3419ea13ed20a91567b85b5ef1771bba4d8b3ab7c530c"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "openjdk"
+path = "https://download.java.net/java/GA/jdk25.0.1/2fbf10d8c78e40bd87641c434705079d/8/GPL/openjdk-25.0.1_macos-x64_bin.tar.gz"
+includes = []
+excludes = []
+digest = "153a7228184064a3df7badb5be88889e28b4207745154a44158058adce9f40a5"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "openjdk"
@@ -967,6 +1111,14 @@ includes = []
 excludes = []
 digest = "57d61ac3324ba6486b798c8e9dfbab9835a595a8d4ace6342886a20b50fde13a"
 platform = "x86_64-linux"
+
+[[sources]]
+name = "ripgrep"
+path = "https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep-14.1.1-x86_64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "bf85900423b680dfa12bf3a240013135dda16b531becb392d3c0a18d0cd150c9"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "ripgrep"
@@ -1170,6 +1322,14 @@ platform = "aarch64-darwin"
 
 [[sources]]
 name = "starship"
+path = "https://github.com/starship/starship/releases/download/v1.21.1/starship-x86_64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "971e28de87b263f0c20cba89b3719c053c6bc45aeea8fbab9545709efb7547b9"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "starship"
 path = "https://github.com/starship/starship/releases/download/v1.21.1/starship-x86_64-unknown-linux-musl.tar.gz"
 includes = []
 excludes = []
@@ -1218,6 +1378,14 @@ platform = "aarch64-darwin"
 
 [[sources]]
 name = "terraform"
+path = "https://releases.hashicorp.com/terraform/1.13.1/terraform_1.13.1_darwin_amd64.zip"
+includes = []
+excludes = []
+digest = "b0bc33beb68452c90f3b978b1e42168c26d11dd0825b8e69b06832701c456f9d"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "terraform"
 path = "https://releases.hashicorp.com/terraform/1.13.1/terraform_1.13.1_linux_amd64.zip"
 includes = []
 excludes = []
@@ -1263,6 +1431,14 @@ includes = []
 excludes = []
 digest = "70691bfbbe623d25d99561192dfb52211ca7e1fa120271c57ae56fe24ca97521"
 platform = "x86_64-linux"
+
+[[sources]]
+name = "tmux"
+path = "https://github.com/tmux/tmux/releases/download/3.5a/tmux-3.5a.tar.gz"
+includes = []
+excludes = []
+digest = "70691bfbbe623d25d99561192dfb52211ca7e1fa120271c57ae56fe24ca97521"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "unzip"
@@ -1359,6 +1535,14 @@ includes = []
 excludes = []
 digest = "912df91581dee3a047324b107a08977d1d51a55b099a6690dc832c6fc7eac100"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "yq"
+path = "https://github.com/mikefarah/yq/releases/download/v4.50.1/yq_darwin_amd64.tar.gz"
+includes = []
+excludes = []
+digest = "d85e290875b0c952300b22dc7f33ed34b826bfe0823f07870b8ea2c78e201209"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "zlib"
