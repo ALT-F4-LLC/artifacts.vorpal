@@ -33,7 +33,7 @@ jobs:
 
       - uses: actions/upload-artifact@v6
         with:
-          name: vorpal-lock
+          name: ${{ runner.arch }}-${{ runner.os }}-vorpal-lock
           path: Vorpal.lock
 
   build:
