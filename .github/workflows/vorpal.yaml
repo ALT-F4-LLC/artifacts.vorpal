@@ -46,6 +46,7 @@ jobs:
           - argocd
           - bat
           - bottom
+          - crane
           - cue
           - direnv
           - doppler
@@ -62,10 +63,13 @@ jobs:
           - nginx
           - openapi-generator-cli
           - openjdk
+          - pkg-config
           - ripgrep
+          - skopeo
           - starship
           - terraform
           - tmux
+          - umoci
           - yq
         runner:
           - macos-latest

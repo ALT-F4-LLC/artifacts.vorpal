@@ -225,6 +225,14 @@ digest = "a7abdad032ae6c318dbb4c9b444d9031ab34d1308700005c4bd5eb5156cad523"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "crane"
+path = "https://github.com/google/go-containerregistry/archive/refs/tags/v0.20.7.tar.gz"
+includes = []
+excludes = []
+digest = "e61f88c967db41f46cd0b7852b7dbedeef4f286fae7613fbb8aff7aa0a35d848"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "cue"
 path = "https://github.com/cue-lang/cue/releases/download/v0.15.1/cue_v0.15.1_linux_amd64.tar.gz"
 includes = []
@@ -575,6 +583,14 @@ includes = []
 excludes = []
 digest = "191226cef6e9ce60e291e178db47682aadea28cb3e92f35f006ba317f3e10195"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "go"
+path = "https://go.dev/dl/go1.24.2.darwin-arm64.tar.gz"
+includes = []
+excludes = []
+digest = "5380e02cdfe2b254af7c3306671fbacc0bfefeb3a9684b502e4af3ad5db917e7"
+platform = "aarch64-darwin"
 
 [[sources]]
 name = "golangci-lint"
@@ -1137,6 +1153,14 @@ digest = "43a6f8cf15fcedeb66e95c4957ec8bc43db40515de89483e507c01c255fce853"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "pkg-config"
+path = "https://pkgconfig.freedesktop.org/releases/pkg-config-0.29.2.tar.gz"
+includes = []
+excludes = []
+digest = "db043f5df7971d9bf97a81c75a46c4656e1a6235c05edad48d11a9314df5363f"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "protoc"
 path = "https://github.com/protocolbuffers/protobuf/releases/download/v25.4/protoc-25.4-osx-x86_64.zip"
 includes = []
@@ -1393,6 +1417,14 @@ digest = "434ff552af89340088e0d8cb206c251761297909bbee401176bc8f655e8e7cf2"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "skopeo"
+path = "https://github.com/containers/skopeo/archive/refs/tags/v1.21.0.tar.gz"
+includes = []
+excludes = []
+digest = "70de9e62ca875d9d8c4c698fcc8bc27a3bf952ff949eb6a15c6bfdc66a7b003f"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "starship"
 path = "https://github.com/starship/starship/releases/download/v1.21.1/starship-aarch64-apple-darwin.tar.gz"
 includes = []
@@ -1519,6 +1551,14 @@ includes = []
 excludes = []
 digest = "70691bfbbe623d25d99561192dfb52211ca7e1fa120271c57ae56fe24ca97521"
 platform = "x86_64-darwin"
+
+[[sources]]
+name = "umoci"
+path = "https://github.com/opencontainers/umoci/archive/refs/tags/v0.6.0.tar.gz"
+includes = []
+excludes = []
+digest = "4c99239fccaf6bee3a50a76fa89289210bee06d2b65747587f73b843dced1599"
+platform = "aarch64-darwin"
 
 [[sources]]
 name = "unzip"
