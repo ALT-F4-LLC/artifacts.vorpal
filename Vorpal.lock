@@ -249,6 +249,14 @@ digest = "e61f88c967db41f46cd0b7852b7dbedeef4f286fae7613fbb8aff7aa0a35d848"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "crane"
+path = "https://github.com/google/go-containerregistry/archive/refs/tags/v0.20.7.tar.gz"
+includes = []
+excludes = []
+digest = "e61f88c967db41f46cd0b7852b7dbedeef4f286fae7613fbb8aff7aa0a35d848"
+platform = "x86_64-darwin"
+
+[[sources]]
 name = "cue"
 path = "https://github.com/cue-lang/cue/releases/download/v0.15.1/cue_v0.15.1_linux_amd64.tar.gz"
 includes = []
@@ -561,6 +569,14 @@ digest = "c7811ed4fe8c1c5afcecea15929178c33dcef4fa885086df96cb558cd9466f29"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "git"
+path = "https://www.kernel.org/pub/software/scm/git/git-2.52.0.tar.gz"
+includes = []
+excludes = []
+digest = "c7811ed4fe8c1c5afcecea15929178c33dcef4fa885086df96cb558cd9466f29"
+platform = "x86_64-darwin"
+
+[[sources]]
 name = "glibc"
 path = "https://ftpmirror.gnu.org/gnu/glibc/glibc-2.42.tar.gz"
 includes = []
@@ -631,6 +647,14 @@ includes = []
 excludes = []
 digest = "87116daeec496cbc32774c024839ce7a7d0dfced9959fb54527bd55b8890791e"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "go"
+path = "https://go.dev/dl/go1.24.2.darwin-amd64.tar.gz"
+includes = []
+excludes = []
+digest = "b5903639cc049e527796b8c1330cec3be12ef11d15668c08a1732c03f0cf1dcd"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "golangci-lint"
@@ -1217,6 +1241,14 @@ digest = "db043f5df7971d9bf97a81c75a46c4656e1a6235c05edad48d11a9314df5363f"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "pkg-config"
+path = "https://pkgconfig.freedesktop.org/releases/pkg-config-0.29.2.tar.gz"
+includes = []
+excludes = []
+digest = "db043f5df7971d9bf97a81c75a46c4656e1a6235c05edad48d11a9314df5363f"
+platform = "x86_64-darwin"
+
+[[sources]]
 name = "protoc"
 path = "https://github.com/protocolbuffers/protobuf/releases/download/v25.4/protoc-25.4-osx-x86_64.zip"
 includes = []
@@ -1497,6 +1529,14 @@ digest = "70de9e62ca875d9d8c4c698fcc8bc27a3bf952ff949eb6a15c6bfdc66a7b003f"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "skopeo"
+path = "https://github.com/containers/skopeo/archive/refs/tags/v1.21.0.tar.gz"
+includes = []
+excludes = []
+digest = "70de9e62ca875d9d8c4c698fcc8bc27a3bf952ff949eb6a15c6bfdc66a7b003f"
+platform = "x86_64-darwin"
+
+[[sources]]
 name = "starship"
 path = "https://github.com/starship/starship/releases/download/v1.21.1/starship-aarch64-apple-darwin.tar.gz"
 includes = []
@@ -1647,6 +1687,14 @@ includes = []
 excludes = []
 digest = "4c99239fccaf6bee3a50a76fa89289210bee06d2b65747587f73b843dced1599"
 platform = "x86_64-linux"
+
+[[sources]]
+name = "umoci"
+path = "https://github.com/opencontainers/umoci/archive/refs/tags/v0.6.0.tar.gz"
+includes = []
+excludes = []
+digest = "4c99239fccaf6bee3a50a76fa89289210bee06d2b65747587f73b843dced1599"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "unzip"
