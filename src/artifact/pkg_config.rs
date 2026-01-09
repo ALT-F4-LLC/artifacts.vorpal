@@ -21,7 +21,7 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
 
         pushd ./source/{name}/pkg-config-{source_version}
 
-        CFLAGS=\"-Wno-error=int-conversion\" ./configure --prefix=$VORPAL_OUTPUT --with-internal-glib
+        CFLAGS=\"-std=gnu89 -Wno-error=int-conversion\" ./configure --prefix=$VORPAL_OUTPUT --with-internal-glib
 
         make
         make install",
