@@ -50,6 +50,14 @@ platform = "x86_64-darwin"
 
 [[sources]]
 name = "awscli2"
+path = "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.33.1.zip"
+includes = []
+excludes = []
+digest = "9cc123be6401193a29659b9aaf65f3fa6be770ff0fc9fbdd4f41cc6ec666c294"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "awscli2"
 path = "https://awscli.amazonaws.com/awscli-exe-linux-aarch64-2.33.1.zip"
 includes = []
 excludes = []
@@ -737,6 +745,14 @@ digest = "d98a7b45f3f70343ae9ba0bab82f3b6553291036c4953c26d7b149544a73f927"
 platform = "x86_64-darwin"
 
 [[sources]]
+name = "gpg"
+path = "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.5.16.tar.bz2"
+includes = []
+excludes = []
+digest = "d98a7b45f3f70343ae9ba0bab82f3b6553291036c4953c26d7b149544a73f927"
+platform = "x86_64-linux"
+
+[[sources]]
 name = "grep"
 path = "https://ftpmirror.gnu.org/gnu/grep/grep-3.12.tar.gz"
 includes = []
@@ -818,6 +834,14 @@ platform = "aarch64-linux"
 
 [[sources]]
 name = "jq"
+path = "https://github.com/jqlang/jq/releases/download/jq-1.8.1/jq-linux-amd64"
+includes = []
+excludes = []
+digest = "8d4bc0c56b18656763379011d871603057e2cc5112207019296960c1e4f6193b"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "jq"
 path = "https://github.com/jqlang/jq/releases/download/jq-1.8.1/jq-macos-amd64"
 includes = []
 excludes = []
@@ -881,6 +905,14 @@ digest = "e5dcfc8309f033309143d492e088503699387911b7ac223a707d6aef27a72be5"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "k9s"
+path = "https://github.com/derailed/k9s/releases/download/v0.50.18/k9s_Linux_amd64.tar.gz"
+includes = []
+excludes = []
+digest = "fcc42954aea2023650adcd8f73e1a186e1dff84b8563692536f593f8eb4d6d8c"
+platform = "x86_64-linux"
+
+[[sources]]
 name = "kn"
 path = "https://github.com/knative/client/releases/download/knative-v1.20.0/kn-linux-arm64"
 includes = []
@@ -927,6 +959,14 @@ includes = []
 excludes = []
 digest = "657c440a8ef456d50c475d93c353d30f0ff844da965eac51f7de32aa79114059"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "kubectl"
+path = "https://dl.k8s.io/release/v1.35.0/bin/linux/amd64/kubectl"
+includes = []
+excludes = []
+digest = "b3ccb81e850fc635e8391d5e46e3b322f4b9b805cc99a8e91766c0718012af3c"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "kubectl"
@@ -1025,6 +1065,14 @@ digest = "b2263b91ed3e1d3d4db7fd09c2eb756b25d2af7e12928871846f14191425dd15"
 platform = "x86_64-darwin"
 
 [[sources]]
+name = "libassuan"
+path = "https://gnupg.org/ftp/gcrypt/libassuan/libassuan-3.0.2.tar.bz2"
+includes = []
+excludes = []
+digest = "b2263b91ed3e1d3d4db7fd09c2eb756b25d2af7e12928871846f14191425dd15"
+platform = "x86_64-linux"
+
+[[sources]]
 name = "libevent"
 path = "https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz"
 includes = []
@@ -1081,6 +1129,14 @@ digest = "5a3cb0f1e809283b38869c57dfb3b66acd319e98f9cf1c026ba28e9d442fdf8e"
 platform = "x86_64-darwin"
 
 [[sources]]
+name = "libgcrypt"
+path = "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.0.tar.bz2"
+includes = []
+excludes = []
+digest = "5a3cb0f1e809283b38869c57dfb3b66acd319e98f9cf1c026ba28e9d442fdf8e"
+platform = "x86_64-linux"
+
+[[sources]]
 name = "libgpg-error"
 path = "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.56.tar.bz2"
 includes = []
@@ -1103,6 +1159,14 @@ includes = []
 excludes = []
 digest = "05928e189eeca1e71bff14fd395abe8f36e9b8a02b3bdfc735770181b70aecd2"
 platform = "x86_64-darwin"
+
+[[sources]]
+name = "libgpg-error"
+path = "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.56.tar.bz2"
+includes = []
+excludes = []
+digest = "05928e189eeca1e71bff14fd395abe8f36e9b8a02b3bdfc735770181b70aecd2"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "libidn2"
@@ -1143,6 +1207,14 @@ includes = []
 excludes = []
 digest = "d4392077dde893b704c72b6b37dbfc4abfad36032e0dfd2066edb22b27183b10"
 platform = "x86_64-darwin"
+
+[[sources]]
+name = "libksba"
+path = "https://gnupg.org/ftp/gcrypt/libksba/libksba-1.6.7.tar.bz2"
+includes = []
+excludes = []
+digest = "d4392077dde893b704c72b6b37dbfc4abfad36032e0dfd2066edb22b27183b10"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "libpsl"
@@ -1306,6 +1378,14 @@ platform = "x86_64-darwin"
 
 [[sources]]
 name = "neovim"
+path = "https://github.com/neovim/neovim/releases/download/v0.11.5/nvim-linux-x86_64.tar.gz"
+includes = []
+excludes = []
+digest = "be12bbc585adb677e1e606f566bf89c59d55e7fcd1ac64e00f63dfd7a72661b4"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "neovim"
 path = "https://github.com/neovim/neovim/releases/download/v0.11.5/nvim-macos-arm64.tar.gz"
 includes = []
 excludes = []
@@ -1369,6 +1449,14 @@ digest = "a0a9e0cff52847ffdd91673adc7dffbda2177e67a87d7fdba5717c898ea0518f"
 platform = "x86_64-darwin"
 
 [[sources]]
+name = "nnn"
+path = "https://github.com/jarun/nnn/archive/refs/tags/v5.1.tar.gz"
+includes = []
+excludes = []
+digest = "a0a9e0cff52847ffdd91673adc7dffbda2177e67a87d7fdba5717c898ea0518f"
+platform = "x86_64-linux"
+
+[[sources]]
 name = "npth"
 path = "https://gnupg.org/ftp/gcrypt/npth/npth-1.8.tar.bz2"
 includes = []
@@ -1391,6 +1479,14 @@ includes = []
 excludes = []
 digest = "a2b6cb020468c58784331757133a7112dbe838d227f8bec3a01382909efa1b63"
 platform = "x86_64-darwin"
+
+[[sources]]
+name = "npth"
+path = "https://gnupg.org/ftp/gcrypt/npth/npth-1.8.tar.bz2"
+includes = []
+excludes = []
+digest = "a2b6cb020468c58784331757133a7112dbe838d227f8bec3a01382909efa1b63"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "openapi-generator-cli"
@@ -2135,3 +2231,11 @@ includes = []
 excludes = []
 digest = "375c3a34bd2233f8aa0f49573d2e57947d63e50668aefcd4988ce769bf017f9d"
 platform = "x86_64-darwin"
+
+[[sources]]
+name = "zsh"
+path = "https://downloads.sourceforge.net/project/zsh/zsh/5.9/zsh-5.9.tar.xz"
+includes = []
+excludes = []
+digest = "375c3a34bd2233f8aa0f49573d2e57947d63e50668aefcd4988ce769bf017f9d"
+platform = "x86_64-linux"
