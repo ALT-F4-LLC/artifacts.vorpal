@@ -40,6 +40,11 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
                 pushd ./source/{name}
                 pkgutil --expand-full AWSCLIV2-{source_version}.pkg extracted
                 cp -Rv extracted/aws-cli.pkg/Payload/aws-cli/* \"$VORPAL_OUTPUT/.\"
+
+                # Verify extracted files exist before creating symlinks
+                test -f \"$VORPAL_OUTPUT/aws\" || (echo 'ERROR: aws executable not found after extraction' && exit 1)
+                test -f \"$VORPAL_OUTPUT/aws_completer\" || (echo 'ERROR: aws_completer not found after extraction' && exit 1)
+
                 ln -sf \"$VORPAL_OUTPUT/aws\" \"$VORPAL_OUTPUT/bin/aws\"
                 ln -sf \"$VORPAL_OUTPUT/aws_completer\" \"$VORPAL_OUTPUT/bin/aws_completer\"",
             };
