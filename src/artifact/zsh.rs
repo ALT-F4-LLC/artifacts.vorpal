@@ -20,6 +20,7 @@ pub async fn build(context: &mut ConfigContext, ncurses: &String) -> Result<Stri
 
         pushd ./source/{name}/zsh-{version}
 
+        export CFLAGS=\"-Wno-incompatible-pointer-types\"
         export CPPFLAGS=\"-I{ncurses}/include -I{ncurses}/include/ncursesw\"
         export LDFLAGS=\"-L{ncurses}/lib -Wl,-rpath,{ncurses}/lib\"
 
