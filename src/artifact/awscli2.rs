@@ -18,6 +18,7 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
             let script = formatdoc! {"
                 mkdir -pv \"$VORPAL_OUTPUT\"
                 pushd ./source/{name}
+                chmod +x ./aws/install
                 ./aws/install --install-dir \"$VORPAL_OUTPUT\" --bin-dir \"$VORPAL_OUTPUT/bin\"",
             };
             (path, script)
@@ -29,6 +30,7 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
             let script = formatdoc! {"
                 mkdir -pv \"$VORPAL_OUTPUT\"
                 pushd ./source/{name}
+                chmod +x ./aws/install
                 ./aws/install --install-dir \"$VORPAL_OUTPUT\" --bin-dir \"$VORPAL_OUTPUT/bin\"",
             };
             (path, script)
