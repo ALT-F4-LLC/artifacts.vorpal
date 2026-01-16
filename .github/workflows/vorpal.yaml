@@ -44,6 +44,7 @@ jobs:
       matrix:
         artifact:
           - argocd
+          - awscli2
           - bat
           - bottom
           - crane
@@ -53,17 +54,29 @@ jobs:
           - fd
           - fluxcd
           - golangci-lint
+          - gpg
           - helm
+          - jq
           - just
+          - k9s
           - kn
+          - kubectl
           - kubeseal
           - lazygit
+          - libassuan
           - libevent
+          - libgcrypt
+          - libgpg-error
+          - libksba
           - ncurses
+          - neovim
           - nginx
+          - nnn
+          - npth
           - openapi-generator-cli
           - openjdk
           - pkg-config
+          - readline
           - ripgrep
           - skopeo
           - starship
@@ -71,6 +84,7 @@ jobs:
           - tmux
           - umoci
           - yq
+          - zsh
         runner:
           - macos-latest
           - macos-latest-large

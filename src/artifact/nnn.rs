@@ -8,37 +8,38 @@ use vorpal_sdk::{
 
 pub async fn build(
     context: &mut ConfigContext,
-    libevent: &String,
     ncurses: &String,
+    pkg_config: &String,
+    readline: &String,
 ) -> Result<String> {
-    let name = "tmux";
-    let version = "3.5a";
+    let name = "nnn";
+    let version = "5.1";
 
-    let path =
-        format!("https://github.com/tmux/tmux/releases/download/{version}/tmux-{version}.tar.gz");
+    let path = format!("https://github.com/jarun/nnn/archive/refs/tags/v{version}.tar.gz");
 
     let source = ArtifactSource::new(name, &path).build();
 
     let script = formatdoc! {"
         mkdir -pv \"$VORPAL_OUTPUT\"
 
-        pushd ./source/{name}/tmux-{version}
+        pushd ./source/{name}/nnn-{version}
 
-        export CPPFLAGS=\"-I{libevent}/include -I{ncurses}/include -I{ncurses}/include/ncursesw\"
-        export LDFLAGS=\"-L{libevent}/lib -L{ncurses}/lib -Wl,-rpath,{libevent}/lib -Wl,-rpath,{ncurses}/lib\"
+        export PATH=\"{pkg_config}/bin:$PATH\"
+        export CPPFLAGS=\"-I{ncurses}/include -I{ncurses}/include/ncursesw -I{readline}/include\"
+        export LDFLAGS=\"-L{ncurses}/lib -L{readline}/lib -Wl,-rpath,{ncurses}/lib -Wl,-rpath,{readline}/lib\"
+        export PKG_CONFIG_PATH=\"{ncurses}/lib/pkgconfig:{readline}/lib/pkgconfig\"
 
-        ./configure --disable-utf8proc --prefix=\"$VORPAL_OUTPUT\"
-
-        make
-        make install",
-        libevent = get_env_key(libevent),
+        make PREFIX=\"$VORPAL_OUTPUT\"
+        make PREFIX=\"$VORPAL_OUTPUT\" install",
         ncurses = get_env_key(ncurses),
+        pkg_config = get_env_key(pkg_config),
+        readline = get_env_key(readline),
     };
 
     let steps = vec![
         step::shell(
             context,
-            vec![libevent.clone(), ncurses.clone()],
+            vec![ncurses.clone(), pkg_config.clone(), readline.clone()],
             vec![],
             script,
             vec![],

@@ -7,27 +7,26 @@ use vorpal_sdk::{
 };
 
 pub async fn build(context: &mut ConfigContext) -> Result<String> {
-    let name = "ncurses";
-    let version = "6.5-20250809";
+    let name = "libgpg-error";
+    let version = "1.56";
 
-    let path =
-        format!("https://invisible-mirror.net/archives/ncurses/current/ncurses-{version}.tgz");
+    let path = format!("https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-{version}.tar.bz2");
+
     let source = ArtifactSource::new(name, &path).build();
 
-    let step_script = formatdoc! {"
+    let script = formatdoc! {"
         mkdir -pv \"$VORPAL_OUTPUT\"
-        pushd ./source/{name}/{name}-{version}
-        ./configure \
-            --enable-pc-files \
-            --prefix=\"$VORPAL_OUTPUT\" \
-            --with-pkg-config-libdir=\"$VORPAL_OUTPUT/lib/pkgconfig\" \
-            --with-shared \
-            --with-termlib
+
+        pushd ./source/{name}/libgpg-error-{version}
+
+        ./configure --prefix=\"$VORPAL_OUTPUT\"
+
         make
         make install",
     };
 
-    let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+    let steps = vec![step::shell(context, vec![], vec![], script, vec![]).await?];
+
     let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 
     Artifact::new(name, steps, systems)
