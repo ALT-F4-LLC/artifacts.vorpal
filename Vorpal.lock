@@ -1697,6 +1697,14 @@ digest = "bd548669e2e324cf1450a04897779301c20f6ccb161f2f6ede7584cab56ce83f"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "readline"
+path = "https://ftpmirror.gnu.org/readline/readline-8.2.tar.gz"
+includes = []
+excludes = []
+digest = "bd548669e2e324cf1450a04897779301c20f6ccb161f2f6ede7584cab56ce83f"
+platform = "x86_64-darwin"
+
+[[sources]]
 name = "ripgrep"
 path = "https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep-14.1.1-x86_64-unknown-linux-musl.tar.gz"
 includes = []
