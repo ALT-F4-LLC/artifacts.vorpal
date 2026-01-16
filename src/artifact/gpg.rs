@@ -1,4 +1,3 @@
-use crate::artifact::{libassuan, libgcrypt, libgpg_error, libksba, npth};
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
@@ -7,13 +6,14 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext) -> Result<String> {
-    let libgpg_error = libgpg_error::build(context).await?;
-    let npth = npth::build(context).await?;
-    let libgcrypt = libgcrypt::build(context).await?;
-    let libassuan = libassuan::build(context).await?;
-    let libksba = libksba::build(context).await?;
-
+pub async fn build(
+    context: &mut ConfigContext,
+    libassuan: &String,
+    libgcrypt: &String,
+    libgpg_error: &String,
+    libksba: &String,
+    npth: &String,
+) -> Result<String> {
     let name = "gpg";
     let version = "2.5.16";
 
@@ -42,17 +42,23 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
 
         make
         make install",
-        libgpg_error = get_env_key(&libgpg_error),
-        npth = get_env_key(&npth),
-        libgcrypt = get_env_key(&libgcrypt),
-        libassuan = get_env_key(&libassuan),
-        libksba = get_env_key(&libksba),
+        libassuan = get_env_key(libassuan),
+        libgcrypt = get_env_key(libgcrypt),
+        libgpg_error = get_env_key(libgpg_error),
+        libksba = get_env_key(libksba),
+        npth = get_env_key(npth),
     };
 
     let steps = vec![
         step::shell(
             context,
-            vec![libgpg_error, npth, libgcrypt, libassuan, libksba],
+            vec![
+                libassuan.clone(),
+                libgcrypt.clone(),
+                libgpg_error.clone(),
+                libksba.clone(),
+                npth.clone(),
+            ],
             vec![],
             script,
             vec![],

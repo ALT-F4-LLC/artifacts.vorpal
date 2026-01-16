@@ -1,4 +1,3 @@
-use crate::artifact::{libevent, ncurses};
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
@@ -7,10 +6,11 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext) -> Result<String> {
-    let libevent = libevent::build(context).await?;
-    let ncurses = ncurses::build(context).await?;
-
+pub async fn build(
+    context: &mut ConfigContext,
+    libevent: &String,
+    ncurses: &String,
+) -> Result<String> {
     let name = "tmux";
     let version = "3.5a";
 
@@ -31,11 +31,20 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
 
         make
         make install",
-        libevent = get_env_key(&libevent),
-        ncurses = get_env_key(&ncurses),
+        libevent = get_env_key(libevent),
+        ncurses = get_env_key(ncurses),
     };
 
-    let steps = vec![step::shell(context, vec![libevent, ncurses], vec![], script, vec![]).await?];
+    let steps = vec![
+        step::shell(
+            context,
+            vec![libevent.clone(), ncurses.clone()],
+            vec![],
+            script,
+            vec![],
+        )
+        .await?,
+    ];
 
     let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 

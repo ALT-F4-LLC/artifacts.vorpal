@@ -1,4 +1,3 @@
-use crate::artifact::libgpg_error;
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
@@ -7,9 +6,7 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext) -> Result<String> {
-    let libgpg_error = libgpg_error::build(context).await?;
-
+pub async fn build(context: &mut ConfigContext, libgpg_error: &String) -> Result<String> {
     let name = "libgcrypt";
     let version = "1.11.0";
 
@@ -30,10 +27,11 @@ pub async fn build(context: &mut ConfigContext) -> Result<String> {
 
         make
         make install",
-        libgpg_error = get_env_key(&libgpg_error),
+        libgpg_error = get_env_key(libgpg_error),
     };
 
-    let steps = vec![step::shell(context, vec![libgpg_error], vec![], script, vec![]).await?];
+    let steps =
+        vec![step::shell(context, vec![libgpg_error.clone()], vec![], script, vec![]).await?];
 
     let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 

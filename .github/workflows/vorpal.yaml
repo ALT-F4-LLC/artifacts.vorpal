@@ -76,6 +76,7 @@ jobs:
           - openapi-generator-cli
           - openjdk
           - pkg-config
+          - readline
           - ripgrep
           - skopeo
           - starship

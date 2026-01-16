@@ -32,6 +32,7 @@ pub mod npth;
 pub mod openapi_generator_cli;
 pub mod openjdk;
 pub mod pkg_config;
+pub mod readline;
 pub mod ripgrep;
 pub mod skopeo;
 pub mod starship;
