@@ -6,33 +6,42 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext) -> Result<String> {
-    let name = "ncurses";
-    let version = "6.5-20250809";
+#[derive(Default)]
+pub struct Ncurses;
 
-    let path =
-        format!("https://invisible-mirror.net/archives/ncurses/current/ncurses-{version}.tgz");
-    let source = ArtifactSource::new(name, &path).build();
+impl Ncurses {
+    pub fn new() -> Self {
+        Self
+    }
 
-    let step_script = formatdoc! {"
-        mkdir -pv \"$VORPAL_OUTPUT\"
-        pushd ./source/{name}/{name}-{version}
-        ./configure \
-            --enable-pc-files \
-            --prefix=\"$VORPAL_OUTPUT\" \
-            --with-pkg-config-libdir=\"$VORPAL_OUTPUT/lib/pkgconfig\" \
-            --with-shared \
-            --with-termlib
-        make
-        make install",
-    };
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let name = "ncurses";
+        let version = "6.5-20250809";
 
-    let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
-    let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+        let path =
+            format!("https://invisible-mirror.net/archives/ncurses/current/ncurses-{version}.tgz");
+        let source = ArtifactSource::new(name, &path).build();
 
-    Artifact::new(name, steps, systems)
-        .with_aliases(vec![format!("{name}:{version}")])
-        .with_sources(vec![source])
-        .build(context)
-        .await
+        let step_script = formatdoc! {"
+            mkdir -pv \"$VORPAL_OUTPUT\"
+            pushd ./source/{name}/{name}-{version}
+            ./configure \
+                --enable-pc-files \
+                --prefix=\"$VORPAL_OUTPUT\" \
+                --with-pkg-config-libdir=\"$VORPAL_OUTPUT/lib/pkgconfig\" \
+                --with-shared \
+                --with-termlib
+            make
+            make install",
+        };
+
+        let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+
+        Artifact::new(name, steps, systems)
+            .with_aliases(vec![format!("{name}:{version}")])
+            .with_sources(vec![source])
+            .build(context)
+            .await
+    }
 }

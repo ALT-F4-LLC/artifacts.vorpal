@@ -6,32 +6,42 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext) -> Result<String> {
-    let name = "libgpg-error";
-    let version = "1.56";
+#[derive(Default)]
+pub struct LibgpgError;
 
-    let path = format!("https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-{version}.tar.bz2");
+impl LibgpgError {
+    pub fn new() -> Self {
+        Self
+    }
 
-    let source = ArtifactSource::new(name, &path).build();
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let name = "libgpg-error";
+        let version = "1.56";
 
-    let script = formatdoc! {"
-        mkdir -pv \"$VORPAL_OUTPUT\"
+        let path =
+            format!("https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-{version}.tar.bz2");
 
-        pushd ./source/{name}/libgpg-error-{version}
+        let source = ArtifactSource::new(name, &path).build();
 
-        ./configure --prefix=\"$VORPAL_OUTPUT\"
+        let script = formatdoc! {"
+            mkdir -pv \"$VORPAL_OUTPUT\"
 
-        make
-        make install",
-    };
+            pushd ./source/{name}/libgpg-error-{version}
 
-    let steps = vec![step::shell(context, vec![], vec![], script, vec![]).await?];
+            ./configure --prefix=\"$VORPAL_OUTPUT\"
 
-    let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+            make
+            make install",
+        };
 
-    Artifact::new(name, steps, systems)
-        .with_aliases(vec![format!("{name}:{version}")])
-        .with_sources(vec![source])
-        .build(context)
-        .await
+        let steps = vec![step::shell(context, vec![], vec![], script, vec![]).await?];
+
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+
+        Artifact::new(name, steps, systems)
+            .with_aliases(vec![format!("{name}:{version}")])
+            .with_sources(vec![source])
+            .build(context)
+            .await
+    }
 }

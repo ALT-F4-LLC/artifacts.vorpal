@@ -1,3 +1,4 @@
+use crate::artifact::ncurses;
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
@@ -6,36 +7,65 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext, ncurses: &String) -> Result<String> {
-    let name = "readline";
-    let version = "8.2";
+#[derive(Default)]
+pub struct Readline<'a> {
+    ncurses: Option<&'a str>,
+}
 
-    let path = format!("https://ftpmirror.gnu.org/readline/readline-{version}.tar.gz");
-    let source = ArtifactSource::new(name, &path).build();
+impl<'a> Readline<'a> {
+    pub fn new() -> Self {
+        Self { ncurses: None }
+    }
 
-    let step_script = formatdoc! {"
-        mkdir -pv \"$VORPAL_OUTPUT\"
-        pushd ./source/{name}/{name}-{version}
+    pub fn with_ncurses(mut self, ncurses: &'a str) -> Self {
+        self.ncurses = Some(ncurses);
+        self
+    }
 
-        export CPPFLAGS=\"-I{ncurses}/include -I{ncurses}/include/ncursesw\"
-        export LDFLAGS=\"-L{ncurses}/lib -Wl,-rpath,{ncurses}/lib\"
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let ncurses = match self.ncurses {
+            Some(val) => val,
+            None => &ncurses::Ncurses::new().build(context).await?,
+        };
 
-        ./configure \
-            --prefix=\"$VORPAL_OUTPUT\" \
-            --with-curses
+        let name = "readline";
+        let version = "8.2";
 
-        make
-        make install",
-        ncurses = get_env_key(ncurses),
-    };
+        let path = format!("https://ftpmirror.gnu.org/readline/readline-{version}.tar.gz");
+        let source = ArtifactSource::new(name, &path).build();
 
-    let steps =
-        vec![step::shell(context, vec![ncurses.clone()], vec![], step_script, vec![]).await?];
-    let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+        let step_script = formatdoc! {"
+            mkdir -pv \"$VORPAL_OUTPUT\"
+            pushd ./source/{name}/{name}-{version}
 
-    Artifact::new(name, steps, systems)
-        .with_aliases(vec![format!("{name}:{version}")])
-        .with_sources(vec![source])
-        .build(context)
-        .await
+            export CPPFLAGS=\"-I{ncurses}/include -I{ncurses}/include/ncursesw\"
+            export LDFLAGS=\"-L{ncurses}/lib -Wl,-rpath,{ncurses}/lib\"
+
+            ./configure \
+                --prefix=\"$VORPAL_OUTPUT\" \
+                --with-curses
+
+            make
+            make install",
+            ncurses = get_env_key(&ncurses.to_string()),
+        };
+
+        let steps = vec![
+            step::shell(
+                context,
+                vec![ncurses.to_string()],
+                vec![],
+                step_script,
+                vec![],
+            )
+            .await?,
+        ];
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+
+        Artifact::new(name, steps, systems)
+            .with_aliases(vec![format!("{name}:{version}")])
+            .with_sources(vec![source])
+            .build(context)
+            .await
+    }
 }

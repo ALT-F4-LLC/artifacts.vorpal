@@ -6,38 +6,47 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext) -> Result<String> {
-    let name = "kubeseal";
-    let source_version = "0.34.0";
+#[derive(Default)]
+pub struct Kubeseal;
 
-    let source_system = match context.get_system() {
-        Aarch64Darwin => "darwin-arm64",
-        Aarch64Linux => "linux-arm64",
-        X8664Darwin => "darwin-amd64",
-        X8664Linux => "linux-amd64",
-        _ => return Err(anyhow::anyhow!("Unsupported system for kubeseal artifact")),
-    };
+impl Kubeseal {
+    pub fn new() -> Self {
+        Self
+    }
 
-    let source_path = format!(
-        "https://github.com/bitnami-labs/sealed-secrets/releases/download/v{source_version}/kubeseal-{source_version}-{source_system}.tar.gz"
-    );
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let name = "kubeseal";
+        let source_version = "0.34.0";
 
-    let source = ArtifactSource::new(name, &source_path).build();
+        let source_system = match context.get_system() {
+            Aarch64Darwin => "darwin-arm64",
+            Aarch64Linux => "linux-arm64",
+            X8664Darwin => "darwin-amd64",
+            X8664Linux => "linux-amd64",
+            _ => return Err(anyhow::anyhow!("Unsupported system for kubeseal artifact")),
+        };
 
-    let step_script = formatdoc! {"
-        mkdir -pv \"$VORPAL_OUTPUT/bin\"
-        pushd ./source/{name}
-        cp kubeseal \"$VORPAL_OUTPUT/bin/kubeseal\"
-        chmod +x \"$VORPAL_OUTPUT/bin/kubeseal\"",
-    };
+        let source_path = format!(
+            "https://github.com/bitnami-labs/sealed-secrets/releases/download/v{source_version}/kubeseal-{source_version}-{source_system}.tar.gz"
+        );
 
-    let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+        let source = ArtifactSource::new(name, &source_path).build();
 
-    let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+        let step_script = formatdoc! {"
+            mkdir -pv \"$VORPAL_OUTPUT/bin\"
+            pushd ./source/{name}
+            cp kubeseal \"$VORPAL_OUTPUT/bin/kubeseal\"
+            chmod +x \"$VORPAL_OUTPUT/bin/kubeseal\"",
+        };
 
-    Artifact::new(name, steps, systems)
-        .with_aliases(vec![format!("{name}:{source_version}")])
-        .with_sources(vec![source])
-        .build(context)
-        .await
+        let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+
+        Artifact::new(name, steps, systems)
+            .with_aliases(vec![format!("{name}:{source_version}")])
+            .with_sources(vec![source])
+            .build(context)
+            .await
+    }
 }

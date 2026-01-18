@@ -1,10 +1,15 @@
 use anyhow::Result;
 use vorpal_artifacts::{
     artifact::{
-        argocd, awscli2, bat, bottom, crane, cue, direnv, doppler, fd, fluxcd, golangci_lint, gpg,
-        helm, jq, just, k9s, kn, kubectl, kubeseal, lazygit, libassuan, libevent, libgcrypt,
-        libgpg_error, libksba, ncurses, neovim, nginx, nnn, npth, openapi_generator_cli, openjdk,
-        pkg_config, readline, ripgrep, skopeo, starship, terraform, tmux, umoci, yq, zsh,
+        argocd::Argocd, awscli2::Awscli2, bat::Bat, bottom::Bottom, crane::Crane, cue::Cue,
+        direnv::Direnv, doppler::Doppler, fd::Fd, fluxcd::Fluxcd, golangci_lint::GolangciLint,
+        gpg::Gpg, helm::Helm, jq::Jq, just::Just, k9s::K9s, kn::Kn, kubectl::Kubectl,
+        kubeseal::Kubeseal, lazygit::Lazygit, libassuan::Libassuan, libevent::Libevent,
+        libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba, ncurses::Ncurses,
+        neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
+        openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk, pkg_config::PkgConfig,
+        readline::Readline, ripgrep::Ripgrep, skopeo::Skopeo, starship::Starship,
+        terraform::Terraform, tmux::Tmux, umoci::Umoci, yq::Yq, zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
 };
@@ -22,57 +27,120 @@ async fn main() -> Result<()> {
 
     // Artifacts
 
-    let libevent = libevent::build(context).await?;
-    let libgpg_error = libgpg_error::build(context).await?;
-    let libassuan = libassuan::build(context, &libgpg_error).await?;
-    let libgcrypt = libgcrypt::build(context, &libgpg_error).await?;
-    let libksba = libksba::build(context, &libgpg_error).await?;
-    let ncurses = ncurses::build(context).await?;
-    let npth = npth::build(context).await?;
-    let openjdk = openjdk::build(context).await?;
-    let pkg_config = pkg_config::build(context).await?;
-    let readline = readline::build(context, &ncurses).await?;
+    let libevent = Libevent::new().build(context).await?;
 
-    argocd::build(context).await?;
-    awscli2::build(context).await?;
-    bat::build(context).await?;
-    bottom::build(context).await?;
-    crane::build(context).await?;
-    cue::build(context).await?;
-    direnv::build(context).await?;
-    doppler::build(context).await?;
-    fd::build(context).await?;
-    fluxcd::build(context).await?;
-    golangci_lint::build(context).await?;
-    gpg::build(
-        context,
-        &libassuan,
-        &libgcrypt,
-        &libgpg_error,
-        &libksba,
-        &npth,
-    )
-    .await?;
-    helm::build(context).await?;
-    jq::build(context).await?;
-    just::build(context).await?;
-    k9s::build(context).await?;
-    kn::build(context).await?;
-    kubectl::build(context).await?;
-    kubeseal::build(context).await?;
-    lazygit::build(context).await?;
-    neovim::build(context).await?;
-    nginx::build(context).await?;
-    nnn::build(context, &ncurses, &pkg_config, &readline).await?;
-    openapi_generator_cli::build(context, openjdk).await?;
-    ripgrep::build(context).await?;
-    skopeo::build(context).await?;
-    starship::build(context).await?;
-    terraform::build(context).await?;
-    tmux::build(context, &libevent, &ncurses).await?;
-    umoci::build(context).await?;
-    yq::build(context).await?;
-    zsh::build(context, &ncurses).await?;
+    let libgpg_error = LibgpgError::new().build(context).await?;
+
+    let libassuan = Libassuan::new()
+        .with_libgpg_error(&libgpg_error)
+        .build(context)
+        .await?;
+
+    let libgcrypt = Libgcrypt::new()
+        .with_libgpg_error(&libgpg_error)
+        .build(context)
+        .await?;
+
+    let libksba = Libksba::new()
+        .with_libgpg_error(&libgpg_error)
+        .build(context)
+        .await?;
+
+    let ncurses = Ncurses::new().build(context).await?;
+
+    let npth = Npth::new().build(context).await?;
+
+    let openjdk = Openjdk::new().build(context).await?;
+
+    let pkg_config = PkgConfig::new().build(context).await?;
+
+    let readline = Readline::new()
+        .with_ncurses(&ncurses)
+        .build(context)
+        .await?;
+
+    Argocd::new().build(context).await?;
+
+    Awscli2::new().build(context).await?;
+
+    Bat::new().build(context).await?;
+
+    Bottom::new().build(context).await?;
+
+    Crane::new().build(context).await?;
+
+    Cue::new().build(context).await?;
+
+    Direnv::new().build(context).await?;
+
+    Doppler::new().build(context).await?;
+
+    Fd::new().build(context).await?;
+
+    Fluxcd::new().build(context).await?;
+
+    GolangciLint::new().build(context).await?;
+
+    Gpg::new()
+        .with_libassuan(&libassuan)
+        .with_libgcrypt(&libgcrypt)
+        .with_libgpg_error(&libgpg_error)
+        .with_libksba(&libksba)
+        .with_npth(&npth)
+        .build(context)
+        .await?;
+
+    Helm::new().build(context).await?;
+
+    Jq::new().build(context).await?;
+
+    Just::new().build(context).await?;
+
+    K9s::new().build(context).await?;
+
+    Kn::new().build(context).await?;
+
+    Kubectl::new().build(context).await?;
+
+    Kubeseal::new().build(context).await?;
+
+    Lazygit::new().build(context).await?;
+
+    Neovim::new().build(context).await?;
+
+    Nginx::new().build(context).await?;
+
+    Nnn::new()
+        .with_ncurses(&ncurses)
+        .with_pkg_config(&pkg_config)
+        .with_readline(&readline)
+        .build(context)
+        .await?;
+
+    OpenapiGeneratorCli::new()
+        .with_openjdk(&openjdk)
+        .build(context)
+        .await?;
+
+    Ripgrep::new().build(context).await?;
+
+    Skopeo::new().build(context).await?;
+
+    Starship::new().build(context).await?;
+
+    Terraform::new().build(context).await?;
+
+    Tmux::new()
+        .with_libevent(&libevent)
+        .with_ncurses(&ncurses)
+        .build(context)
+        .await?;
+
+    Umoci::new().build(context).await?;
+
+    Yq::new().build(context).await?;
+
+    Zsh::new().with_ncurses(&ncurses).build(context).await?;
 
     context.run().await
 }

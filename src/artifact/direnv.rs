@@ -6,36 +6,45 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext) -> Result<String> {
-    let name = "direnv";
-    let source_version = "v2.37.1";
+#[derive(Default)]
+pub struct Direnv;
 
-    let source_system = match context.get_system() {
-        X8664Darwin => "darwin-amd64",
-        Aarch64Darwin => "darwin-arm64",
-        X8664Linux => "linux-amd64",
-        Aarch64Linux => "linux-arm64",
-        _ => return Err(anyhow::anyhow!("Unsupported system for direnv artifact")),
-    };
+impl Direnv {
+    pub fn new() -> Self {
+        Self
+    }
 
-    let source_path = format!("https://github.com/direnv/direnv/releases/download/{source_version}/direnv.{source_system}");
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let name = "direnv";
+        let source_version = "v2.37.1";
 
-    let source = ArtifactSource::new(name, &source_path).build();
+        let source_system = match context.get_system() {
+            X8664Darwin => "darwin-amd64",
+            Aarch64Darwin => "darwin-arm64",
+            X8664Linux => "linux-amd64",
+            Aarch64Linux => "linux-arm64",
+            _ => return Err(anyhow::anyhow!("Unsupported system for direnv artifact")),
+        };
 
-    let step_script = formatdoc! {"
-        mkdir -pv \"$VORPAL_OUTPUT/bin\"
-        pushd ./source/{name}
-        cp direnv.{source_system} \"$VORPAL_OUTPUT/bin/direnv\"
-        chmod +x \"$VORPAL_OUTPUT/bin/direnv\"",
-    };
+        let source_path = format!("https://github.com/direnv/direnv/releases/download/{source_version}/direnv.{source_system}");
 
-    let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+        let source = ArtifactSource::new(name, &source_path).build();
 
-    let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+        let step_script = formatdoc! {"
+            mkdir -pv \"$VORPAL_OUTPUT/bin\"
+            pushd ./source/{name}
+            cp direnv.{source_system} \"$VORPAL_OUTPUT/bin/direnv\"
+            chmod +x \"$VORPAL_OUTPUT/bin/direnv\"",
+        };
 
-    Artifact::new(name, steps, systems)
-        .with_aliases(vec![format!("{name}:{source_version}")])
-        .with_sources(vec![source])
-        .build(context)
-        .await
+        let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+
+        Artifact::new(name, steps, systems)
+            .with_aliases(vec![format!("{name}:{source_version}")])
+            .with_sources(vec![source])
+            .build(context)
+            .await
+    }
 }

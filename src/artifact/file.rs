@@ -6,24 +6,19 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub struct File {
-    name: String,
-    content: String,
+pub struct File<'a> {
+    content: &'a str,
+    name: &'a str,
     systems: Vec<ArtifactSystem>,
 }
 
-impl File {
-    pub fn new(name: &str, systems: Vec<ArtifactSystem>) -> Self {
+impl<'a> File<'a> {
+    pub fn new(content: &'a str, name: &'a str, systems: Vec<ArtifactSystem>) -> Self {
         Self {
-            name: name.to_string(),
-            content: String::new(),
+            content,
+            name,
             systems,
         }
-    }
-
-    pub fn with_content(mut self, content: &str) -> Self {
-        self.content = content.to_string();
-        self
     }
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
@@ -43,7 +38,7 @@ impl File {
 
         let step = step::shell(context, vec![], vec![], step_script, vec![]).await?;
 
-        Artifact::new(&self.name, vec![step], self.systems)
+        Artifact::new(self.name, vec![step], self.systems)
             .build(context)
             .await
     }

@@ -6,34 +6,44 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext) -> Result<String> {
-    let name = "pkg-config";
+#[derive(Default)]
+pub struct PkgConfig;
 
-    let source_version = "0.29.2";
+impl PkgConfig {
+    pub fn new() -> Self {
+        Self
+    }
 
-    let source_path =
-        format!("https://pkgconfig.freedesktop.org/releases/pkg-config-{source_version}.tar.gz");
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let name = "pkg-config";
 
-    let source = ArtifactSource::new(name, source_path.as_str()).build();
+        let source_version = "0.29.2";
 
-    let step_script = formatdoc! {"
-        mkdir -pv \"$VORPAL_OUTPUT/bin\"
+        let source_path = format!(
+            "https://pkgconfig.freedesktop.org/releases/pkg-config-{source_version}.tar.gz"
+        );
 
-        pushd ./source/{name}/pkg-config-{source_version}
+        let source = ArtifactSource::new(name, source_path.as_str()).build();
 
-        CFLAGS=\"-std=gnu89 -Wno-error=int-conversion\" ./configure --prefix=$VORPAL_OUTPUT --with-internal-glib
+        let step_script = formatdoc! {"
+            mkdir -pv \"$VORPAL_OUTPUT/bin\"
 
-        make
-        make install",
-    };
+            pushd ./source/{name}/pkg-config-{source_version}
 
-    let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+            CFLAGS=\"-std=gnu89 -Wno-error=int-conversion\" ./configure --prefix=$VORPAL_OUTPUT --with-internal-glib
 
-    let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+            make
+            make install",
+        };
 
-    Artifact::new(name, steps, systems)
-        .with_aliases(vec![format!("{name}:{source_version}")])
-        .with_sources(vec![source])
-        .build(context)
-        .await
+        let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+
+        Artifact::new(name, steps, systems)
+            .with_aliases(vec![format!("{name}:{source_version}")])
+            .with_sources(vec![source])
+            .build(context)
+            .await
+    }
 }

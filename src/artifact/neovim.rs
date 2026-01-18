@@ -6,36 +6,45 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext) -> Result<String> {
-    let name = "neovim";
-    let source_version = "0.11.5";
+#[derive(Default)]
+pub struct Neovim;
 
-    let source_system = match context.get_system() {
-        Aarch64Darwin => "macos-arm64",
-        Aarch64Linux => "linux-arm64",
-        X8664Darwin => "macos-x86_64",
-        X8664Linux => "linux-x86_64",
-        _ => return Err(anyhow::anyhow!("Unsupported system for neovim artifact")),
-    };
+impl Neovim {
+    pub fn new() -> Self {
+        Self
+    }
 
-    let source_path = format!(
-        "https://github.com/neovim/neovim/releases/download/v{source_version}/nvim-{source_system}.tar.gz"
-    );
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let name = "neovim";
+        let source_version = "0.11.5";
 
-    let source = ArtifactSource::new(name, &source_path).build();
+        let source_system = match context.get_system() {
+            Aarch64Darwin => "macos-arm64",
+            Aarch64Linux => "linux-arm64",
+            X8664Darwin => "macos-x86_64",
+            X8664Linux => "linux-x86_64",
+            _ => return Err(anyhow::anyhow!("Unsupported system for neovim artifact")),
+        };
 
-    let step_script = formatdoc! {"
-        pushd ./source/{name}/nvim-{source_system}
-        cp -Rv * \"$VORPAL_OUTPUT/.\"",
-    };
+        let source_path = format!(
+            "https://github.com/neovim/neovim/releases/download/v{source_version}/nvim-{source_system}.tar.gz"
+        );
 
-    let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+        let source = ArtifactSource::new(name, &source_path).build();
 
-    let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+        let step_script = formatdoc! {"
+            pushd ./source/{name}/nvim-{source_system}
+            cp -Rv * \"$VORPAL_OUTPUT/.\"",
+        };
 
-    Artifact::new(name, steps, systems)
-        .with_aliases(vec![format!("{name}:{source_version}")])
-        .with_sources(vec![source])
-        .build(context)
-        .await
+        let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+
+        Artifact::new(name, steps, systems)
+            .with_aliases(vec![format!("{name}:{source_version}")])
+            .with_sources(vec![source])
+            .build(context)
+            .await
+    }
 }

@@ -6,38 +6,47 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext) -> Result<String> {
-    let name = "k9s";
-    let source_version = "0.50.18";
+#[derive(Default)]
+pub struct K9s;
 
-    let source_system = match context.get_system() {
-        Aarch64Darwin => "Darwin_arm64",
-        Aarch64Linux => "Linux_arm64",
-        X8664Darwin => "Darwin_amd64",
-        X8664Linux => "Linux_amd64",
-        _ => return Err(anyhow::anyhow!("Unsupported system for k9s artifact")),
-    };
+impl K9s {
+    pub fn new() -> Self {
+        Self
+    }
 
-    let source_path = format!(
-        "https://github.com/derailed/k9s/releases/download/v{source_version}/k9s_{source_system}.tar.gz"
-    );
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let name = "k9s";
+        let source_version = "0.50.18";
 
-    let source = ArtifactSource::new(name, &source_path).build();
+        let source_system = match context.get_system() {
+            Aarch64Darwin => "Darwin_arm64",
+            Aarch64Linux => "Linux_arm64",
+            X8664Darwin => "Darwin_amd64",
+            X8664Linux => "Linux_amd64",
+            _ => return Err(anyhow::anyhow!("Unsupported system for k9s artifact")),
+        };
 
-    let step_script = formatdoc! {"
-        mkdir -pv \"$VORPAL_OUTPUT/bin\"
-        pushd ./source/{name}
-        cp k9s \"$VORPAL_OUTPUT/bin/k9s\"
-        chmod +x \"$VORPAL_OUTPUT/bin/k9s\"",
-    };
+        let source_path = format!(
+            "https://github.com/derailed/k9s/releases/download/v{source_version}/k9s_{source_system}.tar.gz"
+        );
 
-    let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+        let source = ArtifactSource::new(name, &source_path).build();
 
-    let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+        let step_script = formatdoc! {"
+            mkdir -pv \"$VORPAL_OUTPUT/bin\"
+            pushd ./source/{name}
+            cp k9s \"$VORPAL_OUTPUT/bin/k9s\"
+            chmod +x \"$VORPAL_OUTPUT/bin/k9s\"",
+        };
 
-    Artifact::new(name, steps, systems)
-        .with_aliases(vec![format!("{name}:{source_version}")])
-        .with_sources(vec![source])
-        .build(context)
-        .await
+        let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+
+        Artifact::new(name, steps, systems)
+            .with_aliases(vec![format!("{name}:{source_version}")])
+            .with_sources(vec![source])
+            .build(context)
+            .await
+    }
 }
