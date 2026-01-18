@@ -32,17 +32,17 @@ async fn main() -> Result<()> {
     let libgpg_error = LibgpgError::new().build(context).await?;
 
     let libassuan = Libassuan::new()
-        .with_libgpg_error(libgpg_error.clone())
+        .with_libgpg_error(&libgpg_error)
         .build(context)
         .await?;
 
     let libgcrypt = Libgcrypt::new()
-        .with_libgpg_error(libgpg_error.clone())
+        .with_libgpg_error(&libgpg_error)
         .build(context)
         .await?;
 
     let libksba = Libksba::new()
-        .with_libgpg_error(libgpg_error.clone())
+        .with_libgpg_error(&libgpg_error)
         .build(context)
         .await?;
 
@@ -55,7 +55,7 @@ async fn main() -> Result<()> {
     let pkg_config = PkgConfig::new().build(context).await?;
 
     let readline = Readline::new()
-        .with_ncurses(ncurses.clone())
+        .with_ncurses(&ncurses)
         .build(context)
         .await?;
 
@@ -82,11 +82,11 @@ async fn main() -> Result<()> {
     GolangciLint::new().build(context).await?;
 
     Gpg::new()
-        .with_libassuan(libassuan)
-        .with_libgcrypt(libgcrypt)
-        .with_libgpg_error(libgpg_error)
-        .with_libksba(libksba)
-        .with_npth(npth)
+        .with_libassuan(&libassuan)
+        .with_libgcrypt(&libgcrypt)
+        .with_libgpg_error(&libgpg_error)
+        .with_libksba(&libksba)
+        .with_npth(&npth)
         .build(context)
         .await?;
 
@@ -111,9 +111,9 @@ async fn main() -> Result<()> {
     Nginx::new().build(context).await?;
 
     Nnn::new()
-        .with_ncurses(ncurses.clone())
-        .with_pkg_config(pkg_config)
-        .with_readline(readline)
+        .with_ncurses(&ncurses)
+        .with_pkg_config(&pkg_config)
+        .with_readline(&readline)
         .build(context)
         .await?;
 
@@ -131,8 +131,8 @@ async fn main() -> Result<()> {
     Terraform::new().build(context).await?;
 
     Tmux::new()
-        .with_libevent(libevent)
-        .with_ncurses(ncurses.clone())
+        .with_libevent(&libevent)
+        .with_ncurses(&ncurses)
         .build(context)
         .await?;
 
@@ -140,10 +140,7 @@ async fn main() -> Result<()> {
 
     Yq::new().build(context).await?;
 
-    Zsh::new()
-        .with_ncurses(ncurses.clone())
-        .build(context)
-        .await?;
+    Zsh::new().with_ncurses(&ncurses).build(context).await?;
 
     context.run().await
 }

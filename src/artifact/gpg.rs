@@ -8,15 +8,15 @@ use vorpal_sdk::{
 };
 
 #[derive(Default)]
-pub struct Gpg {
-    libassuan: Option<String>,
-    libgcrypt: Option<String>,
-    libgpg_error: Option<String>,
-    libksba: Option<String>,
-    npth: Option<String>,
+pub struct Gpg<'a> {
+    libassuan: Option<&'a str>,
+    libgcrypt: Option<&'a str>,
+    libgpg_error: Option<&'a str>,
+    libksba: Option<&'a str>,
+    npth: Option<&'a str>,
 }
 
-impl Gpg {
+impl<'a> Gpg<'a> {
     pub fn new() -> Self {
         Self {
             libassuan: None,
@@ -27,70 +27,70 @@ impl Gpg {
         }
     }
 
-    pub fn with_libassuan(mut self, libassuan: String) -> Self {
+    pub fn with_libassuan(mut self, libassuan: &'a str) -> Self {
         self.libassuan = Some(libassuan);
         self
     }
 
-    pub fn with_libgcrypt(mut self, libgcrypt: String) -> Self {
+    pub fn with_libgcrypt(mut self, libgcrypt: &'a str) -> Self {
         self.libgcrypt = Some(libgcrypt);
         self
     }
 
-    pub fn with_libgpg_error(mut self, libgpg_error: String) -> Self {
+    pub fn with_libgpg_error(mut self, libgpg_error: &'a str) -> Self {
         self.libgpg_error = Some(libgpg_error);
         self
     }
 
-    pub fn with_libksba(mut self, libksba: String) -> Self {
+    pub fn with_libksba(mut self, libksba: &'a str) -> Self {
         self.libksba = Some(libksba);
         self
     }
 
-    pub fn with_npth(mut self, npth: String) -> Self {
+    pub fn with_npth(mut self, npth: &'a str) -> Self {
         self.npth = Some(npth);
         self
     }
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         let libgpg_error = match self.libgpg_error {
-            Some(val) => val.clone(),
-            None => libgpg_error::LibgpgError::new().build(context).await?,
+            Some(val) => val,
+            None => &libgpg_error::LibgpgError::new().build(context).await?,
         };
 
         let libassuan = match self.libassuan {
-            Some(val) => val.clone(),
+            Some(val) => val,
             None => {
-                libassuan::Libassuan::new()
-                    .with_libgpg_error(libgpg_error.clone())
+                &libassuan::Libassuan::new()
+                    .with_libgpg_error(libgpg_error)
                     .build(context)
                     .await?
             }
         };
 
         let libgcrypt = match self.libgcrypt {
-            Some(val) => val.clone(),
+            Some(val) => val,
             None => {
-                libgcrypt::Libgcrypt::new()
-                    .with_libgpg_error(libgpg_error.clone())
+                &libgcrypt::Libgcrypt::new()
+                    .with_libgpg_error(libgpg_error)
                     .build(context)
                     .await?
             }
         };
 
         let libksba = match self.libksba {
-            Some(val) => val.clone(),
+            Some(val) => val,
             None => {
-                libksba::Libksba::new()
-                    .with_libgpg_error(libgpg_error.clone())
+                &libksba::Libksba::new()
+                    .with_libgpg_error(libgpg_error)
                     .build(context)
                     .await?
             }
         };
 
         let npth = match self.npth {
-            Some(val) => val.clone(),
-            None => npth::Npth::new().build(context).await?,
+            Some(val) => val,
+            None => &npth::Npth::new().build(context).await?,
         };
 
         let name = "gpg";
@@ -121,22 +121,22 @@ impl Gpg {
 
             make
             make install",
-            libassuan = get_env_key(&libassuan),
-            libgcrypt = get_env_key(&libgcrypt),
-            libgpg_error = get_env_key(&libgpg_error),
-            libksba = get_env_key(&libksba),
-            npth = get_env_key(&npth),
+            libassuan = get_env_key(&libassuan.to_string()),
+            libgcrypt = get_env_key(&libgcrypt.to_string()),
+            libgpg_error = get_env_key(&libgpg_error.to_string()),
+            libksba = get_env_key(&libksba.to_string()),
+            npth = get_env_key(&npth.to_string()),
         };
 
         let steps = vec![
             step::shell(
                 context,
                 vec![
-                    libassuan.clone(),
-                    libgcrypt.clone(),
-                    libgpg_error.clone(),
-                    libksba.clone(),
-                    npth.clone(),
+                    libassuan.to_string(),
+                    libgcrypt.to_string(),
+                    libgpg_error.to_string(),
+                    libksba.to_string(),
+                    npth.to_string(),
                 ],
                 vec![],
                 script,

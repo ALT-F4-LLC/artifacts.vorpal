@@ -1,4 +1,4 @@
-use crate::artifact::openjdk;
+use crate::artifact::openjdk::Openjdk;
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
@@ -9,7 +9,7 @@ use vorpal_sdk::{
 
 #[derive(Default)]
 pub struct OpenapiGeneratorCli<'a> {
-    openjdk: Option<&'a String>,
+    openjdk: Option<&'a str>,
 }
 
 impl<'a> OpenapiGeneratorCli<'a> {
@@ -17,15 +17,15 @@ impl<'a> OpenapiGeneratorCli<'a> {
         Self { openjdk: None }
     }
 
-    pub fn with_openjdk(mut self, openjdk: &'a String) -> Self {
+    pub fn with_openjdk(mut self, openjdk: &'a str) -> Self {
         self.openjdk = Some(openjdk);
         self
     }
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         let openjdk = match self.openjdk {
-            Some(val) => val.clone(),
-            None => openjdk::Openjdk::new().build(context).await?,
+            Some(val) => val,
+            None => &Openjdk::new().build(context).await?,
         };
 
         let name = "openapi-generator-cli";
@@ -37,7 +37,7 @@ impl<'a> OpenapiGeneratorCli<'a> {
 
         let source = ArtifactSource::new(name, &source_path).build();
 
-        let env_openjdk = get_env_key(&openjdk);
+        let env_openjdk = get_env_key(&openjdk.to_string());
 
         let step_script = formatdoc! {"
             mkdir -p \"$VORPAL_OUTPUT/bin\"
@@ -68,7 +68,7 @@ impl<'a> OpenapiGeneratorCli<'a> {
         let steps = vec![
             step::shell(
                 context,
-                vec![openjdk],
+                vec![openjdk.to_string()],
                 environments.to_vec(),
                 step_script,
                 vec![],

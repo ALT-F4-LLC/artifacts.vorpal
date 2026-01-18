@@ -1,4 +1,4 @@
-use crate::artifact::{ncurses, pkg_config, readline};
+use crate::artifact::{ncurses::Ncurses, pkg_config::PkgConfig, readline::Readline};
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
@@ -8,13 +8,13 @@ use vorpal_sdk::{
 };
 
 #[derive(Default)]
-pub struct Nnn {
-    ncurses: Option<String>,
-    pkg_config: Option<String>,
-    readline: Option<String>,
+pub struct Nnn<'a> {
+    ncurses: Option<&'a str>,
+    pkg_config: Option<&'a str>,
+    readline: Option<&'a str>,
 }
 
-impl Nnn {
+impl<'a> Nnn<'a> {
     pub fn new() -> Self {
         Self {
             ncurses: None,
@@ -23,40 +23,35 @@ impl Nnn {
         }
     }
 
-    pub fn with_ncurses(mut self, ncurses: String) -> Self {
+    pub fn with_ncurses(mut self, ncurses: &'a str) -> Self {
         self.ncurses = Some(ncurses);
         self
     }
 
-    pub fn with_pkg_config(mut self, pkg_config: String) -> Self {
+    pub fn with_pkg_config(mut self, pkg_config: &'a str) -> Self {
         self.pkg_config = Some(pkg_config);
         self
     }
 
-    pub fn with_readline(mut self, readline: String) -> Self {
+    pub fn with_readline(mut self, readline: &'a str) -> Self {
         self.readline = Some(readline);
         self
     }
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         let ncurses = match self.ncurses {
-            Some(val) => val.clone(),
-            None => ncurses::Ncurses::new().build(context).await?,
+            Some(val) => val,
+            None => &Ncurses::new().build(context).await?,
         };
 
         let pkg_config = match self.pkg_config {
-            Some(val) => val.clone(),
-            None => pkg_config::PkgConfig::new().build(context).await?,
+            Some(val) => val,
+            None => &PkgConfig::new().build(context).await?,
         };
 
         let readline = match self.readline {
-            Some(val) => val.clone(),
-            None => {
-                readline::Readline::new()
-                    .with_ncurses(ncurses.clone())
-                    .build(context)
-                    .await?
-            }
+            Some(val) => val,
+            None => &Readline::new().with_ncurses(ncurses).build(context).await?,
         };
 
         let name = "nnn";
@@ -78,15 +73,19 @@ impl Nnn {
 
             make PREFIX=\"$VORPAL_OUTPUT\"
             make PREFIX=\"$VORPAL_OUTPUT\" install",
-            ncurses = get_env_key(&ncurses),
-            pkg_config = get_env_key(&pkg_config),
-            readline = get_env_key(&readline),
+            ncurses = get_env_key(&ncurses.to_string()),
+            pkg_config = get_env_key(&pkg_config.to_string()),
+            readline = get_env_key(&readline.to_string()),
         };
 
         let steps = vec![
             step::shell(
                 context,
-                vec![ncurses.clone(), pkg_config.clone(), readline.clone()],
+                vec![
+                    ncurses.to_string(),
+                    pkg_config.to_string(),
+                    readline.to_string(),
+                ],
                 vec![],
                 script,
                 vec![],

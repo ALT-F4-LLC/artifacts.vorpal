@@ -8,24 +8,24 @@ use vorpal_sdk::{
 };
 
 #[derive(Default)]
-pub struct Readline {
-    ncurses: Option<String>,
+pub struct Readline<'a> {
+    ncurses: Option<&'a str>,
 }
 
-impl Readline {
+impl<'a> Readline<'a> {
     pub fn new() -> Self {
         Self { ncurses: None }
     }
 
-    pub fn with_ncurses(mut self, ncurses: String) -> Self {
+    pub fn with_ncurses(mut self, ncurses: &'a str) -> Self {
         self.ncurses = Some(ncurses);
         self
     }
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         let ncurses = match self.ncurses {
-            Some(val) => val.clone(),
-            None => ncurses::Ncurses::new().build(context).await?,
+            Some(val) => val,
+            None => &ncurses::Ncurses::new().build(context).await?,
         };
 
         let name = "readline";
@@ -47,11 +47,19 @@ impl Readline {
 
             make
             make install",
-            ncurses = get_env_key(&ncurses),
+            ncurses = get_env_key(&ncurses.to_string()),
         };
 
-        let steps =
-            vec![step::shell(context, vec![ncurses.clone()], vec![], step_script, vec![]).await?];
+        let steps = vec![
+            step::shell(
+                context,
+                vec![ncurses.to_string()],
+                vec![],
+                step_script,
+                vec![],
+            )
+            .await?,
+        ];
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 
         Artifact::new(name, steps, systems)

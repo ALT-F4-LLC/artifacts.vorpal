@@ -1,4 +1,4 @@
-use crate::artifact::{libevent, ncurses};
+use crate::artifact::{libevent::Libevent, ncurses::Ncurses};
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
@@ -8,12 +8,12 @@ use vorpal_sdk::{
 };
 
 #[derive(Default)]
-pub struct Tmux {
-    libevent: Option<String>,
-    ncurses: Option<String>,
+pub struct Tmux<'a> {
+    libevent: Option<&'a str>,
+    ncurses: Option<&'a str>,
 }
 
-impl Tmux {
+impl<'a> Tmux<'a> {
     pub fn new() -> Self {
         Self {
             libevent: None,
@@ -21,25 +21,25 @@ impl Tmux {
         }
     }
 
-    pub fn with_libevent(mut self, libevent: String) -> Self {
+    pub fn with_libevent(mut self, libevent: &'a str) -> Self {
         self.libevent = Some(libevent);
         self
     }
 
-    pub fn with_ncurses(mut self, ncurses: String) -> Self {
+    pub fn with_ncurses(mut self, ncurses: &'a str) -> Self {
         self.ncurses = Some(ncurses);
         self
     }
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         let libevent = match self.libevent {
-            Some(val) => val.clone(),
-            None => libevent::Libevent::new().build(context).await?,
+            Some(val) => val,
+            None => &Libevent::new().build(context).await?,
         };
 
         let ncurses = match self.ncurses {
-            Some(val) => val.clone(),
-            None => ncurses::Ncurses::new().build(context).await?,
+            Some(val) => val,
+            None => &Ncurses::new().build(context).await?,
         };
 
         let name = "tmux";
@@ -63,14 +63,14 @@ impl Tmux {
 
             make
             make install",
-            libevent = get_env_key(&libevent),
-            ncurses = get_env_key(&ncurses),
+            libevent = get_env_key(&libevent.to_string()),
+            ncurses = get_env_key(&ncurses.to_string()),
         };
 
         let steps = vec![
             step::shell(
                 context,
-                vec![libevent.clone(), ncurses.clone()],
+                vec![libevent.to_string(), ncurses.to_string()],
                 vec![],
                 script,
                 vec![],
