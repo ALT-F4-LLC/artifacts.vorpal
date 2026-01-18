@@ -6,38 +6,48 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext) -> Result<String> {
-    let name = "nginx";
+#[derive(Default)]
+pub struct Nginx;
 
-    let source_version = "1.27.5";
+impl Nginx {
+    pub fn new() -> Self {
+        Self
+    }
 
-    let source_path =
-        format!("https://github.com/nginx/nginx/archive/refs/tags/release-{source_version}.tar.gz");
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let name = "nginx";
 
-    let source = ArtifactSource::new(name, source_path.as_str()).build();
+        let source_version = "1.27.5";
 
-    let step_script = formatdoc! {"
-        mkdir -pv \"$VORPAL_OUTPUT/bin\"
+        let source_path = format!(
+            "https://github.com/nginx/nginx/archive/refs/tags/release-{source_version}.tar.gz"
+        );
 
-        pushd ./source/{name}/nginx-release-{source_version}
+        let source = ArtifactSource::new(name, source_path.as_str()).build();
 
-        ./auto/configure \
-            --prefix=$VORPAL_OUTPUT \
-            --without-http_rewrite_module
+        let step_script = formatdoc! {"
+            mkdir -pv \"$VORPAL_OUTPUT/bin\"
 
-        make
-        make install
+            pushd ./source/{name}/nginx-release-{source_version}
 
-        ln -svf $VORPAL_OUTPUT/sbin/nginx $VORPAL_OUTPUT/bin/nginx",
-    };
+            ./auto/configure \
+                --prefix=$VORPAL_OUTPUT \
+                --without-http_rewrite_module
 
-    let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+            make
+            make install
 
-    let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+            ln -svf $VORPAL_OUTPUT/sbin/nginx $VORPAL_OUTPUT/bin/nginx",
+        };
 
-    Artifact::new(name, steps, systems)
-        .with_aliases(vec![format!("{name}:{source_version}")])
-        .with_sources(vec![source])
-        .build(context)
-        .await
+        let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+
+        Artifact::new(name, steps, systems)
+            .with_aliases(vec![format!("{name}:{source_version}")])
+            .with_sources(vec![source])
+            .build(context)
+            .await
+    }
 }

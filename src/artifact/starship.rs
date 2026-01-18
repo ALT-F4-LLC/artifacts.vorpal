@@ -6,38 +6,47 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext) -> Result<String> {
-    let name = "starship";
-    let source_version = "1.21.1";
+#[derive(Default)]
+pub struct Starship;
 
-    let source_system = match context.get_system() {
-        Aarch64Darwin => "aarch64-apple-darwin",
-        Aarch64Linux => "aarch64-unknown-linux-musl",
-        X8664Darwin => "x86_64-apple-darwin",
-        X8664Linux => "x86_64-unknown-linux-musl",
-        _ => return Err(anyhow::anyhow!("Unsupported system for starship artifact")),
-    };
+impl Starship {
+    pub fn new() -> Self {
+        Self
+    }
 
-    let source_path = format!(
-        "https://github.com/starship/starship/releases/download/v{source_version}/starship-{source_system}.tar.gz"
-    );
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let name = "starship";
+        let source_version = "1.21.1";
 
-    let source = ArtifactSource::new(name, &source_path).build();
+        let source_system = match context.get_system() {
+            Aarch64Darwin => "aarch64-apple-darwin",
+            Aarch64Linux => "aarch64-unknown-linux-musl",
+            X8664Darwin => "x86_64-apple-darwin",
+            X8664Linux => "x86_64-unknown-linux-musl",
+            _ => return Err(anyhow::anyhow!("Unsupported system for starship artifact")),
+        };
 
-    let step_script = formatdoc! {"
-        mkdir -pv \"$VORPAL_OUTPUT/bin\"
-        pushd ./source/{name}
-        cp starship \"$VORPAL_OUTPUT/bin/starship\"
-        chmod +x \"$VORPAL_OUTPUT/bin/starship\"",
-    };
+        let source_path = format!(
+            "https://github.com/starship/starship/releases/download/v{source_version}/starship-{source_system}.tar.gz"
+        );
 
-    let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+        let source = ArtifactSource::new(name, &source_path).build();
 
-    let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+        let step_script = formatdoc! {"
+            mkdir -pv \"$VORPAL_OUTPUT/bin\"
+            pushd ./source/{name}
+            cp starship \"$VORPAL_OUTPUT/bin/starship\"
+            chmod +x \"$VORPAL_OUTPUT/bin/starship\"",
+        };
 
-    Artifact::new(name, steps, systems)
-        .with_aliases(vec![format!("{name}:{source_version}")])
-        .with_sources(vec![source])
-        .build(context)
-        .await
+        let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+
+        Artifact::new(name, steps, systems)
+            .with_aliases(vec![format!("{name}:{source_version}")])
+            .with_sources(vec![source])
+            .build(context)
+            .await
+    }
 }

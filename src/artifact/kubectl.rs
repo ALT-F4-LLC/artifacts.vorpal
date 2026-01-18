@@ -6,37 +6,46 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext) -> Result<String> {
-    let name = "kubectl";
-    let source_version = "1.35.0";
+#[derive(Default)]
+pub struct Kubectl;
 
-    let (source_os, source_arch) = match context.get_system() {
-        Aarch64Darwin => ("darwin", "arm64"),
-        Aarch64Linux => ("linux", "arm64"),
-        X8664Darwin => ("darwin", "amd64"),
-        X8664Linux => ("linux", "amd64"),
-        _ => return Err(anyhow::anyhow!("Unsupported system for kubectl artifact")),
-    };
+impl Kubectl {
+    pub fn new() -> Self {
+        Self
+    }
 
-    let source_path = format!(
-        "https://dl.k8s.io/release/v{source_version}/bin/{source_os}/{source_arch}/kubectl"
-    );
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let name = "kubectl";
+        let source_version = "1.35.0";
 
-    let source = ArtifactSource::new(name, &source_path).build();
+        let (source_os, source_arch) = match context.get_system() {
+            Aarch64Darwin => ("darwin", "arm64"),
+            Aarch64Linux => ("linux", "arm64"),
+            X8664Darwin => ("darwin", "amd64"),
+            X8664Linux => ("linux", "amd64"),
+            _ => return Err(anyhow::anyhow!("Unsupported system for kubectl artifact")),
+        };
 
-    let step_script = formatdoc! {"
-        mkdir -pv \"$VORPAL_OUTPUT/bin\"
-        cp ./source/{name}/kubectl \"$VORPAL_OUTPUT/bin/kubectl\"
-        chmod +x \"$VORPAL_OUTPUT/bin/kubectl\"",
-    };
+        let source_path = format!(
+            "https://dl.k8s.io/release/v{source_version}/bin/{source_os}/{source_arch}/kubectl"
+        );
 
-    let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+        let source = ArtifactSource::new(name, &source_path).build();
 
-    let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+        let step_script = formatdoc! {"
+            mkdir -pv \"$VORPAL_OUTPUT/bin\"
+            cp ./source/{name}/kubectl \"$VORPAL_OUTPUT/bin/kubectl\"
+            chmod +x \"$VORPAL_OUTPUT/bin/kubectl\"",
+        };
 
-    Artifact::new(name, steps, systems)
-        .with_aliases(vec![format!("{name}:{source_version}")])
-        .with_sources(vec![source])
-        .build(context)
-        .await
+        let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+
+        Artifact::new(name, steps, systems)
+            .with_aliases(vec![format!("{name}:{source_version}")])
+            .with_sources(vec![source])
+            .build(context)
+            .await
+    }
 }

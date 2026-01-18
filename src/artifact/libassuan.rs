@@ -1,3 +1,4 @@
+use crate::artifact::libgpg_error;
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
@@ -6,38 +7,59 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext, libgpg_error: &String) -> Result<String> {
-    let name = "libassuan";
-    let version = "3.0.2";
+#[derive(Default)]
+pub struct Libassuan {
+    libgpg_error: Option<String>,
+}
 
-    let path = format!("https://gnupg.org/ftp/gcrypt/libassuan/libassuan-{version}.tar.bz2");
+impl Libassuan {
+    pub fn new() -> Self {
+        Self { libgpg_error: None }
+    }
 
-    let source = ArtifactSource::new(name, &path).build();
+    pub fn with_libgpg_error(mut self, libgpg_error: String) -> Self {
+        self.libgpg_error = Some(libgpg_error);
+        self
+    }
 
-    let script = formatdoc! {"
-        mkdir -pv \"$VORPAL_OUTPUT\"
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let libgpg_error = match self.libgpg_error {
+            Some(val) => val.clone(),
+            None => libgpg_error::LibgpgError::new().build(context).await?,
+        };
 
-        pushd ./source/{name}/libassuan-{version}
+        let name = "libassuan";
+        let version = "3.0.2";
 
-        export PATH=\"{libgpg_error}/bin:$PATH\"
-        export CPPFLAGS=\"-I{libgpg_error}/include\"
-        export LDFLAGS=\"-L{libgpg_error}/lib -Wl,-rpath,{libgpg_error}/lib\"
+        let path = format!("https://gnupg.org/ftp/gcrypt/libassuan/libassuan-{version}.tar.bz2");
 
-        ./configure --prefix=\"$VORPAL_OUTPUT\" --with-libgpg-error-prefix={libgpg_error}
+        let source = ArtifactSource::new(name, &path).build();
 
-        make
-        make install",
-        libgpg_error = get_env_key(libgpg_error),
-    };
+        let script = formatdoc! {"
+            mkdir -pv \"$VORPAL_OUTPUT\"
 
-    let steps =
-        vec![step::shell(context, vec![libgpg_error.clone()], vec![], script, vec![]).await?];
+            pushd ./source/{name}/libassuan-{version}
 
-    let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+            export PATH=\"{libgpg_error}/bin:$PATH\"
+            export CPPFLAGS=\"-I{libgpg_error}/include\"
+            export LDFLAGS=\"-L{libgpg_error}/lib -Wl,-rpath,{libgpg_error}/lib\"
 
-    Artifact::new(name, steps, systems)
-        .with_aliases(vec![format!("{name}:{version}")])
-        .with_sources(vec![source])
-        .build(context)
-        .await
+            ./configure --prefix=\"$VORPAL_OUTPUT\" --with-libgpg-error-prefix={libgpg_error}
+
+            make
+            make install",
+            libgpg_error = get_env_key(&libgpg_error),
+        };
+
+        let steps =
+            vec![step::shell(context, vec![libgpg_error.clone()], vec![], script, vec![]).await?];
+
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+
+        Artifact::new(name, steps, systems)
+            .with_aliases(vec![format!("{name}:{version}")])
+            .with_sources(vec![source])
+            .build(context)
+            .await
+    }
 }

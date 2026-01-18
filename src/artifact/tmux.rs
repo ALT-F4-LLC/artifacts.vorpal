@@ -1,3 +1,4 @@
+use crate::artifact::{libevent, ncurses};
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
@@ -6,51 +7,83 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(
-    context: &mut ConfigContext,
-    libevent: &String,
-    ncurses: &String,
-) -> Result<String> {
-    let name = "tmux";
-    let version = "3.5a";
+#[derive(Default)]
+pub struct Tmux {
+    libevent: Option<String>,
+    ncurses: Option<String>,
+}
 
-    let path =
-        format!("https://github.com/tmux/tmux/releases/download/{version}/tmux-{version}.tar.gz");
+impl Tmux {
+    pub fn new() -> Self {
+        Self {
+            libevent: None,
+            ncurses: None,
+        }
+    }
 
-    let source = ArtifactSource::new(name, &path).build();
+    pub fn with_libevent(mut self, libevent: String) -> Self {
+        self.libevent = Some(libevent);
+        self
+    }
 
-    let script = formatdoc! {"
-        mkdir -pv \"$VORPAL_OUTPUT\"
+    pub fn with_ncurses(mut self, ncurses: String) -> Self {
+        self.ncurses = Some(ncurses);
+        self
+    }
 
-        pushd ./source/{name}/tmux-{version}
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let libevent = match self.libevent {
+            Some(val) => val.clone(),
+            None => libevent::Libevent::new().build(context).await?,
+        };
 
-        export CPPFLAGS=\"-I{libevent}/include -I{ncurses}/include -I{ncurses}/include/ncursesw\"
-        export LDFLAGS=\"-L{libevent}/lib -L{ncurses}/lib -Wl,-rpath,{libevent}/lib -Wl,-rpath,{ncurses}/lib\"
+        let ncurses = match self.ncurses {
+            Some(val) => val.clone(),
+            None => ncurses::Ncurses::new().build(context).await?,
+        };
 
-        ./configure --disable-utf8proc --prefix=\"$VORPAL_OUTPUT\"
+        let name = "tmux";
+        let version = "3.5a";
 
-        make
-        make install",
-        libevent = get_env_key(libevent),
-        ncurses = get_env_key(ncurses),
-    };
+        let path = format!(
+            "https://github.com/tmux/tmux/releases/download/{version}/tmux-{version}.tar.gz"
+        );
 
-    let steps = vec![
-        step::shell(
-            context,
-            vec![libevent.clone(), ncurses.clone()],
-            vec![],
-            script,
-            vec![],
-        )
-        .await?,
-    ];
+        let source = ArtifactSource::new(name, &path).build();
 
-    let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+        let script = formatdoc! {"
+            mkdir -pv \"$VORPAL_OUTPUT\"
 
-    Artifact::new(name, steps, systems)
-        .with_aliases(vec![format!("{name}:{version}")])
-        .with_sources(vec![source])
-        .build(context)
-        .await
+            pushd ./source/{name}/tmux-{version}
+
+            export CPPFLAGS=\"-I{libevent}/include -I{ncurses}/include -I{ncurses}/include/ncursesw\"
+            export LDFLAGS=\"-L{libevent}/lib -L{ncurses}/lib -Wl,-rpath,{libevent}/lib -Wl,-rpath,{ncurses}/lib\"
+
+            ./configure --disable-utf8proc --prefix=\"$VORPAL_OUTPUT\"
+
+            make
+            make install",
+            libevent = get_env_key(&libevent),
+            ncurses = get_env_key(&ncurses),
+        };
+
+        let steps = vec![
+            step::shell(
+                context,
+                vec![libevent.clone(), ncurses.clone()],
+                vec![],
+                script,
+                vec![],
+            )
+            .await?,
+        ];
+
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+
+        Artifact::new(name, steps, systems)
+            .with_aliases(vec![format!("{name}:{version}")])
+            .with_sources(vec![source])
+            .build(context)
+            .await
+    }
 }

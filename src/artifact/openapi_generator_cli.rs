@@ -1,3 +1,4 @@
+use crate::artifact::openjdk;
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
@@ -6,60 +7,81 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext, openjdk: String) -> Result<String> {
-    let name = "openapi-generator-cli";
-    let source_version = "7.18.0";
+#[derive(Default)]
+pub struct OpenapiGeneratorCli<'a> {
+    openjdk: Option<&'a String>,
+}
 
-    let source_path = format!(
-        "https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/{source_version}/openapi-generator-cli-{source_version}.jar"
-    );
+impl<'a> OpenapiGeneratorCli<'a> {
+    pub fn new() -> Self {
+        Self { openjdk: None }
+    }
 
-    let source = ArtifactSource::new(name, &source_path).build();
+    pub fn with_openjdk(mut self, openjdk: &'a String) -> Self {
+        self.openjdk = Some(openjdk);
+        self
+    }
 
-    let env_openjdk = get_env_key(&openjdk);
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let openjdk = match self.openjdk {
+            Some(val) => val.clone(),
+            None => openjdk::Openjdk::new().build(context).await?,
+        };
 
-    let step_script = formatdoc! {"
-        mkdir -p \"$VORPAL_OUTPUT/bin\"
+        let name = "openapi-generator-cli";
+        let source_version = "7.18.0";
 
-        pushd ./source/{name}
+        let source_path = format!(
+            "https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/{source_version}/openapi-generator-cli-{source_version}.jar"
+        );
 
-        cp META-INF/MANIFEST.MF ../MANIFEST.MF
+        let source = ArtifactSource::new(name, &source_path).build();
 
-        jar cfm ../openapi-generator-cli.jar ../MANIFEST.MF .
+        let env_openjdk = get_env_key(&openjdk);
 
-        mv -v ../openapi-generator-cli.jar \"$VORPAL_OUTPUT/openapi-generator-cli.jar\"
+        let step_script = formatdoc! {"
+            mkdir -p \"$VORPAL_OUTPUT/bin\"
 
-        cat << 'EOF' > \"$VORPAL_OUTPUT/bin/openapi-generator-cli\"
-        #!/bin/sh
-        JAVA_HOME={env_openjdk}/Contents/Home
-        PATH=$JAVA_HOME/bin:$PATH
-        java -jar \"$VORPAL_OUTPUT/openapi-generator-cli.jar\" \"$@\"
-        EOF
+            pushd ./source/{name}
 
-        chmod +x \"$VORPAL_OUTPUT/bin/openapi-generator-cli\""
-    };
+            cp META-INF/MANIFEST.MF ../MANIFEST.MF
 
-    let environments = [
-        format!("JAVA_HOME={env_openjdk}/Contents/Home"),
-        "PATH=$JAVA_HOME/bin:$PATH".to_string(),
-    ];
+            jar cfm ../openapi-generator-cli.jar ../MANIFEST.MF .
 
-    let steps = vec![
-        step::shell(
-            context,
-            vec![openjdk],
-            environments.to_vec(),
-            step_script,
-            vec![],
-        )
-        .await?,
-    ];
+            mv -v ../openapi-generator-cli.jar \"$VORPAL_OUTPUT/openapi-generator-cli.jar\"
 
-    let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+            cat << 'EOF' > \"$VORPAL_OUTPUT/bin/openapi-generator-cli\"
+            #!/bin/sh
+            JAVA_HOME={env_openjdk}/Contents/Home
+            PATH=$JAVA_HOME/bin:$PATH
+            java -jar \"$VORPAL_OUTPUT/openapi-generator-cli.jar\" \"$@\"
+            EOF
 
-    Artifact::new(name, steps, systems)
-        .with_aliases(vec![format!("{name}:{source_version}")])
-        .with_sources(vec![source])
-        .build(context)
-        .await
+            chmod +x \"$VORPAL_OUTPUT/bin/openapi-generator-cli\""
+        };
+
+        let environments = [
+            format!("JAVA_HOME={env_openjdk}/Contents/Home"),
+            "PATH=$JAVA_HOME/bin:$PATH".to_string(),
+        ];
+
+        let steps = vec![
+            step::shell(
+                context,
+                vec![openjdk],
+                environments.to_vec(),
+                step_script,
+                vec![],
+            )
+            .await?,
+        ];
+
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+
+        Artifact::new(name, steps, systems)
+            .with_aliases(vec![format!("{name}:{source_version}")])
+            .with_sources(vec![source])
+            .build(context)
+            .await
+    }
 }

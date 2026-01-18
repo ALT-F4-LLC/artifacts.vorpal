@@ -6,34 +6,43 @@ use vorpal_sdk::{
     context::ConfigContext,
 };
 
-pub async fn build(context: &mut ConfigContext) -> Result<String> {
-    let name = "libevent";
-    let version = "2.1.12";
+#[derive(Default)]
+pub struct Libevent;
 
-    let path = format!(
-        "https://github.com/libevent/libevent/releases/download/release-{version}-stable/libevent-{version}-stable.tar.gz"
-    );
+impl Libevent {
+    pub fn new() -> Self {
+        Self
+    }
 
-    let source = ArtifactSource::new(name, &path).build();
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let name = "libevent";
+        let version = "2.1.12";
 
-    let script = formatdoc! {"
-        mkdir -pv \"$VORPAL_OUTPUT\"
-        pushd ./source/{name}/{name}-{version}-stable
-        ./configure \
-            --disable-openssl \
-            --enable-shared \
-            --prefix=\"$VORPAL_OUTPUT\"
-        make
-        make install",
-    };
+        let path = format!(
+            "https://github.com/libevent/libevent/releases/download/release-{version}-stable/libevent-{version}-stable.tar.gz"
+        );
 
-    let steps = vec![step::shell(context, vec![], vec![], script, vec![]).await?];
+        let source = ArtifactSource::new(name, &path).build();
 
-    let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+        let script = formatdoc! {"
+            mkdir -pv \"$VORPAL_OUTPUT\"
+            pushd ./source/{name}/{name}-{version}-stable
+            ./configure \
+                --disable-openssl \
+                --enable-shared \
+                --prefix=\"$VORPAL_OUTPUT\"
+            make
+            make install",
+        };
 
-    Artifact::new(name, steps, systems)
-        .with_aliases(vec![format!("{name}:{version}")])
-        .with_sources(vec![source])
-        .build(context)
-        .await
+        let steps = vec![step::shell(context, vec![], vec![], script, vec![]).await?];
+
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
+
+        Artifact::new(name, steps, systems)
+            .with_aliases(vec![format!("{name}:{version}")])
+            .with_sources(vec![source])
+            .build(context)
+            .await
+    }
 }
