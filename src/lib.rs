@@ -4,7 +4,7 @@ use vorpal_sdk::{
         ArtifactSystem,
         ArtifactSystem::{Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux},
     },
-    artifact::{get_env_key, protoc, rust_toolchain},
+    artifact::{get_env_key, protoc::Protoc, rust_toolchain, rust_toolchain::RustToolchain},
     context::ConfigContext,
 };
 
@@ -29,8 +29,8 @@ impl ProjectEnvironment {
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         // Dependencies
 
-        let protoc = protoc::build(context).await?;
-        let rust_toolchain = rust_toolchain::build(context).await?;
+        let protoc = Protoc::new().build(context).await?;
+        let rust_toolchain = RustToolchain::new().build(context).await?;
         let rust_toolchain_target = rust_toolchain::target(context.get_system())?;
         let rust_toolchain_version = rust_toolchain::version();
 
