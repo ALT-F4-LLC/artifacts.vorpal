@@ -46,6 +46,7 @@ jobs:
           - argocd
           - awscli2
           - bat
+          - beads
           - bottom
           - crane
           - cue

@@ -1,6 +1,7 @@
 pub mod argocd;
 pub mod awscli2;
 pub mod bat;
+pub mod beads;
 pub mod bottom;
 pub mod crane;
 pub mod cue;
