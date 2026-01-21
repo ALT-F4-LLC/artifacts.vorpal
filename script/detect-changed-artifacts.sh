@@ -15,7 +15,7 @@ set -euo pipefail
 
 # Script location (for relative paths)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Utility files to exclude from artifact discovery
 EXCLUDED_FILES=("file.rs")
