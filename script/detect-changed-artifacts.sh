@@ -84,7 +84,7 @@ get_changed_artifacts() {
     fi
 
     # Build set of directly changed artifacts
-    declare -A artifacts_to_build
+    declare -A artifacts_to_build=()
 
     while IFS= read -r file; do
         # Check if it's an artifact file
