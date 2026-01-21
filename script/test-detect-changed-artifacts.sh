@@ -72,11 +72,11 @@ test_non_artifact_changes_dont_trigger_full_rebuild() {
     local total_artifacts
     total_artifacts="$("$DETECT_SCRIPT" --all | jq 'length')"
 
-    # Test with commits 5fc8933 to 7792d06 which added beads and jj
+    # Test with commits 5fc8933 to 98beb7a (squash merge of PR #9) which added beads and jj
     # These commits also modified src/vorpal.rs, Cargo.lock, and workflow files
     # but should ONLY return beads and jj (not all artifacts)
     local result
-    result="$("$DETECT_SCRIPT" 5fc8933e5f5ddb18b00d2d307d676e4c503814c7 7792d068ed56138721ddeb58c5467393eb9f1d91)"
+    result="$("$DETECT_SCRIPT" 5fc8933e5f5ddb18b00d2d307d676e4c503814c7 98beb7acbc192e0471891fed1942026c7fbc6296)"
 
     local result_count
     result_count="$(echo "$result" | jq 'length')"
