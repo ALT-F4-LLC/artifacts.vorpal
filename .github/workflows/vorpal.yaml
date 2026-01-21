@@ -25,6 +25,8 @@ jobs:
       has_changes: ${{ steps.filter.outputs.has_changes }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Detect changed artifacts
         id: filter
