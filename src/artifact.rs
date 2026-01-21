@@ -1,6 +1,7 @@
 pub mod argocd;
 pub mod awscli2;
 pub mod bat;
+pub mod beads;
 pub mod bottom;
 pub mod crane;
 pub mod cue;
@@ -12,6 +13,7 @@ pub mod fluxcd;
 pub mod golangci_lint;
 pub mod gpg;
 pub mod helm;
+pub mod jj;
 pub mod jq;
 pub mod just;
 pub mod k9s;

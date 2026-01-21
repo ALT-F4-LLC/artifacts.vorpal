@@ -113,6 +113,14 @@ digest = "3ed3a7e93b208399749a2b4b55318f39a8376922173a8af75cfba26890adfc48"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "beads"
+path = "https://github.com/steveyegge/beads/releases/download/v0.47.1/beads_0.47.1_darwin_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "de65e35a1cc0dad8a438c57011e40153abf7a42a29b1edde5f1a33981c0dc919"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "binutils"
 path = "https://ftpmirror.gnu.org/gnu/binutils/binutils-2.45.tar.gz"
 includes = []
@@ -815,6 +823,14 @@ includes = []
 excludes = []
 digest = "8c47e48f689bd861177c77171f491f4301e938ce39e8d6c1e88f27af7c347e7b"
 platform = "x86_64-darwin"
+
+[[sources]]
+name = "jj"
+path = "https://github.com/jj-vcs/jj/releases/download/v0.37.0/jj-v0.37.0-aarch64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "1550c0eb485b0887aa2bfbc1b071836773d3c53459b2fa0bba8b8a4ce68c4523"
+platform = "aarch64-darwin"
 
 [[sources]]
 name = "jq"

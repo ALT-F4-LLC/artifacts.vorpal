@@ -1,9 +1,10 @@
 use anyhow::Result;
 use vorpal_artifacts::{
     artifact::{
-        argocd::Argocd, awscli2::Awscli2, bat::Bat, bottom::Bottom, crane::Crane, cue::Cue,
+        argocd::Argocd, awscli2::Awscli2, bat::Bat, beads::Beads, bottom::Bottom, crane::Crane,
+        cue::Cue,
         direnv::Direnv, doppler::Doppler, fd::Fd, fluxcd::Fluxcd, golangci_lint::GolangciLint,
-        gpg::Gpg, helm::Helm, jq::Jq, just::Just, k9s::K9s, kn::Kn, kubectl::Kubectl,
+        gpg::Gpg, helm::Helm, jj::Jj, jq::Jq, just::Just, k9s::K9s, kn::Kn, kubectl::Kubectl,
         kubeseal::Kubeseal, lazygit::Lazygit, libassuan::Libassuan, libevent::Libevent,
         libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba, ncurses::Ncurses,
         neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
@@ -65,6 +66,8 @@ async fn main() -> Result<()> {
 
     Bat::new().build(context).await?;
 
+    Beads::new().build(context).await?;
+
     Bottom::new().build(context).await?;
 
     Crane::new().build(context).await?;
@@ -91,6 +94,8 @@ async fn main() -> Result<()> {
         .await?;
 
     Helm::new().build(context).await?;
+
+    Jj::new().build(context).await?;
 
     Jq::new().build(context).await?;
 
