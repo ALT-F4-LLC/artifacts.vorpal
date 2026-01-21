@@ -7,7 +7,63 @@ on:
       - main
 
 jobs:
+  test-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Run detect-changed-artifacts tests
+        run: scripts/test-detect-changed-artifacts.sh
+
+  detect-changes:
+    needs: test-scripts
+    runs-on: ubuntu-latest
+    outputs:
+      artifacts: ${{ steps.filter.outputs.artifacts }}
+      has_changes: ${{ steps.filter.outputs.has_changes }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed artifacts
+        id: filter
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE_SHA="${{ github.event.before }}"
+
+            if [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+              BASE_SHA=""
+            fi
+          fi
+
+          if [ -z "$BASE_SHA" ]; then
+            echo "No base SHA available, building all artifacts"
+
+            ARTIFACTS_JSON=$(scripts/detect-changed-artifacts.sh --all)
+          else
+            echo "Comparing $BASE_SHA to ${{ github.sha }}"
+
+            ARTIFACTS_JSON=$(scripts/detect-changed-artifacts.sh "$BASE_SHA" "${{ github.sha }}")
+          fi
+
+          echo "Artifacts to build: $ARTIFACTS_JSON"
+
+          if [ "$ARTIFACTS_JSON" = "[]" ]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "artifacts=[]" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "artifacts=$ARTIFACTS_JSON" >> $GITHUB_OUTPUT
+          fi
+
   build-dev:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
     runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
@@ -38,55 +94,14 @@ jobs:
 
   build:
     needs:
+      - detect-changes
       - build-dev
+    if: needs.detect-changes.outputs.has_changes == 'true'
     runs-on: ${{ matrix.runner }}
     strategy:
+      fail-fast: false
       matrix:
-        artifact:
-          - argocd
-          - awscli2
-          - bat
-          - beads
-          - bottom
-          - crane
-          - cue
-          - direnv
-          - doppler
-          - fd
-          - fluxcd
-          - golangci-lint
-          - gpg
-          - helm
-          - jj
-          - jq
-          - just
-          - k9s
-          - kn
-          - kubectl
-          - kubeseal
-          - lazygit
-          - libassuan
-          - libevent
-          - libgcrypt
-          - libgpg-error
-          - libksba
-          - ncurses
-          - neovim
-          - nginx
-          - nnn
-          - npth
-          - openapi-generator-cli
-          - openjdk
-          - pkg-config
-          - readline
-          - ripgrep
-          - skopeo
-          - starship
-          - terraform
-          - tmux
-          - umoci
-          - yq
-          - zsh
+        artifact: ${{ fromJson(needs.detect-changes.outputs.artifacts) }}
         runner:
           - macos-latest
           - macos-latest-large
