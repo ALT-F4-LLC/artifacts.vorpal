@@ -15,7 +15,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run detect-changed-artifacts tests
-        run: scripts/test-detect-changed-artifacts.sh
+        run: script/test-detect-changed-artifacts.sh
 
   detect-changes:
     needs: test-scripts
@@ -44,11 +44,11 @@ jobs:
           if [ -z "$BASE_SHA" ]; then
             echo "No base SHA available, building all artifacts"
 
-            ARTIFACTS_JSON=$(scripts/detect-changed-artifacts.sh --all)
+            ARTIFACTS_JSON=$(script/detect-changed-artifacts.sh --all)
           else
             echo "Comparing $BASE_SHA to ${{ github.sha }}"
 
-            ARTIFACTS_JSON=$(scripts/detect-changed-artifacts.sh "$BASE_SHA" "${{ github.sha }}")
+            ARTIFACTS_JSON=$(script/detect-changed-artifacts.sh "$BASE_SHA" "${{ github.sha }}")
           fi
 
           echo "Artifacts to build: $ARTIFACTS_JSON"
