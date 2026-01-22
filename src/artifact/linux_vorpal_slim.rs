@@ -26,7 +26,7 @@ impl<'a> LinuxVorpalSlim<'a> {
         let source_version = "latest";
 
         let source = ArtifactSource::new(name, ".")
-            .with_includes(vec!["script/linux-vorpal-slim/clean.sh".to_string()])
+            .with_includes(vec!["script/linux-vorpal-slim.sh".to_string()])
             .build();
 
         let step_script = formatdoc! {"
