@@ -1,3 +1,4 @@
+use crate::artifact::rsync::Rsync;
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
@@ -9,6 +10,7 @@ use vorpal_sdk::{
 #[derive(Default)]
 pub struct LinuxVorpalSlim<'a> {
     linux_vorpal: Option<&'a str>,
+    rsync: Option<&'a str>,
 }
 
 impl<'a> LinuxVorpalSlim<'a> {
@@ -27,35 +29,39 @@ impl<'a> LinuxVorpalSlim<'a> {
             None => &LinuxVorpal::new().build(context).await?,
         };
 
+        let rsync = match self.rsync {
+            Some(val) => val,
+            None => &Rsync::new().build(context).await?,
+        };
+
         let name = "linux-vorpal-slim";
 
-        let source_version = "latest";
+        let version = "latest";
 
         let source = ArtifactSource::new(name, ".")
             .with_includes(vec!["script/linux-vorpal-slim.sh".to_string()])
             .build();
 
         let step_script = formatdoc! {"
-            mkdir -pv \"$VORPAL_OUTPUT/bin\"
+            mkdir -p ./source/linux-vorpal
 
-            pushd ./source/{name}
+            {rsync}/bin/rsync -aPW {linux_vorpal}/ ./source/linux-vorpal
 
-            ls -alh {linux_vorpal}
+            pushd ./source
 
-            ls -alh script/linux-vorpal-slim.sh
-
-            script/linux-vorpal-slim.sh",
+            ./{name}/script/linux-vorpal-slim.sh --dry-run ./linux-vorpal",
             linux_vorpal = get_env_key(&linux_vorpal.to_string()),
+            rsync = get_env_key(&rsync.to_string()),
         };
 
-        let artifacts = vec![linux_vorpal.to_string()];
+        let artifacts = vec![linux_vorpal.to_string(), rsync.to_string()];
 
         let steps = vec![step::shell(context, artifacts, vec![], step_script, vec![]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 
         Artifact::new(name, steps, systems)
-            .with_aliases(vec![format!("{name}:{source_version}")])
+            .with_aliases(vec![format!("{name}:{version}")])
             .with_sources(vec![source])
             .build(context)
             .await

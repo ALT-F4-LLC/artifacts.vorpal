@@ -9,16 +9,22 @@ use vorpal_artifacts::{
         lima::Lima, linux_vorpal_slim::LinuxVorpalSlim, ncurses::Ncurses, neovim::Neovim,
         nginx::Nginx, nnn::Nnn, npth::Npth, openapi_generator_cli::OpenapiGeneratorCli,
         openjdk::Openjdk, pkg_config::PkgConfig, readline::Readline, ripgrep::Ripgrep,
-        skopeo::Skopeo, starship::Starship, terraform::Terraform, tmux::Tmux, umoci::Umoci, yq::Yq,
+        rsync::Rsync, skopeo::Skopeo, starship::Starship, terraform::Terraform, tmux::Tmux,
+        umoci::Umoci, yq::Yq,
         zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
 };
-use vorpal_sdk::{artifact::linux_vorpal::LinuxVorpal, context::get_context};
+use vorpal_sdk::{
+    api::artifact::ArtifactSystem::{Aarch64Linux, X8664Linux},
+    artifact::linux_vorpal::LinuxVorpal,
+    context::get_context,
+};
 
 #[tokio::main]
 async fn main() -> Result<()> {
     let context = &mut get_context().await?;
+    let context_target = context.get_system();
 
     // Artifacts
 
@@ -40,8 +46,6 @@ async fn main() -> Result<()> {
         .with_libgpg_error(&libgpg_error)
         .build(context)
         .await?;
-
-    let linux_vorpal = LinuxVorpal::new().build(context).await?;
 
     let ncurses = Ncurses::new().build(context).await?;
 
@@ -109,11 +113,6 @@ async fn main() -> Result<()> {
 
     Lima::new().build(context).await?;
 
-    LinuxVorpalSlim::new()
-        .with_linux_vorpal(&linux_vorpal)
-        .build(context)
-        .await?;
-
     Neovim::new().build(context).await?;
 
     Nginx::new().build(context).await?;
@@ -132,6 +131,8 @@ async fn main() -> Result<()> {
 
     Ripgrep::new().build(context).await?;
 
+    Rsync::new().build(context).await?;
+
     Skopeo::new().build(context).await?;
 
     Starship::new().build(context).await?;
@@ -149,6 +150,15 @@ async fn main() -> Result<()> {
     Yq::new().build(context).await?;
 
     Zsh::new().with_ncurses(&ncurses).build(context).await?;
+
+    if context_target == Aarch64Linux || context_target == X8664Linux {
+        let linux_vorpal = LinuxVorpal::new().build(context).await?;
+
+        LinuxVorpalSlim::new()
+            .with_linux_vorpal(&linux_vorpal)
+            .build(context)
+            .await?;
+    }
 
     // Development Environment
 
