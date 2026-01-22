@@ -26,6 +26,7 @@ pub mod libevent;
 pub mod libgcrypt;
 pub mod libgpg_error;
 pub mod libksba;
+pub mod lima;
 pub mod ncurses;
 pub mod neovim;
 pub mod nginx;

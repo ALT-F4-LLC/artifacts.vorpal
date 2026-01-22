@@ -1265,6 +1265,14 @@ digest = "e9d4afe75ff42ffce5e55c7267a45d2b6a2c3909d8d8e1ba09cdb99f28896b4d"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "lima"
+path = "https://github.com/lima-vm/lima/releases/download/v2.0.3/lima-2.0.3-Darwin-arm64.tar.gz"
+includes = []
+excludes = []
+digest = "2d9892c27ff2acb4a4363443cb2a1ad87968fd1a6c49fc112e38f4e0764a6c1a"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "linux"
 path = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.16.1.tar.xz"
 includes = []

@@ -29,6 +29,7 @@ impl ProjectEnvironment {
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         // Dependencies
 
+        let lima = artifact::lima::Lima::new().build(context).await?;
         let protoc = Protoc::new().build(context).await?;
         let rust_toolchain = RustToolchain::new().build(context).await?;
         let rust_toolchain_target = rust_toolchain::target(context.get_system())?;
@@ -46,7 +47,7 @@ impl ProjectEnvironment {
         // Artifact
 
         vorpal_sdk::artifact::ProjectEnvironment::new(&self.name, self.systems)
-            .with_artifacts(vec![protoc, rust_toolchain.clone()])
+            .with_artifacts(vec![lima, protoc, rust_toolchain.clone()])
             .with_environments(vec![
                 format!("PATH={}", rust_toolchain_bin),
                 format!("RUSTUP_HOME={}", get_env_key(&rust_toolchain)),

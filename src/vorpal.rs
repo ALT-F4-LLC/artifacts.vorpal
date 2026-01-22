@@ -6,8 +6,8 @@ use vorpal_artifacts::{
         direnv::Direnv, doppler::Doppler, fd::Fd, fluxcd::Fluxcd, golangci_lint::GolangciLint,
         gpg::Gpg, helm::Helm, jj::Jj, jq::Jq, just::Just, k9s::K9s, kn::Kn, kubectl::Kubectl,
         kubeseal::Kubeseal, lazygit::Lazygit, libassuan::Libassuan, libevent::Libevent,
-        libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba, ncurses::Ncurses,
-        neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
+        libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba, lima::Lima,
+        ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
         openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk, pkg_config::PkgConfig,
         readline::Readline, ripgrep::Ripgrep, skopeo::Skopeo, starship::Starship,
         terraform::Terraform, tmux::Tmux, umoci::Umoci, yq::Yq, zsh::Zsh,
@@ -19,12 +19,6 @@ use vorpal_sdk::context::get_context;
 #[tokio::main]
 async fn main() -> Result<()> {
     let context = &mut get_context().await?;
-
-    // Development Environment
-
-    ProjectEnvironment::new("dev", DEFAULT_SYSTEMS.to_vec())
-        .build(context)
-        .await?;
 
     // Artifacts
 
@@ -111,6 +105,8 @@ async fn main() -> Result<()> {
 
     Lazygit::new().build(context).await?;
 
+    Lima::new().build(context).await?;
+
     Neovim::new().build(context).await?;
 
     Nginx::new().build(context).await?;
@@ -146,6 +142,12 @@ async fn main() -> Result<()> {
     Yq::new().build(context).await?;
 
     Zsh::new().with_ncurses(&ncurses).build(context).await?;
+
+    // Development Environment
+
+    ProjectEnvironment::new("dev", DEFAULT_SYSTEMS.to_vec())
+        .build(context)
+        .await?;
 
     context.run().await
 }
