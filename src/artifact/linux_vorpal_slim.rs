@@ -45,11 +45,11 @@ impl<'a> LinuxVorpalSlim<'a> {
         let step_script = formatdoc! {"
             mkdir -p ./source/linux-vorpal
 
-            {rsync}/bin/rsync -aPW {linux_vorpal}/ ./source/linux-vorpal
+            {rsync}/bin/rsync -aPW {linux_vorpal}/ $VORPAL_OUTPUT
 
             pushd ./source
 
-            ./{name}/script/linux-vorpal-slim.sh --dry-run ./linux-vorpal",
+            ./{name}/script/linux-vorpal-slim.sh --execute $VORPAL_OUTPUT",
             linux_vorpal = get_env_key(&linux_vorpal.to_string()),
             rsync = get_env_key(&rsync.to_string()),
         };
