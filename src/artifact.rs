@@ -27,6 +27,7 @@ pub mod libgcrypt;
 pub mod libgpg_error;
 pub mod libksba;
 pub mod lima;
+pub mod linux_vorpal_slim;
 pub mod ncurses;
 pub mod neovim;
 pub mod nginx;
