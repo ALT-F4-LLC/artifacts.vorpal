@@ -137,6 +137,14 @@ digest = "de65e35a1cc0dad8a438c57011e40153abf7a42a29b1edde5f1a33981c0dc919"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "beads"
+path = "https://github.com/steveyegge/beads/releases/download/v0.47.1/beads_0.47.1_linux_amd64.tar.gz"
+includes = []
+excludes = []
+digest = "faa1b87574f498f219b1cb380353420770b0f8eaeb86871ce4fc46b56267963b"
+platform = "x86_64-linux"
+
+[[sources]]
 name = "binutils"
 path = "https://ftpmirror.gnu.org/gnu/binutils/binutils-2.45.tar.gz"
 includes = []
@@ -858,6 +866,14 @@ platform = "aarch64-linux"
 
 [[sources]]
 name = "jj"
+path = "https://github.com/jj-vcs/jj/releases/download/v0.37.0/jj-v0.37.0-x86_64-unknown-linux-musl.tar.gz"
+includes = []
+excludes = []
+digest = "84e75bec06d039a473f178e506e389b08022969023e1c9d7eb4e0e56c7d832b1"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "jj"
 path = "https://github.com/jj-vcs/jj/releases/download/v0.37.0/jj-v0.37.0-x86_64-apple-darwin.tar.gz"
 includes = []
 excludes = []
@@ -1294,6 +1310,14 @@ path = "https://ftpmirror.gnu.org/gnu/libunistring/libunistring-1.3.tar.gz"
 includes = []
 excludes = []
 digest = "e9d4afe75ff42ffce5e55c7267a45d2b6a2c3909d8d8e1ba09cdb99f28896b4d"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "lima"
+path = "https://github.com/lima-vm/lima/releases/download/v2.0.3/lima-2.0.3-Linux-x86_64.tar.gz"
+includes = []
+excludes = []
+digest = "093af7b108a2561eee0255785d898af6268ddc40c8883a9ba99f04a85ec07dde"
 platform = "x86_64-linux"
 
 [[sources]]
@@ -1839,6 +1863,14 @@ includes = []
 excludes = []
 digest = "5ca18fad3772ffe2a04feaffd4639482632baa0fc6b357622b51ea9d17658ec0"
 platform = "x86_64-darwin"
+
+[[sources]]
+name = "rsync"
+path = "https://download.samba.org/pub/rsync/src/rsync-3.4.1.tar.gz"
+includes = []
+excludes = []
+digest = "5ca18fad3772ffe2a04feaffd4639482632baa0fc6b357622b51ea9d17658ec0"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "rust-analyzer"
