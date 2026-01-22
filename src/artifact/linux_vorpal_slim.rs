@@ -49,7 +49,7 @@ impl<'a> LinuxVorpalSlim<'a> {
 
             pushd ./source
 
-            ./{name}/script/linux-vorpal-slim.sh --execute $VORPAL_OUTPUT",
+            ./{name}/script/linux-vorpal-slim.sh --execute --no-confirm $VORPAL_OUTPUT",
             linux_vorpal = get_env_key(&linux_vorpal.to_string()),
             rsync = get_env_key(&rsync.to_string()),
         };
