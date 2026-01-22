@@ -7,18 +7,7 @@ on:
       - main
 
 jobs:
-  test-scripts:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Run detect-changed-artifacts tests
-        run: script/test-detect-changed-artifacts.sh
-
-  detect-changes:
-    needs: test-scripts
+  build-changes:
     runs-on: ubuntu-latest
     outputs:
       artifacts: ${{ steps.filter.outputs.artifacts }}
@@ -62,8 +51,6 @@ jobs:
           fi
 
   build-dev:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.has_changes == 'true'
     runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
@@ -92,16 +79,42 @@ jobs:
           name: ${{ runner.arch }}-${{ runner.os }}-vorpal-lock
           path: Vorpal.lock
 
-  build:
+  build-linux:
     needs:
-      - detect-changes
       - build-dev
-    if: needs.detect-changes.outputs.has_changes == 'true'
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        artifact:
+          - linux-vorpal-slim
+        runner:
+          - ubuntu-latest
+          - ubuntu-latest-arm64
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ALT-F4-LLC/setup-vorpal-action@main
+        with:
+          registry-backend: s3
+          registry-backend-s3-bucket: altf4llc-vorpal-registry
+          version: nightly
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - run: vorpal build '${{ matrix.artifact }}'
+
+  build:
+    if: needs.build-changes.outputs.has_changes == 'true'
+    needs:
+      - build-dev
+      - build-changes
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        artifact: ${{ fromJson(needs.detect-changes.outputs.artifacts) }}
+        artifact: ${{ fromJson(needs.build-changes.outputs.artifacts) }}
         runner:
           - macos-latest
           - macos-latest-large

@@ -114,11 +114,35 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "beads"
+path = "https://github.com/steveyegge/beads/releases/download/v0.47.1/beads_0.47.1_linux_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "0658af083dc5cc70c21faa77b091e8f815d3684fc2e9cad4ed9c8b41336bcf98"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "beads"
+path = "https://github.com/steveyegge/beads/releases/download/v0.47.1/beads_0.47.1_darwin_amd64.tar.gz"
+includes = []
+excludes = []
+digest = "ce43d7b8ceb386520d7d0ecdf53969a846580093c0cf684f3618491d0a05eae4"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "beads"
 path = "https://github.com/steveyegge/beads/releases/download/v0.47.1/beads_0.47.1_darwin_arm64.tar.gz"
 includes = []
 excludes = []
 digest = "de65e35a1cc0dad8a438c57011e40153abf7a42a29b1edde5f1a33981c0dc919"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "beads"
+path = "https://github.com/steveyegge/beads/releases/download/v0.47.1/beads_0.47.1_linux_amd64.tar.gz"
+includes = []
+excludes = []
+digest = "faa1b87574f498f219b1cb380353420770b0f8eaeb86871ce4fc46b56267963b"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "binutils"
@@ -833,6 +857,30 @@ digest = "1550c0eb485b0887aa2bfbc1b071836773d3c53459b2fa0bba8b8a4ce68c4523"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "jj"
+path = "https://github.com/jj-vcs/jj/releases/download/v0.37.0/jj-v0.37.0-aarch64-unknown-linux-musl.tar.gz"
+includes = []
+excludes = []
+digest = "17e80c16083a0f57d4e372c38b56467ca0e4b764433eddd71bd2a0a8f8c2120e"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "jj"
+path = "https://github.com/jj-vcs/jj/releases/download/v0.37.0/jj-v0.37.0-x86_64-unknown-linux-musl.tar.gz"
+includes = []
+excludes = []
+digest = "84e75bec06d039a473f178e506e389b08022969023e1c9d7eb4e0e56c7d832b1"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "jj"
+path = "https://github.com/jj-vcs/jj/releases/download/v0.37.0/jj-v0.37.0-x86_64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "ec2707d3ae80a958c7704ac201f5e20949ea5354ba977de0784db2774d71ac81"
+platform = "x86_64-darwin"
+
+[[sources]]
 name = "jq"
 path = "https://github.com/jqlang/jq/releases/download/jq-1.8.1/jq-macos-arm64"
 includes = []
@@ -1263,6 +1311,38 @@ includes = []
 excludes = []
 digest = "e9d4afe75ff42ffce5e55c7267a45d2b6a2c3909d8d8e1ba09cdb99f28896b4d"
 platform = "x86_64-linux"
+
+[[sources]]
+name = "lima"
+path = "https://github.com/lima-vm/lima/releases/download/v2.0.3/lima-2.0.3-Linux-x86_64.tar.gz"
+includes = []
+excludes = []
+digest = "093af7b108a2561eee0255785d898af6268ddc40c8883a9ba99f04a85ec07dde"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "lima"
+path = "https://github.com/lima-vm/lima/releases/download/v2.0.3/lima-2.0.3-Linux-aarch64.tar.gz"
+includes = []
+excludes = []
+digest = "0ae4dfaa11e243fe281931d0911ec90fba80acf342347cd8c108f065bcb1dc1f"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "lima"
+path = "https://github.com/lima-vm/lima/releases/download/v2.0.3/lima-2.0.3-Darwin-arm64.tar.gz"
+includes = []
+excludes = []
+digest = "2d9892c27ff2acb4a4363443cb2a1ad87968fd1a6c49fc112e38f4e0764a6c1a"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "lima"
+path = "https://github.com/lima-vm/lima/releases/download/v2.0.3/lima-2.0.3-Darwin-x86_64.tar.gz"
+includes = []
+excludes = []
+digest = "f235dd7555f08828c40a75b1a7cc162a0e42bdb5282a88440f4ea3235c8a3637"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "linux"
@@ -1759,6 +1839,38 @@ includes = []
 excludes = []
 digest = "eb0c1779060a651e1288e5a3a6f3d5e3460a2955b64f9d71feefa444ceb52b54"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "rsync"
+path = "https://download.samba.org/pub/rsync/src/rsync-3.4.1.tar.gz"
+includes = []
+excludes = []
+digest = "5ca18fad3772ffe2a04feaffd4639482632baa0fc6b357622b51ea9d17658ec0"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "rsync"
+path = "https://download.samba.org/pub/rsync/src/rsync-3.4.1.tar.gz"
+includes = []
+excludes = []
+digest = "5ca18fad3772ffe2a04feaffd4639482632baa0fc6b357622b51ea9d17658ec0"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "rsync"
+path = "https://download.samba.org/pub/rsync/src/rsync-3.4.1.tar.gz"
+includes = []
+excludes = []
+digest = "5ca18fad3772ffe2a04feaffd4639482632baa0fc6b357622b51ea9d17658ec0"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "rsync"
+path = "https://download.samba.org/pub/rsync/src/rsync-3.4.1.tar.gz"
+includes = []
+excludes = []
+digest = "5ca18fad3772ffe2a04feaffd4639482632baa0fc6b357622b51ea9d17658ec0"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "rust-analyzer"
