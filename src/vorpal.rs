@@ -10,8 +10,7 @@ use vorpal_artifacts::{
         nginx::Nginx, nnn::Nnn, npth::Npth, openapi_generator_cli::OpenapiGeneratorCli,
         openjdk::Openjdk, pkg_config::PkgConfig, readline::Readline, ripgrep::Ripgrep,
         rsync::Rsync, skopeo::Skopeo, starship::Starship, terraform::Terraform, tmux::Tmux,
-        umoci::Umoci, yq::Yq,
-        zsh::Zsh,
+        umoci::Umoci, yq::Yq, zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
 };

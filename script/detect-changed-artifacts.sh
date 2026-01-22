@@ -18,7 +18,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Utility files to exclude from artifact discovery
-EXCLUDED_FILES=("file.rs")
+EXCLUDED_FILES=("file.rs" "linux_vorpal_slim.rs")
 
 # Convert filename to artifact name (underscore -> hyphen)
 filename_to_artifact() {
