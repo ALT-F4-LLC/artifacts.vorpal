@@ -2,7 +2,7 @@ use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
     api::artifact::ArtifactSystem::{Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux},
-    artifact::{linux_vorpal::LinuxVorpal, step, Artifact, ArtifactSource},
+    artifact::{get_env_key, linux_vorpal::LinuxVorpal, step, Artifact, ArtifactSource},
     context::ConfigContext,
 };
 
@@ -22,7 +22,13 @@ impl<'a> LinuxVorpalSlim<'a> {
     }
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let linux_vorpal = match self.linux_vorpal {
+            Some(val) => val,
+            None => &LinuxVorpal::new().build(context).await?,
+        };
+
         let name = "linux-vorpal-slim";
+
         let source_version = "latest";
 
         let source = ArtifactSource::new(name, ".")
@@ -34,12 +40,12 @@ impl<'a> LinuxVorpalSlim<'a> {
 
             pushd ./source/{name}
 
-            ls -alh",
-        };
+            ls -alh {linux_vorpal}
 
-        let linux_vorpal = match self.linux_vorpal {
-            Some(val) => val,
-            None => &LinuxVorpal::new().build(context).await?,
+            ls -alh script/linux-vorpal-slim.sh
+
+            script/linux-vorpal-slim.sh",
+            linux_vorpal = get_env_key(&linux_vorpal.to_string()),
         };
 
         let artifacts = vec![linux_vorpal.to_string()];
