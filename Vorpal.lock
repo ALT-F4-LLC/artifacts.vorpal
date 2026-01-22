@@ -114,6 +114,14 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "beads"
+path = "https://github.com/steveyegge/beads/releases/download/v0.47.1/beads_0.47.1_linux_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "0658af083dc5cc70c21faa77b091e8f815d3684fc2e9cad4ed9c8b41336bcf98"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "beads"
 path = "https://github.com/steveyegge/beads/releases/download/v0.47.1/beads_0.47.1_darwin_arm64.tar.gz"
 includes = []
 excludes = []
@@ -833,6 +841,14 @@ digest = "1550c0eb485b0887aa2bfbc1b071836773d3c53459b2fa0bba8b8a4ce68c4523"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "jj"
+path = "https://github.com/jj-vcs/jj/releases/download/v0.37.0/jj-v0.37.0-aarch64-unknown-linux-musl.tar.gz"
+includes = []
+excludes = []
+digest = "17e80c16083a0f57d4e372c38b56467ca0e4b764433eddd71bd2a0a8f8c2120e"
+platform = "aarch64-linux"
+
+[[sources]]
 name = "jq"
 path = "https://github.com/jqlang/jq/releases/download/jq-1.8.1/jq-macos-arm64"
 includes = []
@@ -1263,6 +1279,14 @@ includes = []
 excludes = []
 digest = "e9d4afe75ff42ffce5e55c7267a45d2b6a2c3909d8d8e1ba09cdb99f28896b4d"
 platform = "x86_64-linux"
+
+[[sources]]
+name = "lima"
+path = "https://github.com/lima-vm/lima/releases/download/v2.0.3/lima-2.0.3-Linux-aarch64.tar.gz"
+includes = []
+excludes = []
+digest = "0ae4dfaa11e243fe281931d0911ec90fba80acf342347cd8c108f065bcb1dc1f"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "lima"
@@ -1775,6 +1799,14 @@ includes = []
 excludes = []
 digest = "5ca18fad3772ffe2a04feaffd4639482632baa0fc6b357622b51ea9d17658ec0"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "rsync"
+path = "https://download.samba.org/pub/rsync/src/rsync-3.4.1.tar.gz"
+includes = []
+excludes = []
+digest = "5ca18fad3772ffe2a04feaffd4639482632baa0fc6b357622b51ea9d17658ec0"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "rust-analyzer"
