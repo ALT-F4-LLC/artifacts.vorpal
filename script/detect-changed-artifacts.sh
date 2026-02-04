@@ -76,7 +76,7 @@ get_changed_artifacts() {
 
     # Get list of changed files
     local changed_files
-    changed_files="$(git -C "$REPO_ROOT" diff --name-only "$base_sha" "$head_sha" 2>/dev/null || echo "")"
+    changed_files="$(git -C "$REPO_ROOT" diff --name-only --diff-filter=d "$base_sha" "$head_sha" 2>/dev/null || echo "")"
 
     if [[ -z "$changed_files" ]]; then
         echo "[]"

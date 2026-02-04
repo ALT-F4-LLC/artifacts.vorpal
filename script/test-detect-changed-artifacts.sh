@@ -98,6 +98,35 @@ test_non_artifact_changes_dont_trigger_full_rebuild() {
     fi
 }
 
+# REGRESSION TEST: Deleted artifact files should not be included in build list
+test_deleted_files_excluded() {
+    echo "Testing: Deleted artifact files excluded from build list..."
+
+    # Commits 8ac021d to 02d3340 deleted linux-vorpal-slim.rs and rsync.rs
+    # The script should NOT include these deleted artifacts
+    local result
+    result="$("$DETECT_SCRIPT" 8ac021d 02d3340 2>&1)" || {
+        fail "Script handles deleted files gracefully" "successful execution" "script failed"
+        return
+    }
+
+    # Should return empty array (no files to build - they were deleted)
+    if [[ "$result" == "[]" ]]; then
+        pass "Deleted artifact files excluded from build list"
+    else
+        # If non-empty, verify deleted artifacts are NOT in the list
+        local has_linux_vorpal_slim has_rsync
+        has_linux_vorpal_slim="$(echo "$result" | jq 'contains(["linux-vorpal-slim"])')"
+        has_rsync="$(echo "$result" | jq 'contains(["rsync"])')"
+
+        if [[ "$has_linux_vorpal_slim" == "false" && "$has_rsync" == "false" ]]; then
+            pass "Deleted artifact files excluded from build list (other changes present)"
+        else
+            fail "Deleted artifact files excluded" "no deleted artifacts in output" "$result"
+        fi
+    fi
+}
+
 # REGRESSION TEST: Script doesn't have hardcoded artifact mechanisms
 test_no_hardcoded_artifacts() {
     local failed=false
@@ -134,6 +163,7 @@ main() {
     test_all_returns_json
     test_empty_diff_returns_empty
     test_non_artifact_changes_dont_trigger_full_rebuild
+    test_deleted_files_excluded
     test_no_hardcoded_artifacts
 
     echo ""
