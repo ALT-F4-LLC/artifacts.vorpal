@@ -6,24 +6,18 @@ use vorpal_artifacts::{
         golangci_lint::GolangciLint, gpg::Gpg, helm::Helm, jj::Jj, jq::Jq, just::Just, k9s::K9s,
         kn::Kn, kubectl::Kubectl, kubeseal::Kubeseal, lazygit::Lazygit, libassuan::Libassuan,
         libevent::Libevent, libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba,
-        lima::Lima, linux_vorpal_slim::LinuxVorpalSlim, ncurses::Ncurses, neovim::Neovim,
-        nginx::Nginx, nnn::Nnn, npth::Npth, openapi_generator_cli::OpenapiGeneratorCli,
-        openjdk::Openjdk, pkg_config::PkgConfig, readline::Readline, ripgrep::Ripgrep,
-        rsync::Rsync, skopeo::Skopeo, starship::Starship, terraform::Terraform, tmux::Tmux,
-        umoci::Umoci, yq::Yq, zsh::Zsh,
+        lima::Lima, ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
+        openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk, pkg_config::PkgConfig,
+        readline::Readline, ripgrep::Ripgrep, skopeo::Skopeo, starship::Starship,
+        terraform::Terraform, tmux::Tmux, umoci::Umoci, yq::Yq, zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
 };
-use vorpal_sdk::{
-    api::artifact::ArtifactSystem::{Aarch64Linux, X8664Linux},
-    artifact::linux_vorpal::LinuxVorpal,
-    context::get_context,
-};
+use vorpal_sdk::context::get_context;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     let context = &mut get_context().await?;
-    let context_target = context.get_system();
 
     // Artifacts
 
@@ -130,8 +124,6 @@ async fn main() -> Result<()> {
 
     Ripgrep::new().build(context).await?;
 
-    Rsync::new().build(context).await?;
-
     Skopeo::new().build(context).await?;
 
     Starship::new().build(context).await?;
@@ -149,15 +141,6 @@ async fn main() -> Result<()> {
     Yq::new().build(context).await?;
 
     Zsh::new().with_ncurses(&ncurses).build(context).await?;
-
-    if context_target == Aarch64Linux || context_target == X8664Linux {
-        let linux_vorpal = LinuxVorpal::new().build(context).await?;
-
-        LinuxVorpalSlim::new()
-            .with_linux_vorpal(&linux_vorpal)
-            .build(context)
-            .await?;
-    }
 
     // Development Environment
 
