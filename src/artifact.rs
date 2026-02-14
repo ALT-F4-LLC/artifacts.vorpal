@@ -38,6 +38,7 @@ pub mod pkg_config;
 pub mod readline;
 pub mod ripgrep;
 pub mod skopeo;
+pub mod sqlite3;
 pub mod starship;
 pub mod terraform;
 pub mod tmux;
