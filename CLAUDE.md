@@ -4,65 +4,66 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Vorpal Artifacts repository that defines pre-compiled binaries and development tools using the Vorpal build system. Each artifact is a Rust struct implementing a builder pattern to download, compile, and package software for cross-platform distribution.
+This is a Rust project that defines and builds software artifacts (packages/tools) for the **Vorpal** build system. Each artifact is a self-contained definition that downloads, builds, and installs a specific tool or library across four target platforms: `Aarch64Darwin`, `Aarch64Linux`, `X8664Darwin`, `X8664Linux`.
 
-## Build Commands
+## Build and Test Commands
 
-```bash
-# Build the development environment
-vorpal build 'dev'
+- **Build**: `cargo build` (or use Vorpal: `vorpal build <artifact-name>`)
+- **Check**: `cargo check`
+- **Run tests**: `./script/test-detect-changed-artifacts.sh`
+- **Build in Lima VM** (Linux on macOS): `make lima` then `make lima-vorpal VORPAL_ARTIFACT=<name>`
 
-# Build a specific artifact
-vorpal build 'bat'
-vorpal build 'gpg'
-```
-
-The project requires the Vorpal CLI installed via `setup-vorpal-action` or directly from the ALT-F4-LLC/vorpal repository.
+There are no Rust unit tests; testing covers the CI artifact detection scripts.
 
 ## Architecture
 
 ### Artifact Builder Pattern
 
-Each artifact in `src/artifact/` follows this structure:
+Every artifact in `src/artifact/` follows the same structure:
 
-1. **Simple artifacts** (no dependencies): Implement `new()` and `build()` methods
-   - Example: `Bat`, `Jq`, `Kubectl` - download pre-built binaries
+1. A struct (optionally holding dependency references) with `new()` constructor
+2. Optional `with_*()` builder methods for injecting dependency artifact keys
+3. An `async fn build(self, context: &mut ConfigContext) -> Result<String>` that:
+   - Resolves platform-specific source URLs via `context.get_system()` match
+   - Creates an `ArtifactSource` for download
+   - Writes a shell build script (typically extract + copy to `$VORPAL_OUTPUT/bin`)
+   - Returns the artifact key string
 
-2. **Complex artifacts** (with dependencies): Add `with_*()` builder methods for each dependency
-   - Example: `Gpg` requires `libassuan`, `libgcrypt`, `libgpg_error`, `libksba`, `npth`
-   - Dependencies are injected via builder pattern and their paths accessed via `get_env_key()`
+**Simple artifact** (pre-built binary download): `src/artifact/jj.rs`
+**Complex artifact** (source build with dependencies): `src/artifact/gpg.rs`
 
 ### Dependency Graph
 
-Dependencies are wired in `src/vorpal.rs`. Artifacts that need dependencies must be built after their dependencies, and the dependency keys are passed via `with_*()` methods:
+Artifacts can depend on other artifacts. Dependencies are built first in `src/vorpal.rs` and injected via builder methods. Key dependency chains:
 
-```rust
-let ncurses = Ncurses::new().build(context).await?;
-let readline = Readline::new()
-    .with_ncurses(&ncurses)
-    .build(context)
-    .await?;
-```
+- `gpg` depends on `libassuan`, `libgcrypt`, `libgpg_error`, `libksba`, `npth`
+- `tmux` depends on `libevent`, `ncurses`
+- `readline` depends on `ncurses`
+- `nnn` depends on `ncurses`, `pkg_config`, `readline`
 
-### Target Systems
+### Entry Points
 
-All artifacts support four platforms defined in `DEFAULT_SYSTEMS`:
-- `Aarch64Darwin` (Apple Silicon macOS)
-- `Aarch64Linux` (ARM Linux)
-- `X8664Darwin` (Intel macOS)
-- `X8664Linux` (x86_64 Linux)
+- `src/vorpal.rs` — Binary entry point. Builds all artifacts in dependency order, then creates the `dev` ProjectEnvironment.
+- `src/lib.rs` — Exports `ProjectEnvironment` (bundles Lima, Protoc, Rust toolchain into a dev environment) and `DEFAULT_SYSTEMS`.
+- `src/artifact.rs` — Module declarations for all artifact modules.
 
-### Build Steps
+### Adding a New Artifact
 
-Artifacts use `step::shell()` for build scripts. The `$VORPAL_OUTPUT` environment variable is the staging directory for the final artifact. Dependencies are accessed via `get_env_key(&artifact_key)` which resolves to the artifact's installation path.
+1. Create `src/artifact/<name>.rs` implementing the builder pattern
+2. Add `pub mod <name>;` to `src/artifact.rs`
+3. Import and call `.build(context)` in `src/vorpal.rs` (respecting dependency order)
+4. CI automatically detects the new file via `script/detect-changed-artifacts.sh`
 
-## Adding New Artifacts
+### CI Artifact Detection
 
-1. Create `src/artifact/<name>.rs` following the pattern in existing artifacts
-2. Export the module in `src/artifact.rs`
-3. Add the artifact build call in `src/vorpal.rs` (respecting dependency order)
-4. CI automatically detects changed artifacts via `script/detect-changed-artifacts.sh`
+`script/detect-changed-artifacts.sh` auto-discovers artifacts from `src/artifact/*.rs` filenames, converts `snake_case.rs` to `kebab-case` names, and uses `git diff --diff-filter=d` to determine which artifacts changed between commits. Only changed artifacts are built in CI.
 
 ## Issue Tracking
 
-This project uses `bd` (beads) for issue tracking. See AGENTS.md for workflow details.
+See `AGENTS.md` for full instructions on using **Linear** for issue tracking via MCP tools. Key points:
+
+- All issue management uses Linear MCP tools (`list_issues`, `create_issue`, `update_issue`, etc.)
+- Issues are scoped to a project matching the repository name, under the "Agents" team
+- Issue titles must follow the format: `[<branch>] <description>` (e.g., `[main] Feature: add new artifact`)
+- Every issue must have exactly one label: **Bug**, **Feature**, or **Improvement**
+- Session completion requires closing all finished issues in Linear (`state="Done"`) with completion summary comments
