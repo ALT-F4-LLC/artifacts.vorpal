@@ -1,266 +1,219 @@
 # Testing Specification
 
-This document describes the current testing strategy, tooling, and coverage for the
-`vorpal-artifacts` project. It reflects what actually exists in the codebase as of the latest
-review.
-
----
-
 ## Overview
 
-The project has a minimal testing footprint. There are **no Rust unit tests, integration tests,
-or end-to-end tests** in the Rust source code. The only automated tests are **bash-based
-regression tests** for the CI artifact detection script. Artifact correctness is validated through
-**build-time verification** in CI, not through a traditional test suite.
+This document describes the current state of testing in the `vorpal-artifacts` project. The
+project is a Rust-based Vorpal artifact registry that defines build configurations for 55+
+software packages (CLI tools, libraries, development environments) across four target systems
+(aarch64-darwin, aarch64-linux, x86_64-darwin, x86_64-linux).
 
-This is consistent with the project's nature: it is a collection of declarative artifact
-definitions (build recipes), not a library or application with complex business logic. The
-"tests" are the builds themselves -- if an artifact builds and produces a valid binary, it works.
+Testing in this project is minimal. There are **no Rust unit tests, no integration test
+harnesses, no `[dev-dependencies]` in `Cargo.toml`, and no `#[cfg(test)]` or `#[test]`
+attributes** anywhere in the Rust source code. The only tests that exist are shell-based
+regression tests for the CI helper script `detect-changed-artifacts.sh`.
 
 ---
 
-## Test Pyramid
+## What Currently Exists
 
-### Unit Tests
+### Shell Script Tests
 
-**Status: None exist.**
+**Location:** `script/test-detect-changed-artifacts.sh`
 
-There are zero `#[test]` functions, zero `#[cfg(test)]` modules, and zero test files anywhere in
-`src/`. No Rust assertion macros (`assert!`, `assert_eq!`, `assert_ne!`) are used in the source
-code.
+The sole test file in the project. It is a hand-rolled bash test harness that validates the
+`script/detect-changed-artifacts.sh` script, which is responsible for detecting which artifacts
+need rebuilding based on git diffs between commits.
 
-This is acknowledged in `CLAUDE.md`:
+**Test count:** 8 assertions across 6 test functions.
 
-> There are no Rust unit tests; testing covers the CI artifact detection scripts.
+**Test functions:**
 
-**What could be unit tested (if desired):**
-- The `filename_to_artifact()` conversion logic in `detect-changed-artifacts.sh` (currently tested
-  indirectly through bash regression tests)
-- Builder pattern validation (e.g., that `Gpg::new()` without required dependencies produces a
-  meaningful error)
-- Platform system matching logic (the `context.get_system()` match arms)
-
-**Why they likely don't exist:**
-- Artifact definitions are declarative -- they are essentially configuration, not logic
-- The `vorpal-sdk` handles the complex build orchestration; this project just composes it
-- Build correctness is verified by actually running `vorpal build <artifact>` in CI
-
-### Integration Tests
-
-**Status: None exist.**
-
-There are no Rust integration tests (no `tests/` directory). There is no test infrastructure
-for validating artifact dependency resolution, source URL availability, or build script
-correctness in isolation.
-
-### End-to-End Tests
-
-**Status: Implicit via CI builds.**
-
-The CI pipeline (`.github/workflows/vorpal.yaml`) serves as the de facto end-to-end test suite:
-
-1. **`build-dev` job**: Builds the `dev` `ProjectEnvironment` artifact across all 4 platform
-   runners (`macos-latest`, `macos-latest-large`, `ubuntu-latest`, `ubuntu-latest-arm64`). This
-   validates that the project compiles and the development environment artifact resolves
-   correctly.
-
-2. **`build` job**: Builds each changed artifact individually via `vorpal build '${{ matrix.artifact }}'`
-   across all 4 runners using a matrix strategy (`fail-fast: false`). This validates that each
-   modified artifact definition produces a successful build on all target platforms.
-
-If an artifact's source URL is broken, its build script has a bug, or its dependencies are
-misconfigured, the CI build job fails. This is the primary correctness signal.
-
-### Script Tests
-
-**Status: One test file exists.**
-
-`script/test-detect-changed-artifacts.sh` contains 6 test functions for the CI artifact detection
-script:
-
-| Test | Purpose |
+| Test | What It Verifies |
 |---|---|
-| `test_list_returns_artifacts` | Verifies `--list` returns a non-zero count of artifacts |
-| `test_all_returns_json` | Verifies `--all` produces a valid JSON array |
-| `test_empty_diff_returns_empty` | Verifies `HEAD HEAD` comparison returns `[]` |
-| `test_non_artifact_changes_dont_trigger_full_rebuild` | Regression: non-artifact file changes (e.g., `Cargo.lock`, `vorpal.rs`) do not trigger all artifacts to rebuild |
-| `test_deleted_files_excluded` | Regression: deleted artifact `.rs` files are excluded from the build list |
-| `test_no_hardcoded_artifacts` | Regression: no `CORE_FILES`, `is_core_file`, or `DEPENDENTS` mechanisms in detection script |
+| `test_list_returns_artifacts` | `--list` flag returns a non-zero count of artifacts |
+| `test_all_returns_json` | `--all` flag returns valid JSON array (validated with `jq`) |
+| `test_empty_diff_returns_empty` | Comparing `HEAD` to `HEAD` returns empty array `[]` |
+| `test_non_artifact_changes_dont_trigger_full_rebuild` | Changes to non-artifact files (e.g., `src/vorpal.rs`, `Cargo.lock`, workflow files) do NOT trigger a full rebuild -- only the specific changed artifact modules are included (regression test) |
+| `test_deleted_files_excluded` | Deleted artifact `.rs` files are excluded from the build list (regression test) |
+| `test_no_hardcoded_artifacts` | Verifies that removed mechanisms (`CORE_FILES`, `is_core_file`, `DEPENDENTS`) do not reappear in the script (regression test) |
 
-**Test runner**: Plain bash with manual pass/fail tracking (colored output, exit code 1 on any
-failure). No test framework.
+**Test runner:** Direct bash execution (`./test-detect-changed-artifacts.sh`). No test framework.
+Uses colored PASS/FAIL output and exits with code 1 if any test fails.
 
-**External dependencies**: Requires `jq` and `git` with access to repository history (uses
-specific commit SHAs for regression tests).
+**Dependencies:** Requires `jq` and a git repository with commit history (some tests reference
+specific commit SHAs like `5fc8933e` and `98beb7a`).
 
-**How to run**:
-```bash
-./script/test-detect-changed-artifacts.sh
-```
+**Note:** These tests are NOT integrated into the CI workflow (`vorpal.yaml`). They must be run
+manually.
 
----
+### CI Build Verification
 
-## CI/CD Testing Pipeline
+**Location:** `.github/workflows/vorpal.yaml`
 
-### Workflow: `.github/workflows/vorpal.yaml`
+The CI workflow provides a form of implicit integration testing through successful artifact builds.
+It does NOT run any explicit test commands (`cargo test`, `cargo check`, `cargo clippy`, etc.).
 
-Triggered on: `pull_request` and `push` to `main`.
+**CI structure:**
 
-| Job | Purpose | Runners |
-|---|---|---|
-| `build-changes` | Detect which artifacts changed between base and head SHA | `ubuntu-latest` |
-| `build-dev` | Build the `dev` environment artifact | 4 runners (macOS arm64, macOS x86, Ubuntu x86, Ubuntu arm64) |
-| `build` | Build each changed artifact individually | 4 runners x N changed artifacts (matrix) |
+1. **`build-changes` job:** Detects which artifacts changed between commits using
+   `detect-changed-artifacts.sh`.
+2. **`build-dev` job:** Builds the `dev` project environment on all four runners (macos-latest,
+   macos-latest-large, ubuntu-latest, ubuntu-latest-arm64). Uses Vorpal's own build system with
+   an S3 registry backend.
+3. **`build` job:** Builds each changed artifact individually on all four runners using a matrix
+   strategy with `fail-fast: false`.
 
-Key properties:
-- `build` uses `fail-fast: false` -- all artifact/runner combinations are tested even if one fails
-- `build` only runs when `build-changes` detects `has_changes == 'true'`
-- Artifact detection uses `script/detect-changed-artifacts.sh` with commit SHA comparison
-- The Vorpal build system is installed via `ALT-F4-LLC/setup-vorpal-action@main` with an S3
-  registry backend
+The CI validates that artifact definitions compile and that the Vorpal build system can execute
+them, but this is build verification, not testing.
 
-### What CI Validates
+### In-Script Assertions
 
-- **Compilation**: `vorpal build 'dev'` compiles the Rust project and resolves the dev environment
-- **Artifact builds**: Each changed artifact is built on all 4 target platforms
-- **Cross-platform**: macOS (arm64 + x86_64) and Ubuntu Linux (arm64 + x86_64) are all tested
-- **Dependency resolution**: Artifacts with dependencies (e.g., `gpg`, `tmux`, `nnn`) must
-  resolve their full dependency chain
+A small number of artifact build scripts contain inline bash assertions using `test -f` to verify
+expected files exist after extraction:
 
-### What CI Does NOT Validate
+- `src/artifact/awscli2.rs` (lines 55-56): Verifies `aws` and `aws_completer` executables exist
+  after `pkgutil` extraction on macOS.
 
-- **Artifact functionality**: A binary that downloads and extracts successfully is not tested for
-  correct operation (e.g., `jj --version` is never run)
-- **Version correctness**: Source URLs and version strings are not validated against upstream
-  releases
-- **Script test suite**: `test-detect-changed-artifacts.sh` is NOT run in CI -- it must be run
-  manually
-- **Rust linting**: No `cargo clippy`, `cargo fmt --check`, or `cargo test` steps exist in CI
-- **Unchanged artifacts**: Only changed artifacts are built; unchanged artifacts could silently
-  break if an upstream source URL becomes unavailable
+These are build-time sanity checks embedded in shell scripts, not structured tests.
 
 ---
 
-## Test Tooling
+## Test Pyramid Breakdown
 
-### In Use
+| Level | Count | Tools/Framework | Notes |
+|---|---|---|---|
+| **Unit tests** | 0 | None | No `#[test]` attributes, no `#[cfg(test)]` modules, no `[dev-dependencies]` |
+| **Integration tests** | 0 | None | No `tests/` directory, no integration test crate |
+| **Shell script tests** | 6 functions (8 assertions) | Hand-rolled bash | Only for `detect-changed-artifacts.sh`; not in CI |
+| **E2E / Build verification** | Implicit via CI | GitHub Actions + Vorpal | Verifies artifacts build on 4 platforms |
 
-| Tool | Purpose | Location |
-|---|---|---|
-| Bash test script | Regression tests for artifact detection | `script/test-detect-changed-artifacts.sh` |
-| `jq` | JSON validation in test assertions | Required by test script |
-| GitHub Actions | CI build-based validation | `.github/workflows/vorpal.yaml` |
-| Vorpal build system | Build-time artifact verification | CI workflow |
-
-### Not In Use
-
-| Tool | Notes |
-|---|---|
-| `cargo test` | No Rust tests exist |
-| `cargo clippy` | Not configured; no CI step |
-| `cargo fmt` | No `.rustfmt.toml`; no CI step |
-| `clippy.toml` | Does not exist |
-| Coverage tools (`tarpaulin`, `llvm-cov`) | Not configured |
-| Property-based testing (`proptest`, `quickcheck`) | Not used |
-| Mocking frameworks (`mockall`, etc.) | Not used |
-| Snapshot testing (`insta`) | Not used |
+The test pyramid is effectively **inverted** -- the only structured testing is at the script
+level, and the primary validation mechanism is full CI builds (the most expensive and slowest
+form of verification).
 
 ---
 
-## Test Data and Fixtures
+## Test Infrastructure
 
-The bash test script uses hardcoded git commit SHAs as test fixtures:
+### Test Runners
 
-- `5fc8933e5f5ddb18b00d2d307d676e4c503814c7` to `98beb7acbc192e0471891fed1942026c7fbc6296`:
-  PR #9 squash merge adding `beads` and `jj` artifacts
-- `8ac021d` to `02d3340`: Deletion of `linux-vorpal-slim` and `rsync` artifacts
+- **Shell tests:** Direct bash execution, no framework.
+- **Rust tests:** `cargo test` is available (Cargo.toml is properly configured) but never invoked.
+  No CI step runs it.
 
-These are **repository-specific** and require the full git history to work (`fetch-depth: 0`
-in checkout).
+### Coverage Tools
 
----
+None. No coverage tooling is configured or referenced anywhere in the project.
 
-## Gaps and Risks
+### Mocking and Fixtures
 
-### Critical Gaps
+None. The Rust source has no test utilities, mock implementations, or test fixtures. The shell
+test file uses real git history (specific commit SHAs) as test fixtures, which makes them
+coupled to the repository's commit history.
 
-1. **No CI execution of the script test suite**: `test-detect-changed-artifacts.sh` must be run
-   manually. There is no CI step that invokes it, meaning regressions in the detection script
-   could ship unnoticed.
+### Test Utilities
 
-2. **No Rust-level testing**: Zero `cargo test` coverage means:
-   - Builder pattern misuse (e.g., calling `.build()` without required dependencies) is only
-     caught at runtime during CI builds
-   - Platform match exhaustiveness is verified by the compiler but error messages are not tested
-   - Refactoring safety relies entirely on `cargo check` and manual review
-
-3. **No linting in CI**: Without `cargo clippy` or `cargo fmt --check`, code quality issues
-   (unused imports, suboptimal patterns, formatting drift) are not caught automatically.
-
-### Moderate Gaps
-
-4. **No artifact functionality validation**: Built artifacts are not smoke-tested. A binary could
-   extract successfully but be corrupt, have missing shared libraries, or be the wrong version.
-
-5. **No upstream availability monitoring**: If an upstream source URL returns 404, the artifact
-   will only fail when it is next changed and rebuilt in CI. Unchanged artifacts with broken URLs
-   are invisible until someone tries to build them.
-
-6. **Hardcoded commit SHAs in tests**: The regression tests depend on specific commits existing in
-   the repository. Force-push or history rewrite would break them.
-
-### Low-Priority Gaps
-
-7. **No build performance benchmarking**: There is no tracking of how long artifacts take to
-   build, which could help detect regressions in build times.
-
-8. **No lock file validation**: `Vorpal.lock` is uploaded as a CI artifact but not validated or
-   compared across runs.
-
----
-
-## Recommendations for New Changes
-
-When contributing to this project, the following testing expectations apply:
-
-### Adding a New Artifact
-
-- No Rust tests are expected or required
-- The artifact will be validated by CI when its `src/artifact/<name>.rs` file is detected as
-  changed by `detect-changed-artifacts.sh`
-- The CI `build` job will attempt `vorpal build '<name>'` on all 4 runners
-- Manual verification: run `cargo check` locally before pushing
-
-### Modifying the Detection Script
-
-- Run `./script/test-detect-changed-artifacts.sh` locally before pushing
-- Consider adding a new regression test if fixing a specific bug
-- The test script requires `jq` and full git history
-
-### Modifying Core Files
-
-- Changes to `src/lib.rs`, `src/artifact.rs`, or `src/vorpal.rs` do NOT automatically trigger
-  rebuilds of all artifacts (this is by design, per the regression test)
-- Run `cargo check` locally to verify compilation
-- If modifying `ProjectEnvironment`, the `build-dev` CI job will validate it
+None beyond the `pass()` and `fail()` helper functions in
+`script/test-detect-changed-artifacts.sh`.
 
 ---
 
 ## How to Run Tests
 
+### Shell Script Tests
+
 ```bash
-# Compile check (fast, catches type errors and missing imports)
-cargo check
-
-# Script regression tests (requires jq, git history)
 ./script/test-detect-changed-artifacts.sh
-
-# Full build of a specific artifact (requires Vorpal installed)
-vorpal build <artifact-name>
-
-# Full build of the dev environment (requires Vorpal installed)
-vorpal build dev
 ```
 
-There is no single command that runs "all tests" because the project's testing is fragmented
-across compilation checks, bash scripts, and CI builds.
+Requires: `bash`, `jq`, full git history (tests reference specific SHAs).
+
+### Rust Tests (No Tests Exist)
+
+```bash
+cargo test
+```
+
+This will compile and report 0 tests. It can still be useful as a compilation check.
+
+### Compilation Check
+
+```bash
+cargo check
+cargo build
+```
+
+Currently the only way to validate that Rust source code is correct.
+
+---
+
+## Gaps and Missing Pieces
+
+### Critical Gaps
+
+1. **No Rust unit tests.** The 55+ artifact modules, the `ProjectEnvironment` struct, and
+   `lib.rs` have zero test coverage. Logic like system matching (`match context.get_system()`),
+   URL construction, and dependency wiring in complex artifacts (e.g., `gpg.rs` with 5
+   dependencies) is entirely untested.
+
+2. **No `cargo test` in CI.** Even though `cargo test` would catch compilation errors and run
+   any future tests, it is not part of the CI pipeline.
+
+3. **No `cargo clippy` or `cargo fmt --check` in CI.** The Vorpal lock file shows clippy and
+   rustfmt are distributed as part of the Rust toolchain, but they are not used in any
+   automated pipeline.
+
+4. **Shell tests not in CI.** The existing shell regression tests are not executed by the GitHub
+   Actions workflow.
+
+### Moderate Gaps
+
+5. **No integration tests against the Vorpal SDK.** The project depends heavily on `vorpal-sdk`
+   (from a git branch dependency), but there are no tests that verify the interface contract
+   between this project and the SDK.
+
+6. **No validation of artifact source URLs.** Source URLs are hardcoded strings. There is no
+   automated verification that URLs resolve or that digests (in `Vorpal.lock`) match expected
+   values outside of a full build.
+
+7. **No property-based or fuzz testing.** Given the repetitive structure of artifact modules
+   (version strings, URL templates, system matching), property-based testing could catch
+   pattern-level bugs across all 55+ artifacts.
+
+### Minor Gaps
+
+8. **Shell test fixtures use hardcoded commit SHAs.** Tests like
+   `test_non_artifact_changes_dont_trigger_full_rebuild` depend on specific commits
+   (`5fc8933e5f5ddb18b00d2d307d676e4c503814c7`). These will break if the repository is rebased,
+   shallow-cloned, or if history is rewritten.
+
+9. **No test documentation.** There is no guidance for contributors on what tests to write when
+   adding a new artifact module.
+
+---
+
+## Recommendations for Test Strategy
+
+These are observations about what would be reasonable to add, ordered by impact relative to effort.
+
+### High Value, Low Effort
+
+- **Add `cargo test` and `cargo clippy` steps to CI.** Even with zero tests, this catches
+  compilation errors and common Rust anti-patterns automatically.
+- **Add shell script tests to CI.** Add a job that runs
+  `./script/test-detect-changed-artifacts.sh` (requires `jq` and full git history).
+
+### High Value, Medium Effort
+
+- **Add unit tests for artifact URL construction and system matching.** Each artifact's `build()`
+  method performs system-dependent branching and string formatting. These are pure logic that
+  can be tested without the Vorpal SDK context by extracting the logic into testable functions.
+- **Add a compilation test for each artifact module.** A basic test that constructs each struct
+  and verifies it implements the expected interface.
+
+### Medium Value, Higher Effort
+
+- **Add integration tests using a mock `ConfigContext`.** Test that `build()` methods produce
+  the expected Vorpal artifact configurations without actually running builds.
+- **Add URL liveness checks as a scheduled CI job.** Verify that artifact source URLs still
+  resolve (HTTP HEAD requests), catching upstream breakage before build time.

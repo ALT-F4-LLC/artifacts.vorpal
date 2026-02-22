@@ -1,282 +1,278 @@
 # Review Strategy
 
-This document describes the review strategy for the `artifacts.vorpal` project. It identifies which
-review dimensions to prioritize, areas of high risk, common pitfalls, and what matters most during
-code review for this specific codebase.
+This document defines the code review strategy for the `artifacts.vorpal` project based on the
+actual codebase structure, change patterns, and risk profile observed in the repository.
 
 ---
 
-## Project Context
+## Project Review Profile
 
-This is a Rust project that defines ~45 software artifact build definitions for the Vorpal build
-system. The codebase is primarily single-contributor (one human author, plus Renovate bot for
-dependency updates). Changes are overwhelmingly one of two types: adding a new artifact or updating
-an existing artifact's version/build script.
+This is a **Vorpal artifact definitions** repository -- a Rust project that declares build
+definitions for ~55 software packages using the Vorpal SDK. The codebase is primarily authored
+by a single contributor (64 of 67 commits) with automated dependency updates from Renovate.
 
-The project has no Rust unit tests. The only test coverage is a shell-based regression test suite
-for the CI artifact detection script. The Rust code compiles to a binary that is executed by Vorpal
-at build time, so "testing" happens implicitly when artifacts are built in CI across four
-platform/architecture combinations.
+**Key characteristics that shape review strategy:**
+
+- The project is a build configuration layer, not a runtime application
+- Changes are overwhelmingly artifact additions or version bumps
+- The Vorpal SDK (external dependency) handles all build execution
+- Cross-platform correctness (4 targets: aarch64-darwin, aarch64-linux, x86_64-darwin, x86_64-linux) is the primary concern
+- There is no application logic, no user-facing API, and no persistent state
 
 ---
 
-## Review Dimension Priorities
+## Review Dimensions by Priority
 
-The six standard review dimensions are ranked here by their relevance to this specific project.
+Review effort should be allocated according to this priority ordering, which reflects the
+actual risk profile of this project.
 
-### 1. Security (HIGH)
+### 1. Cross-Platform Correctness (Highest Priority)
 
-**Why this ranks highest:** Every artifact definition downloads binaries or source code from
-external URLs, extracts archives, and runs shell scripts. This is a software supply chain system.
-A compromised URL, a missing integrity check, or a malicious build script could affect every
-downstream consumer of these artifacts.
+The single most important review dimension. Every artifact must build on all four target
+systems. Common failure modes to watch for:
 
-**What to look for:**
-- Source URLs must point to official release channels (GitHub Releases, official project sites)
-- Version pinning must be explicit (no `latest` tags, no floating references)
-- Shell scripts embedded in `formatdoc!` blocks must not introduce injection vectors through
-  string interpolation of untrusted input
-- `chmod` and file permission operations should follow least privilege
-- No credentials, tokens, or secrets in artifact definitions
+- **System-specific match arms**: Verify all four `ArtifactSystem` variants are handled
+  (`Aarch64Darwin`, `Aarch64Linux`, `X8664Darwin`, `X8664Linux`). Missing a variant produces
+  a runtime error.
+- **Download URL correctness**: Platform-specific download URLs must use the correct
+  architecture naming conventions for each upstream project (e.g., `arm64` vs `aarch64`,
+  `amd64` vs `x86_64`, `darwin` vs `macos`).
+- **Build flags**: Compiler flags, configure options, and cmake variables may need to differ
+  across platforms. Example: `--disable-x86asm` for ffmpeg, `nproc` vs `sysctl -n hw.ncpu`
+  for parallel builds.
+- **Library linking**: `LDFLAGS`, `CPPFLAGS`, `rpath` settings, and `PKG_CONFIG_PATH` must
+  reference correct paths per platform.
 
-**Current gaps:**
-- No cryptographic hash verification of downloaded sources (no SHA256 checksums)
-- No signature verification for any downloaded artifacts
-- Source URLs are HTTP/HTTPS strings with no integrity pinning beyond the version in the URL path
+**Review checklist for this dimension:**
+- [ ] All four system variants handled (or explicit `anyhow!` error for unsupported)
+- [ ] URLs resolve correctly for each platform
+- [ ] Build scripts use cross-platform compatible commands
+- [ ] `nproc`/`sysctl` fallback pattern used where applicable
 
-### 2. Architecture (HIGH)
+### 2. Dependency Graph Integrity
 
-**Why this ranks high:** The builder pattern and dependency graph are the structural backbone of
-the project. Breaking the pattern or miswiring dependencies causes cascading build failures across
-all four platforms.
+Many artifacts depend on other artifacts in this repository (e.g., `gpg` depends on
+`libassuan`, `libgcrypt`, `libgpg_error`, `libksba`, `npth`). Incorrect dependency wiring
+is a high-risk failure mode.
 
-**What to look for:**
-- New artifacts must follow the established builder pattern: struct with `new()`, optional
-  `with_*()` methods, `async fn build(self, context: &mut ConfigContext) -> Result<String>`
-- Dependency injection via `with_*()` must match what `src/vorpal.rs` passes in
-- Dependencies must be built before dependents in `src/vorpal.rs` (topological ordering)
-- The `file.rs` module is a utility, not a standard artifact -- it is excluded from CI detection
-  via `EXCLUDED_FILES` in `detect-changed-artifacts.sh`
-- All four platform systems (`Aarch64Darwin`, `Aarch64Linux`, `X8664Darwin`, `X8664Linux`) must
-  be handled in every artifact's `match context.get_system()` block
+**Review checklist for this dimension:**
+- [ ] Dependencies are correctly wired via the builder pattern (`with_*` methods)
+- [ ] `get_env_key()` is used for referencing dependency paths in build scripts
+- [ ] Circular dependencies are not introduced
+- [ ] Dependency versions are compatible with the artifact being built
+- [ ] Transitive dependencies are properly propagated (e.g., `libgpg_error` flowing through
+  to both `libassuan` and `libgcrypt`)
 
-### 3. Operations (MEDIUM)
+### 3. Build Script Correctness
 
-**Why this ranks medium:** The CI pipeline (`vorpal.yaml`) is tightly coupled to the artifact
-detection script. Changes to CI infrastructure, the detection script, or the naming convention
-can silently break the build pipeline.
+Build scripts are embedded as Rust string literals (using `formatdoc!`) and executed by the
+Vorpal runtime. Errors in these scripts only surface at build time, not at compile time.
 
-**What to look for:**
-- Changes to `script/detect-changed-artifacts.sh` must pass the regression test suite
-- Filename-to-artifact-name conversion (`snake_case.rs` to `kebab-case`) must be preserved
-- The `EXCLUDED_FILES` array in the detection script must stay in sync with utility modules
-- CI workflow changes should be tested against both PR and push event types
-- S3 registry backend credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`) must remain in
-  GitHub Secrets, never hardcoded
+**Review checklist for this dimension:**
+- [ ] Shell scripts follow `set -euo pipefail` semantics (inherited from Vorpal runtime)
+- [ ] `$VORPAL_OUTPUT` is used as the install prefix
+- [ ] Source directory paths match the expected archive structure
+- [ ] `configure` flags, cmake variables, and make targets are correct
+- [ ] Environment variables (`PATH`, `PKG_CONFIG_PATH`, `CPPFLAGS`, `LDFLAGS`) include all
+  required dependency paths
+- [ ] String interpolation in `formatdoc!` correctly substitutes variables
 
-### 4. Code Quality (MEDIUM)
+### 4. Version Management
 
-**Why this ranks medium:** The highly repetitive nature of artifact definitions means consistency
-is more important than cleverness. Deviations from the pattern create maintenance burden.
+Version changes are frequent and carry moderate risk.
 
-**What to look for:**
-- Consistent use of `formatdoc!` for shell scripts
-- Consistent struct/impl layout matching existing artifacts
-- Source version variables named consistently (`source_version` or `version`)
-- Build scripts follow the `mkdir -pv "$VORPAL_OUTPUT"` / extract / copy-or-build / install pattern
-- Error handling uses `anyhow::anyhow!("Unsupported system for <name> artifact")` for unsupported
-  platforms
-- Dependency fallback pattern (the `match self.<dep> { Some(val) => val, None => &build() }`)
-  is used consistently for optional dependencies
+**Review checklist for this dimension:**
+- [ ] Version string is updated in artifact definition
+- [ ] Source URL structure hasn't changed between versions (upstream projects sometimes
+  change release URL patterns)
+- [ ] Aliases include the versioned format (`name:version`)
+- [ ] `Vorpal.lock` is updated with correct digests for all platforms
+- [ ] Upstream changelog checked for breaking build system changes
 
-### 5. Performance (LOW)
+### 5. Code Quality and Pattern Consistency
 
-**Why this ranks low:** This is a build configuration project, not a runtime system. Performance
-concerns are limited to CI pipeline efficiency, which is already addressed by the changed-artifact
-detection mechanism that avoids rebuilding unchanged artifacts.
+The codebase follows well-established patterns. Deviations should be intentional.
 
-**What to look for:**
-- Avoid unnecessary dependencies between artifacts that would force sequential builds
-- Shell build scripts should not do redundant work (e.g., downloading the same source twice)
-- The `build-dev` job runs on all four runners before individual artifact builds; changes that
-  increase dev environment build time affect every CI run
+**Review checklist for this dimension:**
+- [ ] Struct implements `Default` derive (for simple artifacts) or manual `new()` constructor
+- [ ] Builder pattern used consistently for artifacts with dependencies (`with_*` methods
+  returning `Self`)
+- [ ] `build()` method is `async` and returns `Result<String>`
+- [ ] Module declared in `src/artifact.rs` and imported in `src/vorpal.rs`
+- [ ] Follows the established naming convention: `snake_case` module name, `PascalCase`
+  struct name, hyphenated artifact name
 
-### 6. Testing (LOW -- but a known gap)
+### 6. Security (Lower Priority for This Project)
 
-**Why this ranks low:** There are no Rust unit tests and the project explicitly states this. The
-only testing is the shell script regression suite for artifact detection. Artifacts are validated
-implicitly by whether they build successfully in CI across all four platforms.
+Security review is lower priority because this project defines build configurations, not
+runtime code. However, some concerns remain:
 
-**What to look for:**
-- Changes to `detect-changed-artifacts.sh` should include corresponding test cases in
-  `test-detect-changed-artifacts.sh`
-- If a new utility module (like `file.rs`) is added that should be excluded from detection, it
-  must be added to both `EXCLUDED_FILES` and tested
-- Regression tests should use real commit SHAs from the repository history
+- **Source URL integrity**: Artifacts download from external URLs. Verify URLs point to
+  official release channels (GitHub releases, official project domains).
+- **Build script injection**: `formatdoc!` string interpolation could theoretically inject
+  shell commands if variables contain malicious content, but in practice all interpolated
+  values come from hardcoded constants or the Vorpal SDK.
+- **Dependency pinning**: Source digests in `Vorpal.lock` provide integrity verification.
+  Verify lock file updates match expected changes.
+
+---
+
+## Change Categories and Review Effort
+
+### Trivial Changes (1-2 minutes)
+
+- `Vorpal.lock` updates with no corresponding source changes (lock regeneration)
+- `Cargo.lock` updates from Renovate
+- Lockfile-only commits (`chore(vorpal): update lock file`)
+
+**Review approach**: Verify the lock update is expected. Approve quickly.
+
+### Small Changes: New Pre-Built Binary Artifact (5-10 minutes)
+
+Artifacts that download pre-built binaries (e.g., `argocd`, `bat`, `kubectl`, `helm`).
+These follow a simple pattern: download platform-specific binary, copy to `$VORPAL_OUTPUT/bin`.
+
+**Review approach**: Verify URL correctness for all 4 platforms, correct permissions (`chmod +x`),
+and pattern adherence. These are low-risk.
+
+**Reference pattern**: `src/artifact/argocd.rs` (simplest form), `src/artifact/bat.rs`
+(with archive extraction).
+
+### Medium Changes: New Source-Build Artifact (15-30 minutes)
+
+Artifacts that compile from source (e.g., `ffmpeg`, `zlib`, `ncurses`). These involve
+configure/make/cmake scripts with platform-specific flags.
+
+**Review approach**: Full review of build script correctness, cross-platform flags, and
+install paths. Test that configure options are valid for the specified version. Check for
+missing dependencies.
+
+**Reference pattern**: `src/artifact/ffmpeg.rs` (simple source build),
+`src/artifact/cmake.rs` (platform-specific install paths).
+
+### Large Changes: Artifact with Dependencies (30-45 minutes)
+
+Artifacts with inter-artifact dependencies using the builder pattern (e.g., `gpg`, `ttyd`,
+`nnn`, `libwebsockets`). These are the highest-risk changes.
+
+**Review approach**: Full review across all dimensions. Particular attention to dependency
+wiring, environment variable propagation, and transitive dependency correctness. Verify
+the dependency chain builds correctly on all platforms.
+
+**Reference patterns**: `src/artifact/gpg.rs` (5 dependencies, deepest chain),
+`src/artifact/ttyd.rs` (platform-conditional build: pre-built on Linux, source on Darwin),
+`src/artifact/libwebsockets.rs` (cmake-based with multiple dependency paths).
+
+### Infrastructure Changes (15-30 minutes)
+
+Changes to CI workflow (`.github/workflows/vorpal.yaml`), scripts (`script/`), or
+core files (`src/lib.rs`, `src/vorpal.rs`, `Cargo.toml`).
+
+**Review approach**: These affect all artifacts. Review with higher scrutiny. Changes to
+`detect-changed-artifacts.sh` should be verified against its test suite. Changes to
+`src/lib.rs` (ProjectEnvironment) affect the development environment for all users.
 
 ---
 
 ## High-Risk Areas
 
-These are the areas of the codebase where bugs have the highest blast radius or are hardest to
-detect during review.
+These areas of the codebase carry disproportionate risk and warrant extra review attention:
 
-### 1. Dependency Ordering in `src/vorpal.rs`
-
-**Risk: Build failure across all platforms.**
-The `main()` function in `vorpal.rs` builds artifacts in a specific order. Dependencies must be
-built before the artifacts that consume them. Getting this wrong causes runtime failures that may
-only surface on specific platforms.
-
-**Review checklist:**
-- [ ] Is the new artifact placed after all its dependencies in `vorpal.rs`?
-- [ ] Are `with_*()` calls passing the correct variable names?
-- [ ] Does the artifact actually use the injected dependency in its build script?
-
-### 2. Shell Scripts in `formatdoc!` Blocks
-
-**Risk: Silent build failures, platform-specific breakage.**
-Every artifact embeds a shell script via Rust's `formatdoc!` macro. These scripts run inside the
-Vorpal sandbox and failures may not be obvious from the Rust compilation alone.
-
-**Review checklist:**
-- [ ] Does the script use `set -euo pipefail` semantics (inherited from Vorpal)?
-- [ ] Are paths properly quoted (especially `$VORPAL_OUTPUT`)?
-- [ ] Do `pushd` calls match the expected archive extraction layout?
-- [ ] Are configure/make flags correct for the target platform?
-- [ ] Do `CPPFLAGS`, `LDFLAGS`, and `rpath` entries reference all required dependencies?
-
-### 3. Platform-Specific URL and Build Logic
-
-**Risk: One or more of four platforms broken silently.**
-Each artifact must provide correct source URLs and build instructions for all four platform
-variants. A typo in a platform-specific URL will only fail when that platform combination runs
-in CI.
-
-**Review checklist:**
-- [ ] Are all four systems covered in the `match context.get_system()` block?
-- [ ] Do platform-specific URLs use the correct arch/OS naming convention for the upstream project?
-- [ ] Is the wildcard `_` arm returning an error (not silently succeeding)?
-
-### 4. CI Artifact Detection Script
-
-**Risk: Missing builds or unnecessary full rebuilds.**
-The detection script determines which artifacts CI builds. Bugs here either skip necessary builds
-(allowing broken artifacts to ship) or trigger full rebuilds (wasting CI resources).
-
-**Review checklist:**
-- [ ] Does the script handle deleted files correctly (`--diff-filter=d`)?
-- [ ] Is the `EXCLUDED_FILES` array up to date?
-- [ ] Does the `snake_case` to `kebab-case` conversion work for the new artifact name?
-
----
-
-## Common Pitfalls
-
-These are mistakes that have occurred or are likely to occur based on the codebase's history.
-
-| Pitfall | Example | How to Catch |
+| Area | Risk | Reason |
 |---|---|---|
-| Wrong archive directory name in build script | `pushd ./source/name/project-v1.0` when the archive extracts to `project-1.0` (no `v` prefix) | Verify against upstream release archive structure |
-| Missing platform in match block | Handling only Darwin variants and forgetting Linux | Confirm all four `ArtifactSystem` variants are present |
-| Dependency declared in struct but not wired in `vorpal.rs` | Adding `with_ncurses` method but not calling it in main | Cross-reference `vorpal.rs` with the artifact's `with_*()` methods |
-| Incorrect version tag format | SQLite uses `3510200` for version `3.51.2`; some projects use `v` prefix, others don't | Check upstream release page for exact tag/URL format |
-| Stale `Cargo.lock` after SDK update | `vorpal-sdk` is pinned to a git branch; lock file may not reflect latest | Run `cargo check` after SDK-related changes |
-| Non-artifact file included in CI detection | Adding a utility `.rs` file to `src/artifact/` without adding it to `EXCLUDED_FILES` | Check if the new file is a standalone artifact or a utility |
+| `src/lib.rs` (ProjectEnvironment) | High | Defines the dev environment; affects all contributors |
+| `.github/workflows/vorpal.yaml` | High | CI pipeline; broken workflow blocks all builds |
+| `script/detect-changed-artifacts.sh` | High | Determines which artifacts CI builds; incorrect detection wastes CI or misses builds |
+| Artifacts with dependencies (gpg, ttyd, nnn, tmux, neovim, zsh) | High | Complex dependency chains; failures cascade |
+| `src/artifact/file.rs` | Medium | Utility artifact used by others; interface changes break dependents |
+| `Vorpal.toml` | Medium | Project-level build configuration; incorrect settings affect all builds |
 
 ---
 
-## Review Process
+## Artifacts by Complexity Tier
 
-### Current State
+Understanding which artifacts are simple vs complex helps calibrate review effort.
 
-- **No formal review process exists.** The project is primarily single-contributor with direct
-  pushes to `main`.
-- **No PR template.** No `.github/PULL_REQUEST_TEMPLATE.md` exists.
-- **No CODEOWNERS file.** No required reviewers are configured.
-- **No branch protection rules** are visible in the repository configuration files.
-- **No CONTRIBUTING guide.** No contribution guidelines exist.
-- **Renovate bot** handles dependency updates automatically with recommended config.
-- **Conventional Commits** are used informally (e.g., `feat(artifact):`, `fix(ci):`, `chore(deps):`)
-  but there is no enforcing mechanism.
+### Simple (pre-built binary, no dependencies)
+argocd, bat, bottom, crane, cue, direnv, doppler, fd, helm, jq, just, k9s, kn, kubectl,
+kubeseal, lazygit, lima, ripgrep, starship, terraform, yq
 
-### Recommended Review Focus by Change Type
+### Moderate (source build, no inter-artifact dependencies)
+beads, cmake, ffmpeg, jj, libevent, ncurses, nginx, npth, openjdk, pkg_config, sqlite3,
+vhs, zlib
 
-| Change Type | Effort | Primary Focus |
-|---|---|---|
-| New simple artifact (binary download) | Quick (5-10 min) | URL correctness, all 4 platforms covered, builder pattern followed |
-| New complex artifact (source build) | Medium (15-30 min) | Dependency wiring, build script correctness, linker flags, `vorpal.rs` ordering |
-| Artifact version bump | Quick (5 min) | URL still valid, archive structure unchanged, version variables consistent |
-| Dependency library change (ncurses, libgpg_error, etc.) | Medium (15-30 min) | All downstream dependents still build, `rpath` and `LDFLAGS` updated |
-| CI/detection script change | Medium (15 min) | Regression tests pass, edge cases (deleted files, new utilities) handled |
-| `vorpal-sdk` dependency update | Medium (10-15 min) | API compatibility, `Cargo.lock` updated, `cargo check` passes |
-| `lib.rs` or `ProjectEnvironment` changes | High (20-30 min) | Dev environment still functional, Lima/Protoc/Rust toolchain integration intact |
+### Moderate (pre-built + runtime dependency)
+openapi_generator_cli (depends on openjdk)
 
----
-
-## Automated Checks
-
-### Currently in Place
-
-- **`cargo build` / `cargo check`**: Validates Rust compilation. Catches type errors, missing
-  imports, and syntax issues. Does NOT validate embedded shell scripts.
-- **CI matrix build**: Builds changed artifacts on 4 runners (macOS arm64, macOS x86_64, Ubuntu
-  arm64, Ubuntu x86_64). This is the primary validation that artifacts actually work.
-- **`detect-changed-artifacts.sh`**: Limits CI scope to only changed artifacts.
-- **Renovate bot**: Automated dependency update PRs for GitHub Actions.
-
-### Not Currently in Place
-
-- **No linting** (no `clippy` in CI)
-- **No formatting enforcement** (no `rustfmt` check in CI)
-- **No shell script linting** (no `shellcheck` for embedded scripts or standalone scripts)
-- **No security scanning** (no `cargo audit`, no dependency vulnerability checks)
-- **No hash verification** of downloaded artifact sources
-- **No PR checks or required reviews** before merge
+### Complex (source build with inter-artifact dependencies)
+gpg (5 deps: libassuan, libgcrypt, libgpg_error, libksba, npth),
+ttyd (5 deps: cmake, json_c, libuv, libwebsockets, mbedtls; platform-conditional build),
+libwebsockets (3 deps: cmake, libuv, mbedtls),
+nnn (3 deps: ncurses, pkg_config, readline),
+tmux (depends on libevent, ncurses),
+neovim (depends on cmake),
+zsh (depends on ncurses),
+libassuan (depends on libgpg_error),
+libgcrypt (depends on libgpg_error),
+libksba (depends on libgpg_error),
+readline (depends on ncurses),
+libuv (depends on cmake),
+mbedtls (depends on cmake),
+json_c (depends on cmake),
+awscli2 (source install with platform-specific steps)
 
 ---
 
-## Artifact-Specific Review Notes
+## Existing Review Infrastructure
 
-### Utility Modules (Non-Artifact Files)
+### What Exists
 
-`src/artifact/file.rs` is a utility module, not a standalone artifact. It is excluded from CI
-detection via the `EXCLUDED_FILES` array. Any new utility module added to `src/artifact/` must
-also be added to this array to prevent CI from attempting to build it as a standalone artifact.
+- **CI pipeline**: GitHub Actions workflow builds artifacts on all 4 platform runners
+  (macos-latest, macos-latest-large, ubuntu-latest, ubuntu-latest-arm64). CI runs on both
+  pull requests and pushes to main.
+- **Changed artifact detection**: `script/detect-changed-artifacts.sh` identifies which
+  artifacts were modified, enabling incremental CI builds.
+- **Regression tests for CI scripts**: `script/test-detect-changed-artifacts.sh` provides
+  regression tests for the change detection logic.
+- **Renovate**: Automated dependency update bot configured with recommended defaults.
+- **Vorpal.lock**: Content-addressable source integrity verification via SHA-256 digests.
+- **S3 registry backend**: Built artifacts are stored in an S3 registry
+  (`altf4llc-vorpal-registry`), providing a cache layer.
 
-### Artifacts with Dependencies
+### What Does Not Exist
 
-These artifacts require extra scrutiny because changes to their dependencies can break them:
-
-| Artifact | Dependencies | Risk |
-|---|---|---|
-| `gpg` | `libassuan`, `libgcrypt`, `libgpg_error`, `libksba`, `npth` | Highest -- 5 dependencies, complex configure flags |
-| `nnn` | `ncurses`, `pkg_config`, `readline` | High -- 3 dependencies, readline itself depends on ncurses |
-| `tmux` | `libevent`, `ncurses` | Medium -- 2 dependencies |
-| `readline` | `ncurses` | Medium -- transitive dependency for `nnn` |
-| `zsh` | `ncurses` | Medium -- 1 dependency |
-| `openapi-generator-cli` | `openjdk` | Medium -- Java runtime dependency |
-| `libassuan` | `libgpg_error` | Medium -- GPG chain |
-| `libgcrypt` | `libgpg_error` | Medium -- GPG chain |
-| `libksba` | `libgpg_error` | Medium -- GPG chain |
-
-### The GPG Dependency Chain
-
-The GPG artifact chain (`libgpg_error` -> `libassuan`/`libgcrypt`/`libksba` -> `gpg`) is the
-most complex dependency graph in the project. A version bump to `libgpg_error` requires
-verification that all four downstream artifacts still build correctly. The CI detection script
-does NOT automatically rebuild dependents when a dependency changes -- each artifact file must be
-individually modified to trigger a rebuild.
+- **No PR template**: No `.github/PULL_REQUEST_TEMPLATE.md` exists.
+- **No CODEOWNERS file**: No `.github/CODEOWNERS` for automatic review assignment.
+- **No CONTRIBUTING guide**: No contribution guidelines documented.
+- **No branch protection rules** (not verified, but no evidence of required reviews in workflow).
+- **No automated linting**: No `cargo clippy` or `cargo fmt --check` in CI.
+- **No unit tests**: The Rust code has no `#[test]` modules. Build correctness is verified
+  entirely through CI builds on all platforms.
+- **No integration test suite**: No automated verification that built artifacts actually work
+  (e.g., running `argocd version` after build).
 
 ---
 
-## Key Takeaway
+## Commit Message Convention
 
-For this project, the most valuable review time is spent on:
+The project uses conventional commit format with scope, based on observed history:
 
-1. **Verifying source URLs and version strings** -- these are the most common source of breakage
-   and cannot be caught by the Rust compiler
-2. **Checking dependency wiring** -- ensuring `vorpal.rs` ordering and `with_*()` calls are correct
-3. **Validating platform coverage** -- confirming all four architecture/OS combinations are handled
-4. **Reviewing embedded shell scripts** -- the Rust compiler cannot validate these; they fail only
-   at build time in CI
+```
+type(scope): description
+```
+
+Common types observed: `feat`, `fix`, `chore`, `refactor`, `patch`, `docs`
+Common scopes observed: `artifact`, `vorpal`, `ci`, `lock`, `spec`, `lib`, specific artifact names
+
+---
+
+## Recommended Review Workflow
+
+1. **Categorize the change** using the categories above to set time budget.
+2. **Check cross-platform coverage first** -- this is the most common failure mode.
+3. **For dependency changes**, trace the full dependency chain.
+4. **For build scripts**, verify against upstream documentation for the specified version.
+5. **For infrastructure changes**, verify against the test suite and consider blast radius.
+6. **Approve with confidence** for simple pre-built binary artifacts that follow established
+   patterns. These are low-risk and highly formulaic.
+7. **Request split** if a PR mixes artifact additions with infrastructure changes.

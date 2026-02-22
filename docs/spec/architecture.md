@@ -1,354 +1,290 @@
 # Architecture Specification
 
-> Living document describing the architecture of `vorpal-artifacts` as it exists in the codebase.
-> Last updated: 2026-02-21
+## Overview
 
-## System Overview
+`artifacts.vorpal` is a Rust-based artifact definition repository that uses the [Vorpal](https://github.com/ALT-F4-LLC/vorpal) build system SDK (`vorpal-sdk`) to declaratively define, build, and manage software artifacts across multiple platforms. It functions as a **catalog of build recipes** -- each artifact module describes how to fetch, compile, and package a specific tool or library for cross-platform use.
 
-`vorpal-artifacts` is a Rust project that defines and builds software artifacts (packages and tools) for the **Vorpal** build system. It is not a general-purpose package manager -- it is a declarative artifact catalog where each artifact is a self-contained Rust module that describes how to download, build, and install a specific tool or library across four target platforms.
+The project produces a single binary (`vorpal`) that, when executed with `vorpal build <artifact>`, registers all artifact definitions with the Vorpal build system and then delegates the actual build orchestration to the Vorpal runtime.
 
-The project produces a single binary (`vorpal`) that, when executed by the Vorpal build system, registers all artifact definitions and a development environment, then delegates to the Vorpal SDK runtime for actual build orchestration.
-
-## Target Platforms
-
-All artifacts target four platforms, represented by the `ArtifactSystem` enum from the Vorpal SDK:
-
-| Enum Variant     | Architecture | OS     |
-|------------------|-------------|--------|
-| `Aarch64Darwin`  | ARM64       | macOS  |
-| `Aarch64Linux`   | ARM64       | Linux  |
-| `X8664Darwin`    | x86_64      | macOS  |
-| `X8664Linux`     | x86_64      | Linux  |
-
-These are exported as `DEFAULT_SYSTEMS` in `src/lib.rs` (line 13-14).
-
-## Component Architecture
-
-### Entry Points
-
-The project has two logical entry points:
-
-1. **`src/vorpal.rs`** -- The binary entry point. Contains `#[tokio::main] async fn main()` which:
-   - Obtains a `ConfigContext` from the Vorpal SDK via `get_context().await`
-   - Builds all 46 artifacts in dependency order
-   - Creates the `dev` `ProjectEnvironment`
-   - Calls `context.run().await` to hand off to the Vorpal runtime
-
-2. **`src/lib.rs`** -- The library crate root. Exports:
-   - `pub mod artifact` -- the artifact module tree
-   - `DEFAULT_SYSTEMS` -- the four-platform constant array
-   - `ProjectEnvironment` -- a struct that bundles Lima, Protoc, and Rust toolchain into a development environment
-
-### Module Structure
+## System Context
 
 ```
-src/
-  vorpal.rs           # Binary entry point (main)
-  lib.rs              # Library root: ProjectEnvironment, DEFAULT_SYSTEMS
-  artifact.rs         # Module declarations (47 pub mod statements)
-  artifact/
-    argocd.rs          # Simple: pre-built binary download
-    awscli2.rs         # Simple: platform-specific installer
-    bat.rs             # Simple: pre-built binary download
-    beads.rs           # Simple: pre-built binary download
-    bottom.rs          # Simple: pre-built binary download
-    crane.rs           # Simple: pre-built binary download
-    cue.rs             # Simple: pre-built binary download
-    direnv.rs          # Simple: pre-built binary download
-    doppler.rs         # Simple: pre-built binary download
-    fd.rs              # Simple: pre-built binary download
-    file.rs            # Utility: generic file artifact (not a tool)
-    fluxcd.rs          # Simple: pre-built binary download
-    golangci_lint.rs   # Simple: pre-built binary download
-    gpg.rs             # Complex: source build, 5 library dependencies
-    helm.rs            # Simple: pre-built binary download
-    jj.rs              # Simple: pre-built binary download
-    jq.rs              # Simple: pre-built binary download
-    just.rs            # Simple: pre-built binary download
-    k9s.rs             # Simple: pre-built binary download
-    kn.rs              # Simple: pre-built binary download
-    kubectl.rs         # Simple: pre-built binary download
-    kubeseal.rs        # Simple: pre-built binary download
-    lazygit.rs         # Simple: pre-built binary download
-    libassuan.rs       # Library: source build, depends on libgpg_error
-    libevent.rs        # Library: source build, no dependencies
-    libgcrypt.rs       # Library: source build, depends on libgpg_error
-    libgpg_error.rs    # Library: source build, no dependencies
-    libksba.rs         # Library: source build, depends on libgpg_error
-    lima.rs            # Simple: pre-built binary download
-    ncurses.rs         # Library: source build, no dependencies
-    neovim.rs          # Simple: pre-built binary download
-    nginx.rs           # Source build: configure/make/install
-    nnn.rs             # Complex: source build, 3 dependencies
-    npth.rs            # Library: source build, no dependencies
-    openapi_generator_cli.rs  # Wrapper: JAR with shell script, depends on openjdk
-    openjdk.rs         # Simple: pre-built JDK download
-    pkg_config.rs      # Source build: autotools
-    readline.rs        # Library: source build, depends on ncurses
-    ripgrep.rs         # Simple: pre-built binary download
-    skopeo.rs          # Language build: uses SDK Go helper
-    sqlite3.rs         # Source build: configure/make/install
-    starship.rs        # Simple: pre-built binary download
-    terraform.rs       # Simple: pre-built binary download
-    tmux.rs            # Complex: source build, 2 dependencies
-    umoci.rs           # Simple: pre-built binary download
-    yq.rs              # Simple: pre-built binary download
-    zsh.rs             # Source build: depends on ncurses
++---------------------+         +------------------------+
+|                     |         |                        |
+|  artifacts.vorpal   |-------->|  Vorpal Build System   |
+|  (this repo)        |  SDK    |  (vorpal-sdk crate)    |
+|                     |         |                        |
++---------------------+         +------------------------+
+        |                                |
+        | defines                        | orchestrates
+        v                                v
++---------------------+         +------------------------+
+|                     |         |                        |
+|  Artifact Sources   |         |  S3 Registry Backend   |
+|  (GitHub releases,  |         |  (altf4llc-vorpal-     |
+|   tarballs, zips)   |         |   registry)            |
+|                     |         |                        |
++---------------------+         +------------------------+
 ```
 
-### Artifact Categories
+### External Dependencies
 
-Artifacts fall into five categories based on their build strategy:
+- **vorpal-sdk**: The core SDK crate, sourced from `https://github.com/ALT-F4-LLC/vorpal.git` (branch: `main`). Provides `ConfigContext`, `Artifact`, `ArtifactSource`, `ArtifactSystem`, `step::shell`, `get_env_key`, language-specific builders (e.g., `Go`), and the `ProjectEnvironment` abstraction.
+- **Vorpal CLI**: The `vorpal` CLI tool (installed separately) that this binary communicates with via gRPC (evidenced by `tonic`/`prost` in the SDK's dependency tree). The Vorpal CLI handles services, workers, and the actual build execution.
+- **S3 Registry**: Artifact outputs are stored in an S3 bucket (`altf4llc-vorpal-registry`) using AWS credentials, configured via the `setup-vorpal-action` GitHub Action.
 
-| Category | Count | Pattern | Example |
-|----------|-------|---------|---------|
-| **Pre-built binary download** | ~27 | Download platform-specific binary, copy to `$VORPAL_OUTPUT/bin` | `jj.rs`, `argocd.rs` |
-| **Source build (no deps)** | ~8 | Download tarball, `configure && make && make install` | `ncurses.rs`, `nginx.rs`, `sqlite3.rs` |
-| **Source build (with deps)** | ~7 | Source build with dependency injection via builder methods | `gpg.rs`, `tmux.rs`, `nnn.rs` |
-| **Language-specific build** | 1 | Uses SDK language helpers (e.g., `Go::new()`) | `skopeo.rs` |
-| **Utility** | 2 | Non-tool artifacts: `file.rs` (generic file), `openapi_generator_cli.rs` (JAR wrapper) | `file.rs` |
+## Project Structure
 
-## Design Patterns
+```
+.
+├── Cargo.toml              # Rust package manifest (single binary crate)
+├── Cargo.lock              # Pinned Rust dependency versions
+├── Vorpal.toml             # Vorpal configuration (language=rust, source includes)
+├── Vorpal.lock             # Pinned source digests per platform (~2700 lines)
+├── src/
+│   ├── vorpal.rs           # Binary entry point (main function)
+│   ├── lib.rs              # Library root: ProjectEnvironment, DEFAULT_SYSTEMS, re-exports
+│   ├── artifact.rs         # Module declarations for all artifact submodules
+│   └── artifact/           # One file per artifact definition (~55 artifacts)
+│       ├── argocd.rs
+│       ├── bat.rs
+│       ├── file.rs         # Utility: generic file artifact builder
+│       ├── gpg.rs          # Complex: multi-dependency source build
+│       ├── ttyd.rs         # Complex: platform-conditional build strategies
+│       └── ...
+├── script/
+│   ├── detect-changed-artifacts.sh      # CI: identifies changed artifacts for selective builds
+│   ├── test-detect-changed-artifacts.sh # Tests for the detection script
+│   ├── lima.sh                          # Lima VM provisioning for Linux builds on macOS
+│   └── linux-vorpal-slim.sh             # Rootfs slimming utility for Vorpal Linux
+├── .github/
+│   ├── workflows/vorpal.yaml            # CI pipeline: build-changes -> build-dev -> build
+│   └── renovate.json                    # Automated dependency updates
+├── makefile                             # Lima VM management targets
+├── lima.yaml                            # Lima VM template for Linux build environments
+└── docs/
+    └── spec/                            # Project specifications (this directory)
+```
 
-### Artifact Builder Pattern
+## Core Architectural Components
 
-Every artifact follows a consistent builder pattern. This is the single most important architectural pattern in the project.
+### 1. Binary Entry Point (`src/vorpal.rs`)
 
-**Simple artifact (no dependencies):**
+The `main` function is the single entry point. It:
+
+1. Obtains a `ConfigContext` via `vorpal_sdk::context::get_context()` (async, sets up gRPC communication with the Vorpal build system).
+2. Sequentially registers all artifact definitions by calling `Artifact::new().build(context)` on each one.
+3. Registers a development environment (`ProjectEnvironment::new("dev", ...)`) that includes Lima, Protoc, and Rust toolchain artifacts.
+4. Calls `context.run().await` to hand control to the Vorpal runtime for actual build execution.
+
+All artifact registrations happen at startup, before any builds execute. The Vorpal runtime selects which artifacts to build based on CLI arguments.
+
+### 2. Library Root (`src/lib.rs`)
+
+Exports:
+- `DEFAULT_SYSTEMS`: A constant array of the four supported `ArtifactSystem` variants.
+- `ProjectEnvironment`: A wrapper around the SDK's `ProjectEnvironment` that adds project-specific development dependencies (Lima, Protoc, Rust toolchain) with correct environment variable configuration.
+- `pub mod artifact`: Re-exports all artifact submodules.
+
+### 3. Artifact Module (`src/artifact.rs` + `src/artifact/`)
+
+The `artifact.rs` file is a flat module declaration file -- it declares `pub mod` for every artifact submodule. There are currently **55 artifact modules** plus 1 utility module (`file.rs`).
+
+### 4. Vorpal Configuration Files
+
+- **`Vorpal.toml`**: Declares the project language (`rust`) and which files to include as sources (`src`, `Cargo.toml`, `Cargo.lock`). This tells Vorpal how to build this project itself.
+- **`Vorpal.lock`**: A TOML lockfile containing pinned source digests for every artifact source URL, per platform. Each entry records `name`, `path` (URL), `includes`, `excludes`, `digest` (SHA-256), and `platform`. This file is ~2700 lines and is regenerated when artifact versions change.
+
+## Artifact Architecture Patterns
+
+### Pattern Categories
+
+Artifacts follow one of three build strategy patterns:
+
+#### A. Pre-built Binary Download (Simplest)
+
+Used for tools that publish pre-built binaries per platform. Examples: `argocd`, `bat`, `terraform`, `kubectl`, `neovim`, `starship`, `beads`.
+
+Structure:
+1. Map `ArtifactSystem` to platform-specific download URL suffix.
+2. Create an `ArtifactSource` from the URL.
+3. Write a shell step that copies the binary into `$VORPAL_OUTPUT/bin/`.
+4. Register as `Artifact::new(name, steps, systems).with_aliases(...).with_sources(...)`.
+
+#### B. Source Build (No Dependencies)
+
+Used for tools built from source with `./configure && make && make install` but no artifact dependencies. Examples: `nginx`, `ffmpeg`, `zlib`, `sqlite3`, `readline`.
+
+Structure:
+1. Download source tarball.
+2. Shell step runs configure/make/install with `--prefix="$VORPAL_OUTPUT"`.
+3. No artifact dependencies passed to `step::shell`.
+
+#### C. Source Build with Dependencies (Most Complex)
+
+Used for tools that depend on other artifacts built by this same project. Examples: `gpg` (depends on libgpg-error, libassuan, libgcrypt, libksba, npth), `tmux` (depends on libevent, ncurses), `ttyd` (depends on cmake, json-c, libuv, libwebsockets, mbedtls), `zsh` (depends on ncurses).
+
+Structure:
+1. Struct fields hold `Option<&'a str>` references to pre-built dependency artifact hashes.
+2. Builder pattern with `with_*` methods allows dependency injection.
+3. `build()` method resolves dependencies -- if not provided, builds them inline.
+4. Dependencies are referenced via `get_env_key()` which converts artifact hashes to environment variable paths.
+5. `step::shell` receives dependency artifact hashes so the Vorpal runtime makes them available during build.
+
+#### D. Language-Specific Builder
+
+Used for Go projects via the SDK's `Go` builder. Examples: `skopeo`, `umoci`.
+
+Structure:
+1. Uses `vorpal_sdk::artifact::language::go::Go` instead of raw `Artifact` + `step::shell`.
+2. Configures build directory, build path, build flags, and source.
+3. The SDK handles Go toolchain setup, compilation, and output packaging.
+
+#### E. Platform-Conditional Strategy (Hybrid)
+
+Some artifacts use different strategies per platform. Example: `ttyd` uses pre-built binaries on Linux but builds from source on macOS. `awscli2` uses different installation methods per platform (zip extraction on Linux, pkg extraction on macOS).
+
+### Common Artifact API
+
+Every artifact module follows this contract:
 
 ```rust
-#[derive(Default)]
-pub struct ArtifactName;
+pub struct ArtifactName {
+    // Optional dependency references
+}
 
 impl ArtifactName {
-    pub fn new() -> Self { Self }
-
-    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
-        // 1. Define name, version
-        // 2. Match context.get_system() for platform-specific URLs
-        // 3. Create ArtifactSource
-        // 4. Write shell build script
-        // 5. Create step via step::shell()
-        // 6. Return Artifact::new(name, steps, systems).build(context).await
-    }
+    pub fn new() -> Self { ... }
+    // Optional: pub fn with_dependency(mut self, dep: &str) -> Self { ... }
+    pub async fn build(self, context: &mut ConfigContext) -> Result<String> { ... }
 }
 ```
 
-**Complex artifact (with dependencies):**
+The `build` method returns `Result<String>` where the `String` is the artifact's content hash, used to reference it as a dependency in other artifacts.
 
-```rust
-#[derive(Default)]
-pub struct ArtifactName<'a> {
-    dep_a: Option<&'a str>,
-    dep_b: Option<&'a str>,
-}
+### Dependency Graph
 
-impl<'a> ArtifactName<'a> {
-    pub fn new() -> Self { Self { dep_a: None, dep_b: None } }
-
-    pub fn with_dep_a(mut self, dep_a: &'a str) -> Self {
-        self.dep_a = Some(dep_a);
-        self
-    }
-
-    pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
-        // Resolve dependency: use injected value or build inline
-        let dep_a = match self.dep_a {
-            Some(val) => val,
-            None => &DepA::new().build(context).await?,
-        };
-        // ... rest of build logic using get_env_key(&dep_a) for paths
-    }
-}
-```
-
-Key aspects of the pattern:
-- Dependencies are optional `Option<&'a str>` fields holding artifact key strings
-- `with_*()` builder methods inject pre-built dependency keys
-- If a dependency is not injected, the artifact builds it inline (fallback)
-- `get_env_key()` converts artifact keys to environment variable paths for use in shell scripts
-- Dependencies are passed to `step::shell()` as the first argument (artifact dependencies list)
-- Build scripts use `$VORPAL_OUTPUT` as the installation prefix
-- Sources are extracted to `./source/{name}/` by the Vorpal runtime
-
-### Dependency Injection via Artifact Keys
-
-Artifact keys are strings returned by `.build()` that uniquely identify a built artifact. When an artifact depends on another:
-
-1. The dependency is built first, returning its key string
-2. The key is passed via `with_*()` to the dependent artifact
-3. Inside the build script, `get_env_key(&key)` resolves the key to a filesystem path
-4. The path is used in `CPPFLAGS`, `LDFLAGS`, `PATH`, `PKG_CONFIG_PATH`, etc.
-
-This pattern allows the same dependency to be shared across multiple consumers without rebuilding.
-
-### Build Script Convention
-
-All build scripts follow a shell script convention:
-- Output goes to `$VORPAL_OUTPUT` (set by the Vorpal runtime)
-- Binaries are placed in `$VORPAL_OUTPUT/bin/`
-- Source archives are auto-extracted to `./source/{artifact_name}/`
-- Scripts use `pushd` to navigate into source directories
-- Source builds use standard autotools: `./configure --prefix="$VORPAL_OUTPUT" && make && make install`
-
-## Dependency Graph
-
-### Build-Time Dependency Tree
+The artifact dependency tree (inferred from `use crate::artifact::*` imports and `with_*` calls):
 
 ```
-ncurses (standalone)
-  |-- readline
-  |     |-- nnn (also depends on ncurses, pkg_config)
-  |-- tmux (also depends on libevent)
-  |-- zsh
-  |-- nnn
+gpg
+├── libgpg-error
+├── libassuan -> libgpg-error
+├── libgcrypt -> libgpg-error
+├── libksba -> libgpg-error
+└── npth
 
-libevent (standalone)
-  |-- tmux
+tmux
+├── libevent
+└── ncurses
 
-pkg_config (standalone)
-  |-- nnn
+zsh
+└── ncurses
 
-libgpg_error (standalone)
-  |-- libassuan
-  |-- libgcrypt
-  |-- libksba
-  |-- gpg (depends on all five: libassuan, libgcrypt, libgpg_error, libksba, npth)
+ttyd (macOS only, Linux uses prebuilt)
+├── cmake
+├── json-c
+├── libuv -> cmake
+├── libwebsockets -> cmake, libuv, mbedtls
+└── mbedtls -> cmake
 
-npth (standalone)
-  |-- gpg
-
-openjdk (standalone)
-  |-- openapi_generator_cli
+neovim (standalone, prebuilt)
+libevent (standalone, source build)
+ncurses (standalone, source build)
 ```
 
-### Build Order in vorpal.rs
+All other artifacts (~45) are standalone with no inter-artifact dependencies.
 
-`src/vorpal.rs` enforces dependency order by building artifacts sequentially. Artifacts with dependencies are built after their dependencies. The order is:
+## Cross-Platform Support
 
-1. **Foundation libraries** (lines 24-49): `libevent`, `libgpg_error`, `libassuan`, `libgcrypt`, `libksba`, `ncurses`, `npth`, `openjdk`, `pkg_config`, `readline`
-2. **Independent artifacts** (lines 56-129): All simple pre-built binary downloads, plus `gpg`, `nginx`
-3. **Dependent artifacts** (lines 113-145): `nnn`, `openapi_generator_cli`, `tmux`, `zsh`
-4. **Development environment** (lines 149-151): `ProjectEnvironment::new("dev", ...)`
-5. **Runtime handoff** (line 153): `context.run().await`
+### Supported Platforms
 
-### Development Environment (ProjectEnvironment)
+All artifacts target four platforms, defined by the `ArtifactSystem` enum:
 
-`ProjectEnvironment` in `src/lib.rs` bundles three SDK-provided tools into a development environment:
+| Enum Variant      | Platform Description    |
+|-------------------|------------------------|
+| `Aarch64Darwin`   | macOS on Apple Silicon  |
+| `Aarch64Linux`    | Linux on ARM64          |
+| `X8664Darwin`     | macOS on Intel x86_64   |
+| `X8664Linux`      | Linux on x86_64         |
 
-- **Lima** -- Linux VM manager (for macOS-to-Linux development)
-- **Protoc** -- Protocol Buffers compiler (from `vorpal_sdk::artifact::protoc`)
-- **RustToolchain** -- Rust compiler and toolchain (from `vorpal_sdk::artifact::rust_toolchain`)
+### Platform Resolution
 
-The environment configures `PATH`, `RUSTUP_HOME`, and `RUSTUP_TOOLCHAIN` environment variables for the Rust toolchain.
+Each artifact's `build` method uses `context.get_system()` to determine the current platform and selects the appropriate:
+- Download URL or URL suffix
+- Build flags and configure options
+- Installation procedure
 
-## External Dependencies
+### Lima VM for Cross-Platform Linux Builds
 
-### Rust Crate Dependencies
-
-From `Cargo.toml`:
-
-| Crate | Version | Purpose |
-|-------|---------|---------|
-| `anyhow` | 1 | Error handling (`Result<T>` type alias) |
-| `indoc` | 2 | Indented multi-line string literals (`formatdoc!` macro) |
-| `tokio` | 1 (rt-multi-thread) | Async runtime for the binary entry point |
-| `vorpal-sdk` | git (main branch) | Core Vorpal build system SDK |
-
-### Vorpal SDK
-
-The project depends on `vorpal-sdk` from the `ALT-F4-LLC/vorpal` repository (main branch, git dependency). The SDK provides:
-
-- `ConfigContext` -- build context management, platform detection (`get_system()`)
-- `get_context()` -- initialization of the config context
-- `ArtifactSystem` enum -- platform target identifiers
-- `Artifact` -- artifact definition builder with `.with_aliases()`, `.with_sources()`
-- `ArtifactSource` -- source file/URL declaration
-- `step::shell()` -- shell-based build step creation
-- `get_env_key()` -- artifact key to environment path resolution
-- `ProjectEnvironment` -- SDK-level environment bundling
-- Language helpers: `language::go::Go` for Go source builds
-- Built-in artifacts: `Protoc`, `RustToolchain`
-
-The SDK is pinned to the `main` branch via git, meaning SDK changes can break this project without version bump. The `Cargo.lock` file pins the exact commit.
+The project includes Lima VM support for building Linux artifacts on macOS hosts:
+- `lima.yaml`: VM template configuration.
+- `makefile`: Targets for managing Lima VMs (`lima`, `lima-clean`, `lima-sync`, `lima-vorpal`, `lima-vorpal-start`).
+- `script/lima.sh`: Provisions the Lima VM with build dependencies (bubblewrap, build-essential, Docker, Vorpal CLI).
 
 ## CI/CD Architecture
 
-### GitHub Actions Workflow (`.github/workflows/vorpal.yaml`)
+### GitHub Actions Workflow (`vorpal.yaml`)
 
-The CI pipeline has three jobs:
+Three-job pipeline:
 
-1. **`build-changes`** -- Runs on `ubuntu-latest`. Uses `script/detect-changed-artifacts.sh` to determine which artifacts changed between commits. Outputs a JSON array of artifact names and a `has_changes` boolean.
+1. **`build-changes`**: Runs `detect-changed-artifacts.sh` to identify which artifacts were modified between commits. Outputs a JSON array of artifact names and a `has_changes` boolean.
 
-2. **`build-dev`** -- Runs on a 4-runner matrix (macOS ARM, macOS x86, Ubuntu x86, Ubuntu ARM). Builds the `dev` environment using `vorpal build 'dev'`. Uploads the `Vorpal.lock` file as a GitHub artifact.
+2. **`build-dev`**: Builds the development environment (`vorpal build 'dev'`) on all four runner types (`macos-latest`, `macos-latest-large`, `ubuntu-latest`, `ubuntu-latest-arm64`). Uses `ALT-F4-LLC/setup-vorpal-action` to install Vorpal with S3 registry backend. Uploads `Vorpal.lock` as a build artifact.
 
-3. **`build`** -- Conditional on `has_changes`. Uses a matrix of changed artifacts x 4 runners. Each cell runs `vorpal build '<artifact-name>'`. This means only changed artifacts are built, and each is built on all four platforms.
+3. **`build`**: Conditionally runs only if `has_changes == true`. Uses a matrix strategy to build each changed artifact on all four runners. Each runner executes `vorpal build '<artifact>'`.
 
-The workflow uses `ALT-F4-LLC/setup-vorpal-action@main` to install the Vorpal CLI with an S3-backed registry (`altf4llc-vorpal-registry`).
+### Change Detection (`script/detect-changed-artifacts.sh`)
 
-### Artifact Detection Script
+Dynamically discovers artifacts by scanning `src/artifact/*.rs` (excluding `file.rs`). Compares git diffs between commits to identify which artifact files changed. Converts Rust filenames to artifact names (`_` to `-`). Only detects direct artifact file changes -- modifications to shared files (`lib.rs`, `vorpal.rs`, `Cargo.lock`) do not trigger a full rebuild.
 
-`script/detect-changed-artifacts.sh` provides CI-level change detection:
+### Automated Dependency Updates
 
-- **Discovery**: Scans `src/artifact/*.rs` files, converts `snake_case.rs` filenames to `kebab-case` artifact names
-- **Exclusions**: `file.rs` is excluded (it is a utility, not a buildable artifact)
-- **Diff detection**: Uses `git diff --name-only --diff-filter=d` to find changed files between two commits, filtering to only `src/artifact/*.rs` changes
-- **Output**: JSON array of changed artifact names, or `[]` if none changed
-- **Key design decision**: Only direct artifact file changes trigger builds. Changes to `src/vorpal.rs`, `Cargo.lock`, `Cargo.toml`, or other infrastructure files do NOT trigger artifact rebuilds. This was an intentional simplification -- a previous `CORE_FILES` mechanism that triggered full rebuilds on infrastructure changes was removed.
-
-### Lima VM Support
-
-For building Linux artifacts on macOS, the project includes Lima VM integration:
-
-- **`lima.yaml`** -- Lima VM template using Debian 13 (Trixie) cloud images for both aarch64 and x86_64
-- **`script/lima.sh`** -- VM provisioning script that installs build dependencies (bubblewrap, build-essential, docker, vorpal, etc.) and configures AppArmor for bubblewrap
-- **`makefile`** -- Convenience targets for `lima`, `lima-clean`, `lima-sync`, `lima-vorpal`, `lima-vorpal-start`
+Renovate Bot is configured with `config:recommended` to automatically propose dependency updates via pull requests.
 
 ## Build System Integration
 
-### Vorpal.toml
+### How Artifacts Are Built
+
+1. This project is itself a Vorpal project (defined by `Vorpal.toml`).
+2. Running `vorpal build <artifact-name>` compiles this Rust project, executes the resulting binary, which registers all artifact definitions with the Vorpal runtime.
+3. The Vorpal runtime identifies the requested artifact by name or alias, resolves its dependency graph, fetches sources (verified against `Vorpal.lock` digests), and executes build steps in sandboxed environments.
+4. Build steps are shell scripts executed in an environment where `$VORPAL_OUTPUT` points to the artifact's output directory and `$VORPAL_ARTIFACT_<hash>` environment variables point to dependency artifacts.
+5. Built artifacts are cached in the S3 registry, keyed by content hash.
+
+### Source Integrity
+
+The `Vorpal.lock` file provides deterministic, verifiable builds by pinning SHA-256 digests for every source URL per platform. The lockfile format is:
 
 ```toml
-language = "rust"
-
-[source]
-includes = ["src", "Cargo.toml", "Cargo.lock"]
+[[sources]]
+name = "artifact-name"
+path = "https://download-url"
+includes = []
+excludes = []
+digest = "sha256-hex"
+platform = "aarch64-darwin"
 ```
 
-This tells the Vorpal build system that this is a Rust project and to include only the `src/` directory and Cargo manifest files as build inputs.
+## Key Architectural Decisions
 
-### Vorpal.lock
+1. **Single binary, all artifacts registered at startup**: Every artifact is registered regardless of which one is being built. This simplifies the architecture but means adding a new artifact requires modifying both `src/artifact.rs` (module declaration) and `src/vorpal.rs` (build registration).
 
-The lock file (`Vorpal.lock`) tracks source digests (SHA-256 hashes) for every artifact source URL across all platforms. Each entry includes:
-- `name` -- artifact name
-- `path` -- source URL
-- `digest` -- SHA-256 hash of the downloaded source
-- `platform` -- target platform string (e.g., `x86_64-darwin`)
+2. **Inline dependency resolution**: Artifacts with dependencies build their dependencies inline if not explicitly provided. This means running `gpg` alone will also build all five of its dependencies. The Vorpal runtime likely caches results to avoid redundant builds.
 
-This provides reproducible builds by pinning exact source content.
+3. **Shell-based build steps**: Build logic lives in bash scripts embedded in Rust string literals via `indoc::formatdoc!`. This keeps the build recipes portable but means build logic is not type-checked by Rust.
 
-## Architectural Gaps and Observations
+4. **No centralized version catalog**: Each artifact hardcodes its version, source URL pattern, and platform mappings. There is no shared version manifest or central configuration for artifact versions.
 
-### No Unit Tests
-There are no Rust unit tests in the project. The only tests are bash-based regression tests for the `detect-changed-artifacts.sh` script.
+5. **Flat module structure**: All artifacts are siblings in `src/artifact/` with no sub-categorization (e.g., no separation between CLI tools, libraries, development tools). The `artifact.rs` module file is a flat list of `pub mod` declarations.
 
-### No Artifact Versioning Contract
-Artifact versions are hardcoded strings inside each module. There is no centralized version manifest, no automated version bumping mechanism, and no way to query what version of an artifact is defined without reading the source code. Renovate is configured (`.github/renovate.json`) but operates on Cargo dependencies, not artifact versions.
+6. **Content-addressable artifact references**: Artifact `build()` methods return content hash strings. Dependencies reference each other by these hashes, enabling the Vorpal runtime to provide deterministic, cached builds.
 
-### SDK Dependency is Git-Pinned
-The `vorpal-sdk` dependency uses a git branch reference (`main`) rather than a versioned crate release. This means the project depends on HEAD of the SDK's main branch at whatever commit Cargo.lock pins, and SDK API changes can break this project.
+## Gaps and Observations
 
-### No Artifact Validation
-There is no mechanism to validate that a defined artifact actually builds successfully beyond running it through CI. There are no smoke tests, health checks, or artifact integrity verification steps defined within the artifact modules themselves.
-
-### Build Script is Untyped
-Build scripts are shell strings constructed via `formatdoc!`. There is no type safety or validation of the shell scripts at compile time. Errors in build scripts are only caught at Vorpal build runtime.
-
-### Linear Dependency Resolution
-`src/vorpal.rs` resolves dependencies through sequential Rust code ordering. There is no declarative dependency graph, no parallel build orchestration at the artifact registration level, and no cycle detection. The correctness of the build order depends entirely on the developer ordering the calls correctly in `main()`.
-
-### file.rs is Declared but Not Used in vorpal.rs
-The `file` module is declared in `src/artifact.rs` but is not imported or used in `src/vorpal.rs`. It exists as a utility for other consumers of the library crate, not as a standalone artifact. The CI script correctly excludes it from artifact discovery.
-
-### No Error Recovery
-All artifact builds use `?` propagation with `anyhow::Result`. A failure in any single artifact build aborts the entire `main()` function. There is no partial build support or continue-on-error mechanism.
+- **No tests in Rust**: There are no unit or integration tests for the artifact definitions themselves. The only tests are bash-based tests for the `detect-changed-artifacts.sh` script.
+- **No documentation per artifact**: Individual artifact modules have no doc comments explaining versioning policy, known issues, or platform-specific caveats.
+- **Sequential artifact registration**: All artifacts are registered sequentially in `main()`. While this is the registration phase (not the build phase), it could theoretically be parallelized since registrations are independent.
+- **Dependency deduplication is implicit**: When multiple artifacts share a dependency (e.g., `tmux` and `zsh` both depend on `ncurses`), deduplication relies on the Vorpal runtime's caching behavior. There is no explicit mechanism in this codebase to prevent redundant builds.
+- **`file.rs` is a utility, not an artifact**: It provides a generic `File` builder for creating simple file artifacts from string content. It is excluded from the artifact discovery script and is not registered in `vorpal.rs`.
+- **Source lock entries for artifacts not in `src/artifact/`**: The `Vorpal.lock` contains entries for artifacts like `bash`, `tar`, `texinfo`, `unzip`, `util-linux`, `xz` that do not have corresponding `src/artifact/*.rs` files. These are likely SDK-internal bootstrap artifacts needed by the Vorpal build environment.

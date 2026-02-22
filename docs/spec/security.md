@@ -1,286 +1,260 @@
 # Security Specification
 
 This document describes the security model, trust boundaries, secret management, and threat
-considerations for the `vorpal-artifacts` project as they actually exist in the codebase today.
+considerations for the `artifacts.vorpal` project as they exist today.
 
----
+## Project Overview
 
-## 1. Project Security Profile
+`artifacts.vorpal` is a Rust-based artifact definition repository that uses the Vorpal SDK to
+define, build, and publish software packages (CLI tools, libraries, and development environments)
+across four target platforms: `aarch64-darwin`, `aarch64-linux`, `x86_64-darwin`, and
+`x86_64-linux`. It is a build-time system -- it does not run services, handle user authentication,
+or process untrusted user input at runtime.
 
-This project is an **artifact definition repository** -- it declares how software packages are
-downloaded and built via the Vorpal build system. It does not serve user-facing traffic, handle
-user authentication, or store sensitive user data at runtime. Its primary security concerns are:
+## Trust Boundaries
 
-- **Supply chain integrity**: Ensuring downloaded artifacts are genuine and untampered.
-- **CI/CD credential management**: Protecting cloud credentials used during automated builds.
-- **Build-time execution safety**: Shell scripts run during artifact builds must not introduce
-  vulnerabilities.
+### Boundary 1: Upstream Source Downloads
 
----
+Every artifact definition fetches source code or pre-built binaries from external URLs over HTTPS.
+These URLs point to:
 
-## 2. Trust Boundaries
+- **GitHub Releases** (e.g., argocd, bat, bottom, crane, doppler, fd, fluxcd, helm, jj, jq, k9s,
+  kn, kubectl, kubeseal, lazygit, lima, neovim, ripgrep, skopeo, starship, ttyd, umoci, vhs, yq)
+- **Official project download servers** (e.g., ffmpeg.org, gnupg.org, ftpmirror.gnu.org,
+  awscli.amazonaws.com, releases.hashicorp.com, repo1.maven.org, sqlite.org, invisible-island.net,
+  github.com/libevent, github.com/libuv, github.com/warmcat, github.com/Mbed-TLS)
 
-### 2.1 Upstream Source Origins
+**Current integrity verification:** The `Vorpal.lock` file records a SHA-256 `digest` for every
+downloaded source (336 entries across all platforms). The Vorpal SDK is responsible for verifying
+these digests at download time. This is the primary supply chain integrity mechanism.
 
-Every artifact downloads source code or pre-built binaries from external URLs. The project trusts
-the following categories of upstream sources:
+**What is NOT verified at the artifact definition level:**
+- GPG/PGP signature verification of upstream sources
+- Certificate pinning on download URLs
+- SBOM (Software Bill of Materials) generation
 
-| Source Category | Examples | Count |
+All URLs use HTTPS, which provides transport-level authenticity and integrity.
+
+### Boundary 2: Build Script Execution
+
+Each artifact's `build()` method generates a shell script that is executed by the Vorpal SDK's
+`step::shell()` function. These scripts run with access to:
+
+- `$VORPAL_OUTPUT` -- the designated output directory for the built artifact
+- `./source/<name>/` -- the downloaded and extracted source files
+- Environment variables injected via `get_env_key()` for dependency paths
+- Standard build tools available on the host or sandbox
+
+**Build isolation is delegated to the Vorpal SDK.** On Linux, the Vorpal build system uses
+`bubblewrap` (bwrap) for sandboxed builds. The Lima VM setup script (`script/lima.sh`) installs
+bubblewrap and configures an AppArmor profile for it. On macOS, the sandboxing mechanism is
+determined by the SDK (not configured in this repository).
+
+**Shell script safety:** Only `src/artifact/file.rs` uses `set -euo pipefail`. Other artifact
+build scripts rely on the Vorpal SDK's `step::shell()` to configure the shell execution
+environment. The scripts themselves are static templates with compile-time string interpolation --
+they do not process untrusted input at build time.
+
+### Boundary 3: CI/CD Pipeline
+
+The GitHub Actions workflow (`.github/workflows/vorpal.yaml`) is the primary automation boundary.
+
+**Secrets used:**
+- `secrets.AWS_ACCESS_KEY_ID` -- AWS credential for S3 registry access
+- `secrets.AWS_SECRET_ACCESS_KEY` -- AWS credential for S3 registry access
+- `vars.AWS_DEFAULT_REGION` -- AWS region (stored as a variable, not a secret)
+
+These are passed as environment variables to the `ALT-F4-LLC/setup-vorpal-action@main` step,
+which configures Vorpal with an S3 backend registry at `altf4llc-vorpal-registry`.
+
+**Workflow trigger scope:** The workflow runs on `pull_request` events and `push` to `main`. There
+is no restriction on which branches can trigger PR builds.
+
+### Boundary 4: Development Environment
+
+The `ProjectEnvironment` (`src/lib.rs`) configures a development environment with:
+- Lima (VM management)
+- Protoc (Protocol Buffers compiler)
+- Rust toolchain
+
+Environment variables set: `PATH`, `RUSTUP_HOME`, `RUSTUP_TOOLCHAIN`. No secrets or credentials
+are injected into the development environment configuration.
+
+## Secret Management
+
+### Secrets in Use
+
+| Secret | Location | Purpose |
 |---|---|---|
-| GitHub Releases | `github.com/*/releases/download/*` | ~30 artifacts |
-| Official project sites | `gnupg.org/ftp/gcrypt/*`, `dl.k8s.io/*`, `releases.hashicorp.com/*` | ~5 artifacts |
-| Package mirrors | `ftpmirror.gnu.org/*`, `invisible-mirror.net/*`, `downloads.sourceforge.net/*` | ~3 artifacts |
-| Cloud vendor CDNs | `awscli.amazonaws.com/*`, `download.java.net/*` | ~2 artifacts |
-| Package repositories | `repo1.maven.org/*` | ~1 artifact |
+| `AWS_ACCESS_KEY_ID` | GitHub Actions secrets | Authenticate to S3 artifact registry |
+| `AWS_SECRET_ACCESS_KEY` | GitHub Actions secrets | Authenticate to S3 artifact registry |
+| `AWS_DEFAULT_REGION` | GitHub Actions variables | Configure AWS region |
 
-**Current state**: All source URLs use HTTPS. No HTTP (plaintext) URLs exist in the codebase.
-This provides transport-layer encryption and basic server authentication via TLS certificates.
+### Secret Handling Assessment
 
-### 2.2 Vorpal SDK
+- Secrets are stored in GitHub's encrypted secrets store and only exposed as environment variables
+  during CI runs. This follows GitHub's recommended pattern.
+- No secrets are hardcoded in source code. A search for `secret`, `token`, `password`,
+  `credential`, `api_key`, and `auth` across all Rust source files returned no matches related
+  to credential handling.
+- No `.env` files exist in the repository.
+- The `.gitignore` excludes `/.docket` and `/target` but does not explicitly exclude `.env` files
+  or other common secret file patterns.
+- The `.envrc` file (for direnv) exists but could not be inspected due to permissions. Based on
+  the project structure, it likely configures the local Vorpal development environment, not
+  secrets.
 
-The project depends on `vorpal-sdk` (sourced from `https://github.com/ALT-F4-LLC/vorpal.git`,
-`main` branch) for all build orchestration, including `ArtifactSource`, `ConfigContext`,
-`step::shell`, and the `Artifact` builder. The SDK is an implicit trust boundary -- this project
-trusts whatever download, extraction, sandboxing, and caching behavior the SDK implements.
+## Supply Chain Security
 
-### 2.3 CI/CD Environment
+### Source Integrity
 
-GitHub Actions runners (`ubuntu-latest`, `macos-latest`, and their architecture variants) are
-trusted execution environments. The `ALT-F4-LLC/setup-vorpal-action@main` action is referenced
-by branch (`main`), not by commit SHA or tag, which means changes to that action are implicitly
-trusted.
+The lockfile-based integrity model (`Vorpal.lock`) provides:
 
-### 2.4 Renovate Bot
+1. **Reproducible builds**: Every source URL is pinned to a specific version and its SHA-256 digest
+   is recorded.
+2. **Tamper detection**: If an upstream source changes (e.g., a re-tagged release), the digest
+   mismatch will cause the build to fail.
+3. **Version pinning**: All artifact versions are hardcoded in their respective Rust source files
+   (e.g., `let source_version = "3.2.3"` in `argocd.rs`).
 
-Renovate (`config:recommended`) is configured to automatically propose dependency updates via
-pull requests. This introduces a trust relationship with the Renovate service for dependency
-version bumps in `Cargo.toml`.
+### Dependency Management
 
----
+**Rust dependencies** are managed via `Cargo.lock`, which pins exact versions. The project has a
+minimal dependency footprint:
+- `anyhow` -- error handling
+- `indoc` -- indented string formatting
+- `tokio` -- async runtime
+- `vorpal-sdk` -- the core build SDK (pinned to `main` branch of the ALT-F4-LLC/vorpal repository)
 
-## 3. Source Integrity Verification
+**Notable:** The `vorpal-sdk` dependency tracks the `main` branch via Git, not a tagged release.
+This means the SDK version used in builds can change without explicit action in this repository.
+This is a supply chain risk -- a compromised or breaking change in the SDK's `main` branch would
+affect all builds.
 
-### 3.1 Vorpal.lock Digest Mechanism
+**Renovate** is configured (`.github/renovate.json`) with the recommended preset for automated
+dependency update PRs. This helps keep dependencies current with security patches.
 
-The `Vorpal.lock` file contains SHA-256 digests for every source artifact, per platform. Example:
+### Third-Party Actions
 
-```toml
-[[sources]]
-name = "argocd"
-path = "https://github.com/argoproj/argo-cd/releases/download/v3.2.3/argocd-darwin-amd64"
-digest = "1ef724533580a0011ff20f172119065214470aa7fca80eb10c9e11a26489f6cc"
-platform = "x86_64-darwin"
-```
+The CI workflow uses:
+- `actions/checkout@v6` -- official GitHub action, version-pinned by major version
+- `ALT-F4-LLC/setup-vorpal-action@main` -- organization-owned action, pinned to `main` branch
+- `actions/upload-artifact@v6` -- official GitHub action, version-pinned by major version
 
-There are approximately 301 digest entries in `Vorpal.lock`, covering all artifacts across all
-four target platforms. This lockfile is checked into version control, providing a verifiable
-record of expected source content.
+**Risk:** Both `ALT-F4-LLC/setup-vorpal-action@main` and the vorpal-sdk Git dependency track
+`main` branches rather than tagged releases or commit SHAs. This creates a mutable reference that
+could change without notice.
 
-**How verification works**: The Vorpal SDK (not this repository's code) is responsible for
-comparing downloaded content against these digests. The artifact definitions in `src/artifact/*.rs`
-do **not** contain inline hashes -- they only specify URLs. The lockfile is generated and enforced
-at the SDK/runtime level.
+## CI/CD Security
 
-**Implication**: Digest verification depends entirely on the Vorpal SDK's implementation.
-This repository cannot independently verify that digests are checked before build scripts execute.
+### Workflow Configuration
 
-### 3.2 What Is NOT Present
+- **No explicit permissions block**: The workflow does not define `permissions:` at the workflow
+  or job level. This means jobs run with the default token permissions for the repository, which
+  may be broader than necessary.
+- **Matrix injection risk**: The `build` job uses `${{ matrix.artifact }}` in a `run` step
+  (`vorpal build '${{ matrix.artifact }}'`). The artifact names are derived from
+  `needs.build-changes.outputs.artifacts`, which is computed by `script/detect-changed-artifacts.sh`
+  from filenames in `src/artifact/`. Since artifact names are derived from filesystem paths in the
+  repository (not from user-controlled PR titles or branch names), the injection risk is low.
+- **S3 bucket access**: The `altf4llc-vorpal-registry` S3 bucket is accessible to all CI jobs
+  with the same credentials. There is no distinction between read and write access at the
+  workflow level.
 
-- **No GPG signature verification** of downloaded sources (despite building GPG itself as an
-  artifact).
-- **No checksum URLs** (e.g., `.sha256` sidecar files) are fetched or compared.
-- **No SLSA provenance** or Sigstore verification for any artifact.
-- **No Software Bill of Materials (SBOM)** generation.
-- **No pinned commit SHAs** for source archives fetched from GitHub archive URLs (e.g.,
-  `archive/refs/tags/v*.tar.gz`). Tag mutability means these could theoretically change.
+### Build Artifact Handling
 
----
+- The workflow uploads `Vorpal.lock` as a GitHub Actions artifact for each platform/architecture
+  combination. This file contains digests but no secrets.
+- Built artifacts are stored in the S3 registry via the Vorpal backend, not as GitHub Actions
+  artifacts.
 
-## 4. Secret Management
+## Build Script Security
 
-### 4.1 CI/CD Secrets
+### Shell Script Patterns
 
-The GitHub Actions workflow (`.github/workflows/vorpal.yaml`) uses the following secrets and
-variables:
+The artifact build scripts follow a consistent pattern:
+1. Create output directory (`mkdir -pv "$VORPAL_OUTPUT/bin"`)
+2. Navigate to extracted source (`pushd ./source/<name>/...`)
+3. Build or copy the artifact
+4. Install to `$VORPAL_OUTPUT`
 
-| Name | Type | Purpose | Scope |
+**Strengths:**
+- Variables are consistently double-quoted (`"$VORPAL_OUTPUT"`) in most scripts, preventing word
+  splitting and glob expansion issues.
+- No network access during build steps (sources are pre-downloaded).
+- Build scripts are static templates -- no dynamic input from users or PRs.
+
+**Weaknesses:**
+- Only `file.rs` explicitly sets `set -euo pipefail`. Other scripts rely on the SDK to configure
+  shell behavior. If the SDK does not set `set -e`, build errors in intermediate commands could be
+  silently ignored.
+- Some scripts use `$VORPAL_OUTPUT` without quotes (e.g., `nginx.rs` line 34:
+  `--prefix=$VORPAL_OUTPUT`, line 40: `ln -svf $VORPAL_OUTPUT/sbin/nginx $VORPAL_OUTPUT/bin/nginx`;
+  `file.rs` line 29: `$VORPAL_OUTPUT/{name}`; `pkg_config.rs` line 33:
+  `--prefix=$VORPAL_OUTPUT`). Since `VORPAL_OUTPUT` is set by the SDK and unlikely to contain
+  spaces or special characters, this is low-risk but inconsistent.
+
+### Lima VM Setup Script
+
+`script/lima.sh` performs privileged operations:
+- Runs `sudo apt-get` for package installation
+- Downloads and executes Docker's install script from `https://get.docker.com`
+- Downloads and executes the Vorpal install script from GitHub
+- Modifies AppArmor profiles with `sudo`
+
+This script is intended for VM provisioning only, not for use in production environments. The use
+of `curl -fsSL | sh` for Docker installation is a common but inherently trust-on-first-use
+pattern.
+
+### Linux Slimming Script
+
+`script/linux-vorpal-slim.sh` is a rootfs slimming tool that:
+- Operates on a specified rootfs path
+- Has a protected list of runtime libraries that must never be removed
+- Defaults to dry-run mode (`DRY_RUN="yes"`)
+- Requires explicit confirmation unless `--no-confirm` is passed
+
+The dry-run default is a good safety measure against accidental data loss.
+
+## Identified Gaps and Recommendations
+
+### Current Gaps
+
+1. **No GPG signature verification**: Upstream source authenticity relies solely on HTTPS transport
+   security and SHA-256 digest matching. Sources from projects that provide GPG signatures (GnuPG,
+   GNU projects) are not signature-verified.
+
+2. **Mutable dependency references**: Both `vorpal-sdk` (Cargo.toml) and
+   `setup-vorpal-action` (workflow) reference `main` branches instead of pinned
+   commits or tags.
+
+3. **No workflow permissions scoping**: The GitHub Actions workflow does not restrict token
+   permissions, potentially granting broader access than needed.
+
+4. **No `.env` exclusion in `.gitignore`**: While no `.env` files exist, the `.gitignore` does not
+   proactively exclude them, increasing the risk of accidental secret commits.
+
+5. **No CODEOWNERS file**: There is no `CODEOWNERS` file to enforce review requirements for
+   security-sensitive paths (e.g., `.github/workflows/`, `script/`).
+
+6. **No branch protection documentation**: Whether branch protection rules (required reviews,
+   status checks) are configured on `main` is not captured in the repository.
+
+### Low-Priority Observations
+
+- The `${{ matrix.artifact }}` expression in the CI workflow is safe given the current artifact
+  name derivation from filesystem paths, but wrapping it in an intermediate environment variable
+  would be a defense-in-depth improvement.
+- The Renovate configuration uses the default recommended preset. Adding automerge rules for
+  patch-level security updates could reduce the window of vulnerability exposure.
+
+## Threat Model Summary
+
+| Threat | Likelihood | Impact | Mitigation |
 |---|---|---|---|
-| `AWS_ACCESS_KEY_ID` | `secrets.*` | S3 registry authentication | CI only |
-| `AWS_SECRET_ACCESS_KEY` | `secrets.*` | S3 registry authentication | CI only |
-| `AWS_DEFAULT_REGION` | `vars.*` | S3 registry region | CI only |
-
-These credentials are passed as environment variables to the `ALT-F4-LLC/setup-vorpal-action`
-step and are used to authenticate with an S3 bucket (`altf4llc-vorpal-registry`) serving as the
-Vorpal artifact registry backend.
-
-**Exposure surface**: The secrets are scoped to the CI workflow and are not referenced anywhere
-in the Rust source code. They are available to the `vorpal build` command at runtime within CI,
-which means any artifact's build script technically executes in an environment where these
-variables exist in the process tree.
-
-### 4.2 Local Development
-
-- **No `.env` files** exist in the repository.
-- **No credential files** (`.json`, `.pem`, `.key`) are present.
-- **`.gitignore`** only excludes the `/target` directory. There is no explicit exclusion for
-  common secret file patterns (`.env`, `*.pem`, `*.key`, `credentials.*`).
-- The `Vorpal.toml` source includes (`src`, `Cargo.toml`, `Cargo.lock`) are narrowly scoped,
-  which limits what gets packaged, but the `.gitignore` gap means secrets could accidentally be
-  committed.
-
-### 4.3 Runtime Secrets
-
-The project itself does not handle runtime secrets. However, some of the artifacts it builds are
-secret management tools:
-
-- **Doppler CLI** (`src/artifact/doppler.rs`) -- a secrets management tool
-- **GPG** (`src/artifact/gpg.rs`) -- cryptographic key management
-- **Kubeseal** (`src/artifact/kubeseal.rs`) -- Kubernetes secret encryption
-- **AWS CLI** (`src/artifact/awscli2.rs`) -- cloud credential management
-
-These tools handle secrets at the user level after installation, not during the build process
-defined here.
-
----
-
-## 5. Build Script Security
-
-### 5.1 Shell Script Execution Model
-
-Every artifact defines a shell build script (via `step::shell()`) that runs during `vorpal build`.
-These scripts perform operations like:
-
-- Extracting archives (`tar`, `unzip`, `pkgutil`)
-- Copying binaries to `$VORPAL_OUTPUT`
-- Running `./configure && make && make install` for source builds
-- Setting `chmod +x` on executables
-
-### 5.2 Script Injection Risk
-
-Build scripts are constructed using Rust's `formatdoc!` macro with string interpolation. The
-interpolated values come from:
-
-1. **Hardcoded version strings** (e.g., `source_version = "0.37.0"`) -- safe
-2. **Platform match results** (e.g., `"aarch64-apple-darwin"`) -- safe
-3. **Artifact key references** via `get_env_key()` -- values are Vorpal-internal identifiers
-
-There is **no user input** flowing into build scripts. All values are compile-time constants or
-SDK-generated identifiers. The injection risk is minimal given the current architecture.
-
-### 5.3 Build Environment Isolation
-
-Build isolation is delegated to the Vorpal SDK. The `step::shell()` function signature accepts
-artifact dependencies and environment variables, suggesting the SDK provides some form of
-sandboxing (potentially using `bubblewrap`, given `lima.sh` installs it). The exact isolation
-guarantees are defined by the SDK, not this repository.
-
-The Lima VM script (`script/lima.sh`) installs `bubblewrap` and configures an AppArmor profile
-for it on Linux, which suggests Vorpal uses `bwrap` for build sandboxing on Linux targets.
-
----
-
-## 6. Dependency Security
-
-### 6.1 Rust Dependencies
-
-Direct dependencies from `Cargo.toml`:
-
-| Dependency | Version | Security Relevance |
-|---|---|---|
-| `anyhow` | `1` | Error handling; no security surface |
-| `indoc` | `2` | String formatting macro; compile-time only |
-| `tokio` | `1` (rt-multi-thread) | Async runtime; well-audited |
-| `vorpal-sdk` | Git branch `main` | **Critical**: Handles all download, verification, and sandboxing |
-
-**Concern**: `vorpal-sdk` is pinned to a **branch** (`main`), not a specific commit or version.
-This means any push to the `vorpal` repository's `main` branch will be picked up on the next
-`cargo update`. The `Cargo.lock` file pins the actual resolved commit, providing reproducibility
-for a given lock state, but the `Cargo.toml` declaration allows unreviewed SDK changes to flow in.
-
-### 6.2 Transitive Dependencies
-
-The `Cargo.lock` contains the full set of transitive dependencies. These are standard Rust
-ecosystem crates (tokio, tonic/gRPC stack, prost for protobuf, etc.). No known security concerns
-beyond standard supply chain risk.
-
----
-
-## 7. CI/CD Security
-
-### 7.1 GitHub Actions Workflow
-
-**Strengths**:
-- Secrets are stored in GitHub's encrypted secrets store, not in code.
-- The workflow uses `actions/checkout@v6` (version-tagged, not branch-pinned).
-- `actions/upload-artifact@v6` is used for build outputs.
-- Matrix builds across 4 runner types provide cross-platform verification.
-
-**Concerns**:
-- `ALT-F4-LLC/setup-vorpal-action@main` is pinned to `main` branch, not a commit SHA. A
-  compromise of this action repository would affect all CI builds.
-- The `vorpal build '${{ matrix.artifact }}'` step interpolates the artifact name from the matrix.
-  The artifact names are derived from the `detect-changed-artifacts.sh` script output. Since this
-  script reads filenames from `src/artifact/*.rs` and converts them to kebab-case, a maliciously
-  named artifact file (e.g., one containing shell metacharacters) could theoretically inject into
-  the `vorpal build` command. However, Rust module names are restricted to `[a-z0-9_]`, making
-  this practically infeasible.
-- The `detect-changed-artifacts.sh` script uses `set -euo pipefail` and properly quotes
-  variables, reducing shell injection risk.
-
-### 7.2 Artifact Detection Script Security
-
-The `script/detect-changed-artifacts.sh` script:
-- Uses `set -euo pipefail` for strict error handling.
-- Reads only from `src/artifact/*.rs` filenames (controlled by the repository).
-- Uses `git diff --diff-filter=d` to exclude deleted files (preventing stale artifact references).
-- Converts filenames via `tr '_' '-'` (safe transformation).
-
----
-
-## 8. Identified Gaps and Recommendations
-
-### 8.1 High Priority
-
-| Gap | Description | Risk |
-|---|---|---|
-| **No `.gitignore` for secrets** | Common secret file patterns (`.env`, `*.pem`, `*.key`) are not excluded | Accidental secret commit |
-| **Branch-pinned SDK** | `vorpal-sdk` in `Cargo.toml` tracks `main` branch | Unreviewed dependency changes |
-| **Branch-pinned CI action** | `setup-vorpal-action@main` is not SHA-pinned | CI supply chain risk |
-
-### 8.2 Medium Priority
-
-| Gap | Description | Risk |
-|---|---|---|
-| **No signature verification** | Downloaded sources are not GPG-verified | Compromised mirrors |
-| **No SBOM generation** | No software bill of materials for built artifacts | Compliance, auditability |
-| **Opaque SDK trust** | Digest verification behavior is not visible in this repo | Unknown verification gaps |
-
-### 8.3 Low Priority
-
-| Gap | Description | Risk |
-|---|---|---|
-| **No Dependabot/audit CI step** | No `cargo audit` in the CI pipeline | Known vulnerability detection |
-| **Tag mutability** | GitHub archive URLs use tags that could theoretically be force-pushed | Source tampering (mitigated by lockfile digests) |
-
----
-
-## 9. Security-Sensitive Artifacts
-
-The following artifacts have elevated security relevance because they handle cryptographic
-operations, secrets, or privileged access in the environments where they are deployed:
-
-| Artifact | Why It Matters |
-|---|---|
-| `gpg` + libraries (`libgcrypt`, `libgpg_error`, `libassuan`, `libksba`, `npth`) | Cryptographic operations, key management |
-| `kubeseal` | Encrypts Kubernetes secrets |
-| `doppler` | Secrets management platform CLI |
-| `awscli2` | Cloud infrastructure access with IAM credentials |
-| `terraform` | Infrastructure-as-code with cloud provider credentials |
-| `kubectl` | Kubernetes cluster administration |
-| `helm` | Kubernetes package manager with cluster access |
-| `argocd` | GitOps continuous delivery with cluster access |
-| `fluxcd` | GitOps toolkit with cluster access |
-
-These artifacts are downloaded as pre-built binaries (except GPG and its libraries, which are
-compiled from source). Their integrity depends entirely on the HTTPS transport security and the
-Vorpal lockfile digest verification.
+| Compromised upstream source | Low | High | SHA-256 digest verification via Vorpal.lock |
+| Compromised vorpal-sdk main branch | Low | Critical | None -- tracks mutable branch reference |
+| AWS credential leak from CI | Low | High | GitHub encrypted secrets, not hardcoded |
+| Malicious PR modifying build scripts | Low | Medium | Code review (no automated enforcement documented) |
+| Supply chain attack via GitHub Actions | Low | High | First-party and org-owned actions only |
+| Accidental secret commit | Low | Medium | No `.env` files exist; `.gitignore` could be stricter |

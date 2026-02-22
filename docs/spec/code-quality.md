@@ -1,309 +1,404 @@
 # Code Quality Specification
 
+## Overview
+
 This document describes the coding standards, naming conventions, error handling patterns, design
-patterns, and project-specific style decisions as they actually exist in the codebase.
+patterns, and project-specific style decisions observed in the `artifacts.vorpal` codebase. It
+reflects what actually exists in the code today.
+
+The project is a Rust binary (`vorpal-artifacts`) that defines build artifact definitions for the
+Vorpal build system. It uses the `vorpal-sdk` to declare how software packages are fetched,
+compiled, and installed across four target systems: `Aarch64Darwin`, `Aarch64Linux`,
+`X8664Darwin`, and `X8664Linux`.
+
+---
 
 ## Language and Edition
 
 - **Language**: Rust (edition 2021)
-- **Shell scripts**: Bash (`#!/usr/bin/env bash`)
-- **Build system**: Cargo (standard Rust toolchain)
-- **CI/CD**: GitHub Actions YAML
+- **Binary target**: `vorpal` (entry point: `src/vorpal.rs`)
+- **Library crate**: `vorpal_artifacts` (entry point: `src/lib.rs`)
 
-## Formatter and Linter Configuration
+---
 
-### What Exists
+## Project Structure and Module Organization
 
-- **No `rustfmt.toml` or `.rustfmt.toml`**: The project relies on Rust's default `rustfmt`
-  settings. All code in the repository appears to follow standard `rustfmt` formatting.
-- **No Clippy configuration**: No `.clippy.toml` or `clippy.toml` exists. There is no evidence
-  of Clippy being run in CI or locally.
-- **No `.editorconfig`**: No editor configuration file exists.
-- **No pre-commit hooks**: No `.pre-commit-config.yaml` or git hooks are configured.
+```
+src/
+  vorpal.rs          # Binary entry point - instantiates and builds all artifacts
+  lib.rs             # Library root - exports artifact module, DEFAULT_SYSTEMS, ProjectEnvironment
+  artifact.rs        # Module declaration file - pub mod for every artifact
+  artifact/
+    <name>.rs        # One file per artifact (56 files total)
+    file.rs          # Utility artifact (excluded from CI auto-discovery)
+script/
+  detect-changed-artifacts.sh       # CI artifact detection script
+  test-detect-changed-artifacts.sh  # Regression tests for detection script
+  lima.sh                           # Lima VM provisioning script
+  linux-vorpal-slim.sh              # Linux slim build script
+```
 
-### What Does NOT Exist (Gaps)
+### Module Organization Conventions
 
-- No automated formatting enforcement in CI (no `cargo fmt -- --check` step).
-- No automated linting in CI (no `cargo clippy` step).
-- No `cargo check` step in CI beyond what `vorpal build` implies.
-- The CI workflow (`vorpal.yaml`) only runs `vorpal build` commands -- it does not run any
-  Rust-specific quality gates.
+- Each artifact gets its own file under `src/artifact/`.
+- The `src/artifact.rs` file is a flat list of `pub mod` declarations, alphabetically ordered.
+- No sub-directories within `artifact/` -- all artifacts are peers at the same level.
+- The `file.rs` module is a utility artifact (generic file creation) and is excluded from CI
+  artifact discovery via the `EXCLUDED_FILES` array in `detect-changed-artifacts.sh`.
+
+---
 
 ## Naming Conventions
 
-### Rust Modules and Files
+### Rust Code
 
-- **Module files**: `snake_case.rs` (e.g., `libgpg_error.rs`, `openapi_generator_cli.rs`,
-  `pkg_config.rs`).
-- **Module declarations in `src/artifact.rs`**: Flat list of `pub mod <name>;` in alphabetical
-  order. No nested modules.
-- **Artifact names at runtime**: kebab-case strings (e.g., `"libgpg-error"`, `"openapi-generator-cli"`).
-  The CI script `detect-changed-artifacts.sh` converts `snake_case` filenames to `kebab-case`
-  artifact names via `tr '_' '-'`.
+| Element | Convention | Examples |
+|---------|-----------|----------|
+| **Module names** | `snake_case` | `golangci_lint`, `libgpg_error`, `json_c`, `pkg_config` |
+| **Struct names** | `PascalCase` | `GolangciLint`, `LibgpgError`, `JsonC`, `PkgConfig` |
+| **Method names** | `snake_case` | `new()`, `build()`, `with_cmake()`, `with_ncurses()` |
+| **Constants** | `SCREAMING_SNAKE_CASE` | `DEFAULT_SYSTEMS` |
+| **Local variables** | `snake_case` | `source_version`, `source_system`, `step_script` |
+| **Lifetime parameters** | Single lowercase letter | `'a` (used consistently) |
 
-### Struct Naming
+### File-to-Struct Name Mapping
 
-- **Artifact structs**: PascalCase matching the module name (e.g., `LibgpgError` in
-  `libgpg_error.rs`, `OpenapiGeneratorCli` in `openapi_generator_cli.rs`, `Jj` in `jj.rs`).
-- **Every artifact struct derives `Default`**: `#[derive(Default)]` is applied to all 47 artifact
-  structs without exception.
+Module filenames use `snake_case` and map to `PascalCase` struct names:
+- `golangci_lint.rs` -> `GolangciLint`
+- `libgpg_error.rs` -> `LibgpgError`
+- `openapi_generator_cli.rs` -> `OpenapiGeneratorCli`
+- `json_c.rs` -> `JsonC`
+- `pkg_config.rs` -> `PkgConfig`
 
-### Variable Naming
+### Artifact Names (String Identifiers)
 
-- `name`: The artifact's runtime name string (kebab-case, e.g., `"libgpg-error"`).
-- `version` or `source_version`: The upstream version string.
-- `source_system` or `source_path`: Platform-specific URL components.
-- `source`: The `ArtifactSource` object.
-- `step_script` or `script`: The shell script string for the build step.
-- `steps`: The `Vec` of build steps.
-- `systems`: The `Vec<ArtifactSystem>` of target platforms.
-- Dependency variables: Named after the dependency artifact (e.g., `ncurses`, `libevent`,
-  `libgpg_error`), holding `&str` artifact key references.
+Artifact names used in build definitions are `kebab-case` strings:
+- `"openapi-generator-cli"`, `"golangci-lint"`, `"pkg-config"`, `"json-c"`
 
-### Method Naming
+The CI script `detect-changed-artifacts.sh` converts between these by replacing underscores with
+hyphens (`filename_to_artifact` function).
 
-- `new()`: Constructor, always returns `Self`. Takes no arguments for simple artifacts, takes
-  parameters for utility structs like `File`.
-- `with_<dependency>(mut self, <dependency>: &'a str) -> Self`: Builder method for injecting
-  dependency artifact keys.
-- `build(self, context: &mut ConfigContext) -> Result<String>`: Async method that performs the
-  artifact registration and returns the artifact key.
+### Shell Scripts
+
+- Filenames: `kebab-case` (e.g., `detect-changed-artifacts.sh`)
+- Variables: `SCREAMING_SNAKE_CASE` for constants/globals, `snake_case` for locals
+- Functions: `snake_case` (e.g., `filename_to_artifact`, `discover_artifacts`)
+
+### Git Commit Messages
+
+The project follows conventional commit format:
+
+```
+<type>(<scope>): <description>
+```
+
+Types observed: `feat`, `fix`, `chore`, `refactor`, `docs`
+Scopes observed: `artifact`, `vorpal`, `ffmpeg`, `lock`, `spec`
+
+---
 
 ## Design Patterns
 
 ### Builder Pattern (Primary Pattern)
 
-Every artifact follows the same builder pattern. There are three structural tiers:
+Every artifact follows the same builder-style pattern:
 
-**Tier 1 -- Simple artifact (no dependencies):**
-Struct is a unit struct, `new()` returns `Self`, `build()` does all the work.
-Examples: `Bat`, `Jj`, `Lima`, `Ncurses`, `Sqlite3`, `LibgpgError`.
+1. A struct is defined with `#[derive(Default)]`.
+2. A `new()` constructor returns a default instance.
+3. Optional dependency injection via `with_<dep>()` methods (fluent/chaining style).
+4. A `build()` method that takes `&mut ConfigContext` and returns `Result<String>`.
+
+**Two structural variants exist:**
+
+#### Simple Artifacts (No Dependencies)
+
+Artifacts with no build-time dependencies on other artifacts use a unit struct:
 
 ```rust
 #[derive(Default)]
-pub struct ArtifactName;
+pub struct Zlib;
 
-impl ArtifactName {
+impl Zlib {
     pub fn new() -> Self { Self }
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> { ... }
 }
 ```
 
-**Tier 2 -- Artifact with dependencies:**
-Struct has `Option<&'a str>` fields for each dependency. `with_*()` methods inject them.
-`build()` resolves uninjected dependencies by building them inline.
-Examples: `Tmux`, `Zsh`, `Readline`, `Nnn`, `Gpg`, `OpenapiGeneratorCli`.
+Examples: `Argocd`, `Bat`, `Cmake`, `Ffmpeg`, `Zlib`, `Sqlite3`, and most download-only artifacts.
+
+#### Complex Artifacts (With Dependencies)
+
+Artifacts that depend on other artifacts use a struct with `Option<&'a str>` fields and
+`with_*()` methods:
 
 ```rust
 #[derive(Default)]
-pub struct ArtifactName<'a> {
-    dependency: Option<&'a str>,
+pub struct Tmux<'a> {
+    libevent: Option<&'a str>,
+    ncurses: Option<&'a str>,
 }
 
-impl<'a> ArtifactName<'a> {
-    pub fn new() -> Self { Self { dependency: None } }
-    pub fn with_dependency(mut self, dep: &'a str) -> Self { self.dependency = Some(dep); self }
+impl<'a> Tmux<'a> {
+    pub fn new() -> Self { Self { libevent: None, ncurses: None } }
+    pub fn with_libevent(mut self, libevent: &'a str) -> Self { ... }
+    pub fn with_ncurses(mut self, ncurses: &'a str) -> Self { ... }
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> { ... }
 }
 ```
 
-**Tier 3 -- Language-specific builder (SDK-provided):**
-Uses `vorpal_sdk::artifact::language::go::Go` builder instead of manual `step::shell`.
-Examples: `Crane`, `Skopeo`, `Umoci`.
+Examples: `Gpg`, `Ttyd`, `Nnn`, `Tmux`, `Libwebsockets`, `Zsh`.
+
+### Lazy Dependency Resolution
+
+When a dependency is not explicitly provided via `with_*()`, the `build()` method constructs and
+builds the dependency on the fly:
 
 ```rust
-Go::new(name, systems)
-    .with_alias(...)
-    .with_build_directory(...)
-    .with_build_path(...)
-    .with_source(source)
-    .build(context)
-    .await
-```
-
-**Tier 4 -- Utility struct (non-artifact):**
-The `File` struct in `file.rs` is a utility builder for creating file-based artifacts. It takes
-`content`, `name`, and `systems` as constructor parameters. It does NOT derive `Default` and
-does NOT follow the `new()` + `with_*()` pattern.
-
-### Dependency Resolution Pattern
-
-When an artifact has dependencies, each dependency follows a consistent resolution pattern:
-
-```rust
-let dep = match self.dep {
+let ncurses = match self.ncurses {
     Some(val) => val,
-    None => &DepStruct::new().build(context).await?,
+    None => &Ncurses::new().build(context).await?,
 };
 ```
 
-This allows dependencies to be either:
-1. **Injected** from the orchestrator (`src/vorpal.rs`) for shared/deduplication.
-2. **Built inline** as a fallback when the artifact is used standalone.
+This pattern is used consistently across all complex artifacts. It enables both explicit
+dependency injection (when sharing a dependency across multiple artifacts) and automatic
+resolution (when used standalone).
 
-### Orchestration Pattern
+### System-Specific Dispatching
 
-`src/vorpal.rs` serves as the dependency-aware orchestrator:
-1. Shared dependencies are built first and stored as `let` bindings.
-2. Artifacts that depend on shared dependencies use `with_*()` to inject them.
-3. Independent artifacts call `.build(context)` directly without injection.
-4. The final `ProjectEnvironment` is built after all artifacts.
+Artifacts use `match context.get_system()` to handle platform-specific behavior:
 
-### Platform Dispatch Pattern
+- **URL selection**: Different download URLs per platform.
+- **Build script variation**: Different build commands for Darwin vs Linux.
+- **Unsupported system handling**: Returns `Err(anyhow::anyhow!("Unsupported system for ... artifact"))`.
 
-Platform-specific values are resolved via `match context.get_system()`:
+Some artifacts combine Darwin variants (`Aarch64Darwin | X8664Darwin`) when behavior is identical
+across architectures.
 
-```rust
-let source_system = match context.get_system() {
-    Aarch64Darwin => "...",
-    Aarch64Linux => "...",
-    X8664Darwin => "...",
-    X8664Linux => "...",
-    _ => return Err(anyhow::anyhow!("Unsupported system for <name> artifact")),
-};
-```
-
-All four platforms (`Aarch64Darwin`, `Aarch64Linux`, `X8664Darwin`, `X8664Linux`) are always
-listed. The wildcard arm returns an `anyhow` error.
-
-Some artifacts (e.g., `awscli2`) use more complex platform dispatch where the entire
-`(source_path, step_script)` tuple is matched per-platform.
+---
 
 ## Error Handling
 
-### Patterns in Use
+### Approach
 
-- **`anyhow::Result<T>`**: Used exclusively throughout the project. No custom error types.
-- **`?` operator**: The primary error propagation mechanism. Used on all `await?` calls and
-  `context.get_system()` results.
-- **`anyhow::anyhow!("...")`**: Used for unsupported platform errors in the wildcard match arm.
-  Message format: `"Unsupported system for <name> artifact"`.
-- **No `unwrap()` or `expect()` calls**: All fallible operations use `?`.
-- **No `panic!()` calls**: The codebase does not use panics.
+- **`anyhow::Result`** is the universal error type. No custom error types exist.
+- **`?` operator** is used pervasively for error propagation.
+- **`anyhow::anyhow!()` macro** creates ad-hoc errors for unsupported system variants.
+- No `unwrap()` or `expect()` calls in the codebase.
+- No `panic!()` calls.
+- No custom `From` or `Error` implementations.
 
-### Error Propagation Chain
+### Error Messages
 
-Errors propagate upward through the `Result` type:
-- Artifact `build()` returns `Result<String>`.
-- `main()` in `vorpal.rs` returns `Result<()>`.
-- The `#[tokio::main]` attribute handles top-level errors.
+Error messages follow a descriptive pattern:
+```rust
+return Err(anyhow::anyhow!("Unsupported system for <name> artifact"));
+```
+
+This is the only error created directly in the codebase; all other errors propagate from the SDK
+or standard library via `?`.
 
 ### Gaps
 
-- Error messages are minimal. The `anyhow::anyhow!` messages do not include contextual
-  information like which system was actually encountered.
-- No `.context()` or `.with_context()` usage from `anyhow` to add layers of error context.
+- Error messages do not include the actual unsupported system value in most cases, making
+  debugging harder when a new system variant is added.
+- No structured logging or tracing instrumentation exists in this codebase (logging may exist in
+  the SDK).
 
-## Import Organization
+---
 
-Imports follow a consistent ordering pattern (enforced by `rustfmt` defaults):
+## Code Style
 
-1. `crate::` imports (local dependencies)
-2. `anyhow::Result`
-3. `indoc::formatdoc`
-4. `vorpal_sdk::` imports
+### Formatting
 
-Within the `vorpal_sdk` import block, items are grouped as:
-- `api::artifact::ArtifactSystem::{...}` (always listing all four platforms)
-- `artifact::{step, Artifact, ArtifactSource}` (or `get_env_key` when needed)
-- `context::ConfigContext`
+- No `rustfmt.toml` or `.rustfmt.toml` configuration file exists. The project relies on
+  `rustfmt` defaults.
+- Code is consistently formatted (likely via `cargo fmt`), though no CI step enforces it.
+- 4-space indentation (Rust default).
 
-## Code Comments
+### Linting
 
-### What Exists
+- No `clippy.toml` configuration file exists.
+- No `#[allow(...)]`, `#[warn(...)]`, or `#[deny(...)]` attributes are used anywhere.
+- No evidence of Clippy being run in CI.
 
-- **Minimal inline comments**: Only `src/vorpal.rs` and `src/lib.rs` contain comments, using
-  section headers like `// Artifacts`, `// Dependencies`, `// Environment variables`,
-  `// Artifact`, `// Development Environment`.
-- **No doc comments (`///`)**: Zero doc comments exist anywhere in the source code.
-- **Shell script comments**: The `detect-changed-artifacts.sh` and
-  `test-detect-changed-artifacts.sh` files have descriptive header comments and inline
-  documentation.
+### Comments
 
-### What Does NOT Exist
+- **No doc comments** (`///` or `//!`) exist anywhere in the Rust source code.
+- **No inline comments** (`//`) exist in the Rust source code.
+- The only comments appear in `src/vorpal.rs` as section markers: `// Artifacts` and
+  `// Development Environment`.
+- Comments in `src/lib.rs` serve as section markers: `// Dependencies`, `// Environment variables`,
+  `// Artifact`.
+- Shell scripts include header comments explaining purpose and usage, following this format:
+  ```bash
+  #!/usr/bin/env bash
+  #
+  # script-name.sh
+  #
+  # Description of what the script does.
+  #
+  # Usage:
+  #   ./script-name.sh <args>
+  ```
 
-- No `//!` module-level documentation.
-- No `///` function/struct documentation.
-- No `#[doc = "..."]` attributes.
-- No `README.md` content beyond a title (the file contains only `# vorpal-artifacts`).
+### Import Organization
 
-## Module Organization
+Imports follow a consistent ordering (likely `rustfmt` defaults):
 
+1. `crate::` imports (internal dependencies) first.
+2. `anyhow::Result`.
+3. `indoc::formatdoc`.
+4. `vorpal_sdk::` imports grouped in a single `use` block with nested paths.
+5. No blank lines between import groups.
+
+### Shell Scripting Style
+
+- All shell scripts use `#!/usr/bin/env bash`.
+- All scripts set `set -euo pipefail` at the top.
+- Functions are declared with `function name {` (lima.sh) or `name() {` (detect script) syntax --
+  not fully consistent.
+- Local variables are declared with `local`.
+
+---
+
+## Dependencies
+
+### Direct Dependencies (Cargo.toml)
+
+| Dependency | Version | Purpose |
+|-----------|---------|---------|
+| `anyhow` | `1` | Error handling |
+| `indoc` | `2` | Multi-line string formatting (`formatdoc!`) |
+| `tokio` | `1` (with `rt-multi-thread`) | Async runtime |
+| `vorpal-sdk` | Git (main branch) | Core Vorpal build system SDK |
+
+### Dependency Management
+
+- **Renovate** is configured (`.github/renovate.json`) with `config:recommended` for automated
+  dependency updates.
+- `vorpal-sdk` is pinned to the `main` branch of the upstream repository via Git dependency, not
+  a versioned crate.
+- `Cargo.lock` is committed to the repository (appropriate for a binary crate).
+
+---
+
+## Build Script Patterns (Embedded Shell)
+
+Artifacts contain embedded shell scripts via the `formatdoc!` macro from `indoc`. These scripts
+follow common patterns:
+
+### Standard Preamble
+
+```bash
+mkdir -pv "$VORPAL_OUTPUT"
+pushd ./source/<name>/<name>-<version>
 ```
-src/
-  artifact.rs          -- Module declarations (flat pub mod list, alphabetical)
-  artifact/
-    <name>.rs          -- One file per artifact (47 artifacts + 1 utility)
-    file.rs            -- Utility struct (not an artifact itself, excluded from CI detection)
-  lib.rs               -- Library root: exports ProjectEnvironment, DEFAULT_SYSTEMS
-  vorpal.rs            -- Binary entry point: orchestrates all artifact builds
+
+### Autotools Pattern (configure/make)
+
+```bash
+./configure --prefix="$VORPAL_OUTPUT" [flags]
+make
+make install
 ```
 
-- Each artifact is a single file containing a single public struct and its `impl` block.
-- No artifact file exceeds ~160 lines. Most are 40-90 lines.
-- No sub-modules within `artifact/`. All artifacts are siblings.
-- The `file.rs` module is explicitly excluded from CI artifact detection via the `EXCLUDED_FILES`
-  array in `detect-changed-artifacts.sh`.
+### CMake Pattern
 
-## Shell Script Conventions
+```bash
+<cmake>/bin/cmake \
+    -DCMAKE_INSTALL_PREFIX="$VORPAL_OUTPUT" \
+    -DCMAKE_PREFIX_PATH="<deps>" \
+    [options] \
+    <source>
+make install
+```
 
-### Embedded Build Scripts (in Rust)
+### Binary Download Pattern
 
-- Built using `indoc::formatdoc!` macro for heredoc-style string interpolation.
-- Shell variables use `$VORPAL_OUTPUT` (provided by the Vorpal runtime).
-- Template variables use Rust's `{variable}` format syntax within `formatdoc!`.
-- Dependency paths are resolved via `get_env_key()` for environment variable interpolation.
-- Common patterns: `mkdir -pv "$VORPAL_OUTPUT/bin"`, `pushd ./source/{name}/...`,
-  `chmod +x "$VORPAL_OUTPUT/bin/..."`.
+```bash
+mkdir -pv "$VORPAL_OUTPUT/bin"
+cp <source-binary> "$VORPAL_OUTPUT/bin/<name>"
+chmod +x "$VORPAL_OUTPUT/bin/<name>"
+```
 
-### Standalone Scripts (`script/`)
+### Environment Setup Pattern (for source builds)
 
-- All start with `#!/usr/bin/env bash` and `set -euo pipefail`.
-- Functions use `snake_case` naming.
-- Variables use `UPPER_SNAKE_CASE` for constants and `lower_snake_case` for locals.
-- `detect-changed-artifacts.sh` has a `main()` entry point pattern.
-- Test script uses colored output (ANSI escape codes) and pass/fail counting.
+```bash
+export PATH="<dep>/bin:$PATH"
+export PKG_CONFIG_PATH="<dep>/lib/pkgconfig"
+export CPPFLAGS="-I<dep>/include"
+export LDFLAGS="-L<dep>/lib -Wl,-rpath,<dep>/lib"
+```
 
-## Dependency Management
-
-### Rust Dependencies (Cargo.toml)
-
-- **`anyhow = "1"`**: Error handling (permissive version).
-- **`indoc = { version = "2" }`**: String formatting for shell scripts.
-- **`tokio = { features = ["rt-multi-thread"], version = "1" }`**: Async runtime.
-- **`vorpal-sdk`**: Git dependency pinned to `main` branch of `ALT-F4-LLC/vorpal.git`.
-
-### Automated Updates
-
-- **Renovate** is configured (`.github/renovate.json`) with the `config:recommended` preset.
-  This covers GitHub Actions version bumps. Cargo dependency updates depend on Renovate's
-  Rust manager being enabled by default.
+---
 
 ## Consistency and Uniformity
 
-The codebase is notable for its high degree of structural consistency:
+### Highly Consistent Patterns
 
-- All 47 artifacts follow the same builder pattern with minor tier variations.
-- All artifacts derive `Default`.
-- All artifacts target the same four platforms.
-- All artifacts use the same `Artifact::new(name, steps, systems)` terminal call.
-- All artifacts use `.with_aliases(vec![format!("{name}:{version}")])` for versioned aliases.
-- All artifacts use `.with_sources(vec![source])` for source registration.
-- Import blocks are formatted identically across files.
-- The only exceptions are the three Go-based artifacts (`crane`, `skopeo`, `umoci`) which use
-  the SDK's `Go` builder, and the `file.rs` utility which serves a different purpose.
+- Every artifact follows the same `new()` / `build()` pattern.
+- Every artifact returns `Result<String>`.
+- Every artifact defines `systems` as `vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux]`.
+- Every artifact uses `.with_aliases(vec![format!("{name}:{version}")])`.
+- Every artifact uses `step::shell()` for build steps.
+- The module declaration file (`artifact.rs`) is a simple flat list with no logic.
 
-## Known Gaps and Areas for Improvement
+### Minor Inconsistencies
 
-1. **No CI quality gates**: No `cargo fmt`, `cargo clippy`, or `cargo check` steps in the CI
-   pipeline.
-2. **No documentation**: Zero doc comments in Rust code. README is a stub.
-3. **No rustfmt configuration**: Relying on defaults is fine, but there is no enforcement.
-4. **No Clippy configuration**: No linting is performed or configured.
-5. **Minimal error context**: Errors do not include contextual information beyond the immediate
-   failure message.
-6. **No tests in Rust code**: Only shell script tests exist (`test-detect-changed-artifacts.sh`).
-   No `#[test]` modules in any Rust source file.
-7. **Git dependency for vorpal-sdk**: Pinned to `main` branch, which means builds are not
-   reproducible across time. A pinned commit hash or published crate version would be more
-   deterministic.
+- Some artifacts use `source_version` while others use `version` for the version string variable.
+- Some artifacts include `#!/bin/bash` and `set -euo pipefail` in their shell scripts
+  (`file.rs`), while most do not (likely handled by the SDK).
+- The `file.rs` artifact does not use the `#[derive(Default)]` pattern since it requires
+  constructor arguments.
+- Shell function declaration syntax varies between scripts (`function name {` vs `name() {`).
+
+---
+
+## Tooling and Editor Configuration
+
+### Present
+
+- `.envrc` -- direnv environment file (contents not accessible, but direnv is used for
+  environment setup).
+- `.gitignore` -- excludes `/.docket` and `/target`.
+- `Vorpal.toml` -- Vorpal project configuration declaring Rust language and source includes.
+- `lima.yaml` -- Lima VM configuration for cross-platform development/testing.
+- `makefile` -- Lima VM management targets (`lima`, `lima-clean`, `lima-sync`, `lima-vorpal`).
+- `.docket/` -- Docket issue tracking database.
+
+### Absent
+
+- No `.editorconfig` file.
+- No `rustfmt.toml` or `.rustfmt.toml`.
+- No `clippy.toml`.
+- No `deny.toml` (cargo-deny).
+- No pre-commit hooks configuration.
+- No IDE-specific configuration files (`.vscode/`, `.idea/`).
+
+---
+
+## Gaps and Observations
+
+1. **No linting or formatting enforcement in CI.** The GitHub Actions workflow builds artifacts
+   but does not run `cargo fmt --check`, `cargo clippy`, or any other quality gate.
+
+2. **No documentation.** Zero doc comments across all Rust source files. No module-level
+   documentation. The README is minimal (2 lines).
+
+3. **No tests in Rust code.** The Rust codebase has no unit tests or integration tests. Testing
+   exists only as shell script regression tests for the CI detection script.
+
+4. **No structured error context.** Error messages for unsupported systems do not include the
+   actual system value, making debugging harder.
+
+5. **No logging or tracing.** The codebase does not instrument any operations with logging.
+   Observability depends entirely on the underlying SDK.
+
+6. **SDK dependency on Git branch.** The `vorpal-sdk` dependency points to a Git branch (`main`)
+   rather than a versioned release, which means builds are not reproducible across time.
+
+7. **Boilerplate-heavy code.** The artifact definition pattern involves significant repetition
+   across 56 files. The `with_*()` / `match self.field` pattern for optional dependencies is
+   repeated verbatim in every complex artifact. This is a deliberate trade-off: each artifact is
+   self-contained and independently readable, at the cost of DRY.

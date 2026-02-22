@@ -1,152 +1,118 @@
 # Operations Specification
 
-> Last updated: 2026-02-21
+> Project: `artifacts.vorpal` (ALT-F4-LLC)
+> Last updated: 2026-02-22
 
-This document describes the operational characteristics, deployment strategy, CI/CD pipeline,
-and environment management for the `artifacts.vorpal` project as they actually exist in the
-codebase today.
+This document describes the operational characteristics of the `artifacts.vorpal` project based on
+what actually exists in the codebase. It covers CI/CD, deployment, environment management, artifact
+registry, and operational tooling.
 
 ---
 
-## 1. Project Nature
+## 1. Project Overview
 
-This is a **build-definition** project, not a deployed service. It produces artifact definitions
-(Rust code consumed by the Vorpal build system) rather than running workloads. As a result,
-traditional operational concerns like uptime, health checks, and production monitoring do not
-apply directly. Instead, the operational surface is:
+`artifacts.vorpal` is a Rust-based artifact definition repository that uses the
+[Vorpal](https://github.com/ALT-F4-LLC/vorpal) build system to define, build, and publish
+software artifacts (CLI tools, libraries, and runtime components) across four target platforms:
 
-- **CI/CD pipeline** that validates and builds artifacts
-- **Artifact registry** (S3-backed) that stores build outputs
-- **Local development environments** including Lima VMs for cross-platform testing
+- `aarch64-darwin` (macOS ARM)
+- `x86_64-darwin` (macOS Intel)
+- `aarch64-linux` (Linux ARM)
+- `x86_64-linux` (Linux x86)
+
+The project currently defines **55+ artifacts** including tools like `bat`, `ripgrep`, `kubectl`,
+`terraform`, `neovim`, `tmux`, `gpg`, `nginx`, `ffmpeg`, and many others. Each artifact is
+defined as a Rust module in `src/artifact/` that describes how to fetch, build, and package the
+software.
 
 ---
 
 ## 2. CI/CD Pipeline
 
-### 2.1. Workflow
+### 2.1 Workflow Configuration
 
-A single GitHub Actions workflow is defined at `.github/workflows/vorpal.yaml` named `vorpal`.
+**File**: `.github/workflows/vorpal.yaml`
 
-**Trigger events:**
-- `pull_request` (all branches)
-- `push` to `main`
+The project uses a single GitHub Actions workflow (`vorpal`) triggered on:
 
-### 2.2. Jobs
+- **Pull requests**: All PRs
+- **Pushes to `main`**: Post-merge builds
 
-The pipeline consists of three jobs:
+### 2.2 Pipeline Stages
 
-#### Job 1: `build-changes`
-- **Runner:** `ubuntu-latest`
-- **Purpose:** Detects which artifacts have changed between the base and head commits.
-- **Mechanism:** Runs `script/detect-changed-artifacts.sh` with commit SHAs derived from the
-  event context (PR base SHA or push `before` SHA).
-- **Outputs:** `artifacts` (JSON array of changed artifact names) and `has_changes` (boolean).
-- **Edge case handling:** When `BASE_SHA` is the null SHA (`000...000`, e.g., initial branch
-  push), falls back to `--all` mode, building every artifact.
-- **Uses:** `actions/checkout@v6` with `fetch-depth: 0` for full git history.
+The pipeline has three jobs executed in sequence:
 
-#### Job 2: `build-dev`
-- **Runner:** Matrix of 4 runners:
-  - `macos-latest` (ARM64 macOS)
-  - `macos-latest-large` (x86_64 macOS)
-  - `ubuntu-latest` (x86_64 Linux)
-  - `ubuntu-latest-arm64` (ARM64 Linux)
-- **Purpose:** Builds the `dev` ProjectEnvironment on all four target platforms.
-- **Steps:**
-  1. Checkout code
+#### Job 1: `build-changes` (Change Detection)
+
+- **Runner**: `ubuntu-latest`
+- **Purpose**: Determines which artifacts have changed between commits using
+  `script/detect-changed-artifacts.sh`
+- **Logic**:
+  - On PRs: compares PR base SHA to head SHA
+  - On pushes: compares `github.event.before` to current SHA
+  - Falls back to building all artifacts when no base SHA is available (e.g., initial push)
+- **Outputs**: `artifacts` (JSON array of changed artifact names) and `has_changes` (boolean)
+
+The change detection script (`script/detect-changed-artifacts.sh`) dynamically discovers artifacts
+by scanning `src/artifact/*.rs` files. It only triggers rebuilds for artifacts whose source files
+have changed -- changes to shared files like `src/vorpal.rs`, `Cargo.lock`, or workflow files do
+**not** trigger a full rebuild of all artifacts.
+
+#### Job 2: `build-dev` (Development Environment)
+
+- **Runners**: Matrix across all four platform runners:
+  - `macos-latest` (aarch64-darwin)
+  - `macos-latest-large` (x86_64-darwin)
+  - `ubuntu-latest` (x86_64-linux)
+  - `ubuntu-latest-arm64` (aarch64-linux)
+- **Steps**:
+  1. Checkout repository
   2. Set up Vorpal via `ALT-F4-LLC/setup-vorpal-action@main` with S3 registry backend
-  3. Run `vorpal build 'dev'`
-  4. Upload `Vorpal.lock` as a GitHub Actions artifact (named `<arch>-<os>-vorpal-lock`)
-- **Runs on:** Every push/PR (no conditional gating)
+  3. Run `vorpal build 'dev'` to build the development environment
+  4. Upload `Vorpal.lock` as a GitHub Actions artifact (named by arch/OS)
+- **Purpose**: Validates the development environment builds on all platforms
 
-#### Job 3: `build`
-- **Conditional:** Only runs when `build-changes.outputs.has_changes == 'true'`
-- **Dependencies:** `build-dev` and `build-changes` must complete first
-- **Runner:** Same 4-runner matrix as `build-dev`
-- **Strategy:** `fail-fast: false` -- all artifact/platform combinations are attempted even if
-  some fail.
-- **Matrix:** Artifact names from `build-changes` output crossed with the 4 runners, producing
-  up to `N artifacts * 4 platforms` jobs.
-- **Steps:**
-  1. Checkout code
-  2. Set up Vorpal via `ALT-F4-LLC/setup-vorpal-action@main`
-  3. Run `vorpal build '<artifact-name>'`
+#### Job 3: `build` (Artifact Builds)
 
-### 2.3. Vorpal Setup Action
+- **Condition**: Only runs if `build-changes` detected changed artifacts (`has_changes == 'true'`)
+- **Dependencies**: Requires both `build-dev` and `build-changes` to complete
+- **Strategy**: Matrix of changed artifacts x platform runners, with `fail-fast: false`
+  (individual artifact failures do not cancel other builds)
+- **Steps**: Same Vorpal setup, then `vorpal build '<artifact_name>'` for each changed artifact
 
-All build jobs use `ALT-F4-LLC/setup-vorpal-action@main` with the following configuration:
+### 2.3 Vorpal Setup Action
 
-| Parameter | Value |
-|---|---|
-| `registry-backend` | `s3` |
-| `registry-backend-s3-bucket` | `altf4llc-vorpal-registry` |
-| `version` | `nightly` |
+The pipeline uses `ALT-F4-LLC/setup-vorpal-action@main` with:
 
-This action installs the Vorpal CLI and configures it to use an S3-backed artifact registry.
-The `nightly` version is always used, meaning CI depends on the latest Vorpal build.
-
-### 2.4. Required Secrets and Variables
-
-| Name | Type | Purpose |
-|---|---|---|
-| `AWS_ACCESS_KEY_ID` | Secret | S3 registry authentication |
-| `AWS_SECRET_ACCESS_KEY` | Secret | S3 registry authentication |
-| `AWS_DEFAULT_REGION` | Variable | S3 bucket region |
-
-These are referenced in the workflow as environment variables passed to the setup action.
+- **Version**: `nightly`
+- **Registry backend**: S3
+- **S3 bucket**: `altf4llc-vorpal-registry`
+- **AWS credentials**: Provided via GitHub Secrets (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
+  and Variables (`AWS_DEFAULT_REGION`)
 
 ---
 
-## 3. Artifact Detection System
+## 3. Artifact Registry
 
-### 3.1. Script: `script/detect-changed-artifacts.sh`
+### 3.1 Storage Backend
 
-This script is the core of the incremental build strategy. It dynamically discovers artifacts
-from `src/artifact/*.rs` file names and detects which ones changed between two git commits.
+Built artifacts are stored in an **AWS S3 bucket** (`altf4llc-vorpal-registry`). This serves as
+the Vorpal artifact registry where built artifacts are cached and retrieved.
 
-**Key behaviors:**
+### 3.2 Lock File
 
-- **Discovery:** Scans `src/artifact/*.rs`, excludes utility files (currently only `file.rs`),
-  and converts `snake_case.rs` filenames to `kebab-case` artifact names.
-- **Change detection:** Uses `git diff --name-only --diff-filter=d` to find changed files,
-  filtering out deleted files (the `d` filter).
-- **Output formats:**
-  - `--all`: All artifacts as JSON array
-  - `--list`: All artifacts as plain text, one per line
-  - `<base_sha> <head_sha>`: Changed artifacts as JSON array
-- **Important design decision:** Only changes to `src/artifact/<name>.rs` files trigger builds
-  for that artifact. Changes to shared files like `src/vorpal.rs`, `Cargo.toml`, or workflow
-  files do NOT trigger full rebuilds. This is intentional -- the CORE_FILES and DEPENDENTS
-  mechanisms were deliberately removed (regression tests verify this).
+The `Vorpal.lock` file records the source digest (SHA-256 hash) and download URL for every source
+dependency across all platforms. This provides:
 
-### 3.2. Script: `script/test-detect-changed-artifacts.sh`
+- **Reproducibility**: Exact source versions are pinned by content hash
+- **Integrity verification**: Downloaded sources are validated against recorded digests
+- **Platform awareness**: Each source entry includes a `platform` field
 
-Regression test suite for the detection script. Tests cover:
+The lock file is uploaded as a CI artifact from `build-dev` for each platform runner.
 
-- `--list` returns artifacts
-- `--all` returns valid JSON
-- Same-commit comparison returns empty array
-- Non-artifact file changes do NOT trigger full rebuild (regression test)
-- Deleted artifact files are excluded from build list (regression test)
-- No hardcoded artifact mechanisms remain (regression test)
+### 3.3 Source Configuration
 
----
-
-## 4. Artifact Registry
-
-### 4.1. S3-Backed Registry
-
-Built artifacts are stored in the S3 bucket `altf4llc-vorpal-registry`. This serves as both
-a build cache and distribution mechanism. The Vorpal build system handles cache lookups and
-uploads transparently.
-
-### 4.2. Lock File
-
-The `Vorpal.lock` file records the exact artifact hashes for a build. The CI pipeline uploads
-this as a GitHub Actions artifact for each platform, enabling reproducibility verification
-across the 4-runner matrix.
-
-The `Vorpal.toml` configuration specifies the source includes:
+`Vorpal.toml` defines the project metadata:
 
 ```toml
 language = "rust"
@@ -155,141 +121,250 @@ language = "rust"
 includes = ["src", "Cargo.toml", "Cargo.lock"]
 ```
 
----
-
-## 5. Target Platforms
-
-All artifacts target four platforms:
-
-| Platform | CI Runner | Architecture |
-|---|---|---|
-| `Aarch64Darwin` | `macos-latest` | ARM64 macOS |
-| `X8664Darwin` | `macos-latest-large` | x86_64 macOS |
-| `Aarch64Linux` | `ubuntu-latest-arm64` | ARM64 Linux |
-| `X8664Linux` | `ubuntu-latest` | x86_64 Linux |
-
-Each artifact must provide platform-specific source URLs or build logic for all four targets.
-The `DEFAULT_SYSTEMS` constant in `src/lib.rs` defines these four systems.
+This tells Vorpal which files constitute the project source for build purposes.
 
 ---
 
-## 6. Local Development Environment
+## 4. Development Environment
 
-### 6.1. Build Commands
+### 4.1 Local Development
 
-| Command | Purpose |
+- **direnv**: The project uses `.envrc` for automatic environment variable loading (direnv
+  integration)
+- **Rust toolchain**: Defined via `vorpal-sdk` dependency; the development environment
+  (`ProjectEnvironment`) configures `RUSTUP_HOME`, `RUSTUP_TOOLCHAIN`, and `PATH` to include
+  the Rust toolchain binaries
+
+### 4.2 Lima Virtual Machines (Linux Testing on macOS)
+
+The project includes Lima VM support for testing Linux builds from macOS:
+
+**File**: `lima.yaml`
+
+- **Base images**: Debian 13 (Trixie) cloud images for both `amd64` and `aarch64`
+- **Mount type**: 9p unsupported, uses default
+
+**File**: `makefile`
+
+Lima management targets:
+
+| Target | Description |
 |---|---|
-| `cargo build` | Compile the Rust artifact definitions |
-| `cargo check` | Type-check without producing binaries |
-| `vorpal build <artifact-name>` | Build a specific artifact via Vorpal |
-| `vorpal build dev` | Build the full development environment |
+| `lima` | Creates and provisions a Lima VM (installs deps, Vorpal) |
+| `lima-clean` | Stops and deletes the Lima VM |
+| `lima-sync` | Syncs source code into the VM |
+| `lima-vorpal` | Runs `vorpal build` inside the VM |
+| `lima-vorpal-start` | Starts Vorpal services inside the VM |
 
-### 6.2. Lima VM (Linux on macOS)
+Default VM configuration: 8 CPUs, 8GB RAM, 100GB disk.
 
-The project includes Lima VM support for testing Linux builds on macOS.
+**File**: `script/lima.sh`
 
-**`lima.yaml`** defines a Lima VM using Debian 13 (Trixie) cloud images:
-- ARM64 and x86_64 images available
-- Home directory mounted (read-only by default)
-- `/tmp/lima` mounted writable
-- `9p` mount type excluded (unsupported)
+Provisioning script that installs:
 
-**`script/lima.sh`** provides VM provisioning:
-- `deps`: Installs build dependencies (bubblewrap, build-essential, curl, jq, rsync, etc.),
-  Docker, Vorpal CLI, and configures AppArmor for bubblewrap if needed.
-- `sync`: Runs `deps` then rsyncs the project source to `$HOME/source` inside the VM,
-  excluding `.git` and `target` directories.
-
-**Usage** (per CLAUDE.md): `make lima` then `make lima-vorpal VORPAL_ARTIFACT=<name>`. Note:
-no `Makefile` currently exists in the repository. This appears to be a documentation reference
-to a Makefile that has been removed or exists in a parent/sibling project.
-
-### 6.3. Linux Rootfs Slimming
-
-**`script/linux-vorpal-slim.sh`** is a comprehensive rootfs slimming script (v1.0.0) that
-reduces a Vorpal Linux installation from ~2.9GB to ~600-700MB. It removes development
-toolchains, Python, Perl, static libraries, headers, documentation, and locale data while
-preserving runtime essentials. This script supports dry-run mode, backup creation, selective
-section execution, and aggressive mode (binary stripping).
+- Build essentials, curl, jq, rsync, wget, unzip, ca-certificates
+- Bubblewrap (sandbox runtime)
+- Docker
+- Vorpal (via upstream install script)
+- AppArmor profile for bubblewrap (if AppArmor is detected)
 
 ---
 
-## 7. Dependency Management
+## 5. Dependency Management
 
-### 7.1. Rust Dependencies
+### 5.1 Rust Dependencies
 
-Managed via `Cargo.toml` and `Cargo.lock`. The project has minimal dependencies:
+Managed via `Cargo.toml` and `Cargo.lock`:
 
-- `anyhow` (error handling)
-- `indoc` (indented string formatting)
-- `tokio` (async runtime)
-- `vorpal-sdk` (from `ALT-F4-LLC/vorpal.git`, `main` branch)
+- `anyhow` - Error handling
+- `indoc` - Indented string formatting for build scripts
+- `tokio` - Async runtime (multi-threaded)
+- `vorpal-sdk` - Vorpal build system SDK (from Git, `main` branch)
 
-The `vorpal-sdk` dependency is pinned to the `main` branch of the upstream Vorpal repository
-via git URL, not a crate version. This means builds track upstream changes.
+### 5.2 Automated Dependency Updates
 
-### 7.2. Renovate
+**File**: `.github/renovate.json`
 
-Automated dependency updates are configured via `.github/renovate.json` using the
-`config:recommended` preset. This handles Cargo dependency updates and GitHub Actions version
-bumps.
+Renovate Bot is configured with the `config:recommended` preset. This provides automated PRs for
+dependency updates across the project.
 
----
+### 5.3 Artifact Sources
 
-## 8. Release Process
-
-**There is no formal release process.** The project operates on a continuous-delivery model:
-
-- Pushes to `main` trigger CI builds
-- Built artifacts are stored in the S3 registry
-- No versioning, tagging, or release branches exist
-- The `Cargo.toml` version (`0.1.0-rc.0`) appears to be a placeholder
+Each artifact module defines its own upstream source URLs and versions. Sources are fetched as
+tarballs or binaries from upstream release pages (GitHub Releases, project websites, etc.) and
+their integrity is tracked in `Vorpal.lock` via SHA-256 digests.
 
 ---
 
-## 9. Monitoring and Observability
+## 6. Operational Scripts
 
-**There is no monitoring or observability infrastructure.** This is expected given the project's
-nature as a build-definition repository rather than a running service. Operational visibility
-comes from:
+### 6.1 Change Detection
 
-- **GitHub Actions UI** for build status and logs
-- **GitHub Actions artifacts** for lock file inspection
-- **S3 bucket** for registry contents (no documented access pattern)
+**File**: `script/detect-changed-artifacts.sh`
+
+- Dynamically discovers artifacts from `src/artifact/*.rs` filenames
+- Converts filenames to artifact names (underscores to hyphens)
+- Excludes utility files (currently `file.rs`)
+- Supports `--all` (JSON), `--list` (plain text), and commit range comparison modes
+- Uses `git diff --name-only --diff-filter=d` to detect changes (excludes deleted files)
+
+### 6.2 Linux Rootfs Slimming
+
+**File**: `script/linux-vorpal-slim.sh`
+
+A comprehensive rootfs slimming script that reduces Vorpal Linux installations from ~2.9GB to
+~600-700MB. Features:
+
+- 13 configurable removal sections (GCC, dev tools, Python, Perl, static libs, headers,
+  sanitizers, docs, locales, i18n, build artifacts, optional cleanup)
+- Dry-run mode (default) with size estimation
+- Backup creation support
+- Protected files list (critical runtime libraries and binaries)
+- Post-removal verification of essential files
+- Aggressive mode for binary stripping
+
+### 6.3 Change Detection Tests
+
+**File**: `script/test-detect-changed-artifacts.sh`
+
+Regression tests for the change detection script, covering:
+
+- Basic listing and JSON output
+- Empty diff handling
+- Regression: non-artifact file changes do not trigger full rebuild
+- Regression: deleted artifact files are excluded from build list
+- Regression: no hardcoded artifact mechanisms (CORE_FILES, DEPENDENTS removed)
 
 ---
 
-## 10. Rollback Procedures
+## 7. Release & Versioning
 
-**There is no formal rollback procedure.** Given the project's nature:
+### 7.1 Project Version
 
-- **Code rollback:** Standard `git revert` on `main` would trigger a new CI build
-- **Artifact rollback:** The S3 registry retains previous builds, but there is no documented
-  mechanism to roll back to a prior artifact version
-- **Vorpal CLI rollback:** CI uses `version: nightly`, so there is no pinned Vorpal version
-  to roll back to
+The project is at version `0.1.0-rc.0` (release candidate), as defined in `Cargo.toml`.
+
+### 7.2 Artifact Versioning
+
+Each artifact tracks its own upstream version independently. Artifacts register aliases in the
+format `<name>:<version>` (e.g., `bat:0.25.0`, `zlib:1.3.2`). Version bumps are made by updating
+the version constant in the corresponding `src/artifact/<name>.rs` file.
+
+### 7.3 Release Process
+
+**No formal release process exists.** There are no:
+
+- Tagged releases
+- Changelog generation
+- Release branches
+- Published binaries or packages
+
+The project operates on a trunk-based development model where `main` is the primary branch and
+CI builds artifacts on every push.
 
 ---
 
-## 11. Identified Gaps
+## 8. Monitoring & Observability
 
-The following operational gaps exist. These are documented for awareness, not as a requirement
-to address immediately:
+### 8.1 Current State
 
-1. **No Makefile:** CLAUDE.md references `make lima` and `make lima-vorpal` commands, but no
-   `Makefile` exists in the repository.
-2. **Nightly Vorpal dependency:** CI uses `version: nightly` for the Vorpal CLI, meaning builds
-   can break from upstream Vorpal changes without any code change in this repository.
-3. **Git-branch SDK dependency:** `vorpal-sdk` is pinned to `main` branch via git URL, not a
-   versioned release. Breaking changes upstream will propagate silently until `cargo build`
-   fails.
-4. **No artifact versioning strategy:** Individual artifacts embed version numbers in their
-   source code (e.g., `jj` at `0.37.0`), but there is no systematic process for updating them
-   beyond manual edits and Renovate.
-5. **No build status notifications:** Failed CI builds only surface through the GitHub Actions
-   UI. There are no Slack, email, or other notification integrations.
-6. **No artifact registry cleanup:** No retention policy or garbage collection mechanism is
-   documented for the S3 registry bucket.
-7. **No cross-artifact dependency tracking in CI:** If `ncurses` changes, dependent artifacts
-   (`tmux`, `nnn`, `readline`, `zsh`) are not automatically rebuilt. The detection script
-   intentionally only rebuilds artifacts whose own `.rs` files changed.
+**There is no monitoring, logging, or observability infrastructure in this project.** Specifically:
+
+- No structured logging framework
+- No metrics collection or dashboards
+- No distributed tracing
+- No alerting
+- No health checks
+- No error tracking or reporting service
+
+### 8.2 Build Visibility
+
+The only operational visibility comes from:
+
+- **GitHub Actions workflow runs**: Build success/failure per artifact per platform
+- **GitHub Actions matrix view**: Shows which specific artifact x platform combinations failed
+- **Vorpal.lock diffs**: Show when source versions or digests change
+
+---
+
+## 9. Rollback Procedures
+
+### 9.1 Current State
+
+**No formal rollback procedures exist.** Since this is an artifact definition repository (not a
+deployed service), rollback means:
+
+1. **Git revert**: Revert the commit that introduced the problematic artifact change
+2. **Re-run CI**: Push the revert to `main` to trigger a rebuild
+3. **Registry state**: Built artifacts in the S3 registry are keyed by content hash, so previous
+   versions should remain available as long as the registry has not been pruned
+
+### 9.2 Risks
+
+- The Vorpal SDK dependency tracks `main` branch via Git, meaning SDK changes could break builds
+  without any change in this repository
+- No pinned Vorpal action version (uses `@main`)
+- No mechanism to roll back the S3 registry contents independently of Git history
+
+---
+
+## 10. Security Operations
+
+### 10.1 Secrets Management
+
+- **AWS credentials**: Stored as GitHub Secrets (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
+- **AWS region**: Stored as a GitHub Variable (`AWS_DEFAULT_REGION`)
+- No other secrets are used in the codebase
+
+### 10.2 Supply Chain
+
+- Source integrity is verified via SHA-256 digests in `Vorpal.lock`
+- Renovate Bot provides automated dependency update PRs
+- The Vorpal SDK is fetched from Git (`main` branch) without a pinned commit or tag
+- The setup action (`ALT-F4-LLC/setup-vorpal-action@main`) is not pinned to a specific version
+
+---
+
+## 11. Infrastructure
+
+### 11.1 Compute
+
+All compute is provided by GitHub Actions runners. No self-hosted runners or additional
+infrastructure is used for CI/CD.
+
+| Runner | Platform | Architecture |
+|---|---|---|
+| `macos-latest` | macOS | aarch64 |
+| `macos-latest-large` | macOS | x86_64 |
+| `ubuntu-latest` | Linux | x86_64 |
+| `ubuntu-latest-arm64` | Linux | aarch64 |
+
+### 11.2 Storage
+
+- **S3 bucket** (`altf4llc-vorpal-registry`): Artifact registry storage
+- **GitHub Actions artifacts**: Temporary storage for lock files between jobs
+
+### 11.3 No Additional Infrastructure
+
+There are no:
+
+- Databases
+- Container registries (though Docker is installed in Lima VMs)
+- Load balancers or CDNs
+- DNS or domain management
+- Kubernetes clusters or container orchestration
+
+---
+
+## 12. Known Gaps
+
+| Gap | Risk | Impact |
+|---|---|---|
+| No pinned Vorpal SDK version | High | SDK `main` branch changes can break builds without warning |
+| No pinned setup action version | Medium | Action changes could alter build behavior |
+| No monitoring or alerting | Low | Relies entirely on checking GitHub Actions manually |
+| No formal release process | Medium | No versioned releases, changelogs, or upgrade paths for consumers |
+| No rollback automation | Low | Manual git revert + CI re-run required |
+| No build notifications | Low | No Slack/email notifications on build failures |
+| No artifact retention policy | Medium | S3 registry may grow unbounded without pruning |
+| No cost monitoring | Low | S3 storage and GitHub Actions usage are not tracked |
+| Shared infrastructure changes (e.g., Vorpal SDK breaking changes) not detected proactively | High | Builds can break due to upstream changes in dependencies not tracked in this repo |

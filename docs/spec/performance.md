@@ -1,207 +1,391 @@
 # Performance Specification
 
-## Overview
-
-This document describes the performance characteristics, known bottlenecks, and scaling considerations for the `vorpal-artifacts` project. It reflects what actually exists in the codebase as of the current state -- not aspirational goals.
-
-The project is a Rust build-time configuration tool that defines ~45 software artifacts for the Vorpal build system. Its "runtime" is the `vorpal build` invocation, which compiles the Rust binary and then hands off artifact build instructions to the Vorpal engine. Performance considerations are split between two phases: (1) the Rust compilation of the artifact definitions, and (2) the execution of artifact builds by the Vorpal runtime.
+This document describes the performance characteristics, bottlenecks, optimization strategies, and
+scaling considerations for the `vorpal-artifacts` project as they exist today.
 
 ---
 
-## Artifact Definition Phase (Rust Compilation)
+## 1. Project Nature and Performance Profile
 
-### Compile-Time Characteristics
+`vorpal-artifacts` is a **build-time artifact definition system**, not a runtime service. It defines
+~55 software artifacts (binaries, libraries, and tools) as Rust structs that produce build
+instructions for the Vorpal build system. The performance-critical operations are:
 
-- **Dependency footprint**: The project has a moderate dependency tree (~2,630 lines in `Cargo.lock`). Key dependencies are `anyhow`, `indoc`, `tokio` (with `rt-multi-thread` feature), and `vorpal-sdk` (from Git).
-- **Git dependency**: `vorpal-sdk` is sourced from a Git branch (`main`), which means every fresh `cargo build` must fetch the latest commit. This adds network latency to cold builds and makes builds non-reproducible unless `Cargo.lock` is committed (it is).
-- **Protobuf code generation**: The `vorpal-sdk` dependency triggers `prost` protobuf code generation at build time (visible in `target/debug/build/vorpal-sdk-*/out/*.rs`). This adds compile-time cost for generated `.rs` files covering agent, artifact, archive, context, and worker protobuf schemas.
-- **Binary size**: A single binary (`vorpal`) is produced. All 45+ artifact modules are compiled into this binary regardless of which artifacts are actually needed at runtime.
+- **Configuration phase**: Registering all artifact definitions with the Vorpal SDK context
+- **Build execution phase**: Downloading sources, compiling, and packaging artifacts (handled by
+  the Vorpal SDK/runtime, not this codebase directly)
+- **CI pipeline throughput**: Building changed artifacts across 4 platform runners
 
-### No Compile-Time Optimizations Present
-
-- No `[profile.release]` optimizations are configured in `Cargo.toml` (e.g., `lto`, `codegen-units`, `opt-level`).
-- No feature flags exist to conditionally compile subsets of artifacts.
-- No workspace structure -- the project is a single crate.
+The codebase itself is a Rust binary (`src/vorpal.rs`) that runs an async Tokio main function.
+It does not serve HTTP traffic, manage databases, or handle user-facing load. Performance
+characteristics are dominated by build orchestration and I/O.
 
 ---
 
-## Artifact Build Phase (Vorpal Runtime)
+## 2. Build-Time Performance Characteristics
 
-### Sequential Execution Model
+### 2.1 Sequential Artifact Registration
 
-The main entry point (`src/vorpal.rs`) builds all artifacts **sequentially** using `await` chains. Each `.build(context).await?` call completes before the next begins. There is no parallelism at the artifact definition level within this codebase.
+The main entry point (`src/vorpal.rs:21-88`) registers all ~55 artifacts **sequentially** using
+`await` on each `.build(context)` call. Each artifact registration is awaited one at a time:
 
-```
-let libevent = Libevent::new().build(context).await?;
-let libgpg_error = LibgpgError::new().build(context).await?;
-// ... every artifact awaits in sequence
-```
-
-Whether the underlying Vorpal runtime (`context.run().await`) parallelizes the actual builds is outside the scope of this project. This project's responsibility is defining the build graph; execution is delegated to the Vorpal engine.
-
-### Dependency Graph Impact
-
-The dependency graph creates a critical path that constrains parallelism even if the Vorpal engine supports it:
-
-- **Longest chain**: `libgpg_error` -> `libassuan` / `libgcrypt` / `libksba` -> `gpg` (3 levels deep, with 5 dependencies converging)
-- **Shared dependencies**: `ncurses` is a dependency of `tmux`, `zsh`, `nnn`, and `readline` (which itself feeds `nnn`). Building `ncurses` is on the critical path for 4+ artifacts.
-- **Independent artifacts**: The majority of artifacts (~30 out of 45) have no dependencies on other artifacts in this project. They download pre-built binaries and could theoretically build in parallel.
-
-### Artifact Build Categories and Performance Profiles
-
-Artifacts fall into three distinct performance profiles:
-
-#### 1. Pre-built Binary Downloads (Fast)
-
-~30 artifacts download pre-built binaries and extract them. Build time is dominated by network download speed.
-
-Examples: `jj`, `bat`, `fd`, `ripgrep`, `kubectl`, `helm`, `terraform`, `starship`, `k9s`, `lazygit`, `argocd`, `bottom`, `cue`, `direnv`, `doppler`, `fluxcd`, `golangci-lint`, `jq`, `just`, `kn`, `kubeseal`, `lima`, `neovim`, `yq`, `beads`, `openjdk`.
-
-Typical build script pattern:
-```bash
-mkdir -pv "$VORPAL_OUTPUT/bin"
-cp ./source/<name>/<binary> "$VORPAL_OUTPUT/bin/<binary>"
-chmod +x "$VORPAL_OUTPUT/bin/<binary>"
+```rust
+Argocd::new().build(context).await?;
+Awscli2::new().build(context).await?;
+Bat::new().build(context).await?;
+// ... ~52 more sequential calls
 ```
 
-#### 2. Source Compilations with `configure && make` (Slow)
+This is the **configuration phase** only -- it registers artifact definitions with the Vorpal SDK
+context, not the actual build execution. The Vorpal SDK's `context.run().await` at the end handles
+actual build orchestration. Whether the SDK itself parallelizes builds is outside this codebase's
+control.
 
-~10 artifacts compile from source using autotools. These are the slowest artifacts.
+**Current state**: No parallel registration of independent artifacts. All 55 artifacts are awaited
+sequentially even when they have no dependencies on each other.
 
-Examples: `ncurses`, `libevent`, `libgpg_error`, `libassuan`, `libgcrypt`, `libksba`, `npth`, `gpg`, `readline`, `pkg_config`, `nginx`, `tmux`, `nnn`, `zsh`, `sqlite3`.
+**Impact**: For the configuration phase, the overhead is likely minimal (network-free, in-memory
+struct registration). The sequential pattern matters more if the SDK performs any I/O during
+`.build(context)` registration (e.g., source digest verification).
 
-**Notable**: None of these use `make -j` for parallel compilation. All use bare `make`, which defaults to single-threaded compilation. This is a significant performance gap for source-built artifacts.
+### 2.2 Dependency Chains and Build Graph Depth
 
-#### 3. Go Source Builds (Medium)
+Several artifacts form dependency chains that increase total build time:
 
-3 artifacts use the `vorpal-sdk` Go builder: `crane`, `skopeo`, `umoci`. Build time depends on Go compilation and Go module download speeds.
+| Chain | Depth | Components |
+|---|---|---|
+| **ttyd** | 5 | cmake -> mbedtls, libuv, json-c, libwebsockets -> ttyd |
+| **gpg** | 3 | libgpg-error -> libassuan, libgcrypt, libksba, npth -> gpg |
+| **nnn** | 3 | ncurses -> readline, pkg-config -> nnn |
+| **tmux** | 2 | ncurses, libevent -> tmux |
+| **zsh** | 2 | ncurses -> zsh |
 
-#### 4. Special Cases
+The deepest chain is **ttyd** with 5 levels of transitive dependencies. The `libwebsockets`
+artifact itself depends on cmake, libuv, and mbedtls. These chains are the **critical path** for
+full rebuilds.
 
-- `awscli2`: Platform-specific extraction (Linux installer vs macOS `.pkg` expansion).
-- `openapi-generator-cli`: Downloads a JAR file and wraps it with a shell script; depends on `openjdk`.
+### 2.3 Dependency Deduplication via Builder Pattern
 
----
+Artifacts with dependencies use an optional builder pattern (e.g., `.with_ncurses(ncurses)`) that
+allows callers to inject pre-built dependency references. When dependencies are not injected,
+artifacts rebuild them internally:
 
-## CI Performance Characteristics
+```rust
+// In gpg.rs -- if libgpg_error not provided, it gets built fresh
+let libgpg_error = match self.libgpg_error {
+    Some(val) => val,
+    None => &libgpg_error::LibgpgError::new().build(context).await?,
+};
+```
 
-### Changed-Artifact Detection
+The current `src/vorpal.rs` does **not** use this injection pattern. Each artifact is built with
+`::new()` defaults, meaning shared dependencies (like `ncurses`, `cmake`) may be registered
+multiple times. Whether the Vorpal SDK deduplicates identical artifact registrations is not
+visible from this codebase.
 
-The CI workflow (`.github/workflows/vorpal.yaml`) uses `script/detect-changed-artifacts.sh` to avoid building unchanged artifacts. This is the project's primary CI performance optimization.
-
-- Detection works by comparing `git diff --name-only --diff-filter=d` between base and head SHAs.
-- Only files matching `src/artifact/*.rs` trigger rebuilds.
-- Filename-to-artifact conversion uses `snake_case` -> `kebab-case` mapping.
-- **Limitation**: Changes to shared code (`src/lib.rs`, `src/artifact.rs`, `src/vorpal.rs`, `Cargo.toml`) do not trigger any artifact rebuilds, even though they could affect all artifacts.
-
-### CI Matrix Strategy
-
-- The `build-dev` job runs on 4 runners in parallel: `macos-latest`, `macos-latest-large`, `ubuntu-latest`, `ubuntu-latest-arm64`. This covers all 4 target platforms simultaneously.
-- The `build` job uses a matrix of `artifact x runner`, with `fail-fast: false` so a failure in one artifact does not block others.
-- The `build` job depends on `build-dev` completing first.
-
-### Registry-Based Caching
-
-The CI workflow configures an S3-backed Vorpal registry (`altf4llc-vorpal-registry`). This means previously built artifacts are cached in S3 and reused when their definition has not changed. The caching mechanism is provided by the Vorpal engine, not by this project's code.
-
----
-
-## Caching Strategy
-
-### What Exists
-
-- **Vorpal registry (S3)**: Artifact outputs are cached in an S3 bucket. The Vorpal engine handles cache key computation (likely based on source hash + build script content). This is the primary caching layer.
-- **Vorpal.lock**: A lockfile (`Vorpal.lock`) records resolved artifact configurations. It is generated by `vorpal build` and committed to the repository. CI uploads it as a GitHub Actions artifact per platform.
-- **Cargo dependency caching**: No explicit Cargo cache configuration exists in CI (no `actions/cache` for `target/` or `~/.cargo`).
-- **Git fetch-depth 0**: The `build-changes` job fetches full history for accurate diff detection. The `build-dev` and `build` jobs use default (shallow) checkout.
-
-### What Does Not Exist
-
-- No application-level caching within the Rust code.
-- No download caching for artifact sources (e.g., no local cache of downloaded tarballs between runs). Source caching is presumably handled by the Vorpal engine.
-- No incremental build support within individual artifact definitions.
-- No Cargo build caching in CI (e.g., `sccache`, `actions/cache` for `target/`).
+**Gap**: No explicit dependency sharing in the top-level orchestration. Artifacts like `ncurses`
+are depended upon by tmux, nnn, zsh, and readline, but each path potentially re-registers it.
 
 ---
 
-## Concurrency and Parallelism
+## 3. Artifact Build Strategies and Their Performance Costs
 
-### Within This Codebase
+### 3.1 Pre-built Binary Downloads (Fast Path)
 
-- **Tokio runtime**: The project uses `tokio` with `rt-multi-thread`, but the main function executes all artifact builds sequentially via `.await` chains. The multi-threaded runtime is required by the Vorpal SDK, not utilized for parallelism within this project.
-- **No `tokio::spawn`**: No tasks are spawned concurrently. No `join!` or `JoinSet` usage.
-- **No parallel iteration**: No `rayon` or similar parallel iterator usage.
-- **`&mut ConfigContext`**: The mutable reference to `ConfigContext` prevents parallel artifact definition -- only one artifact can register itself with the context at a time. This is a fundamental design constraint from the Vorpal SDK.
+Approximately 30 of the ~55 artifacts download pre-built binaries. These involve:
+- A single HTTP download
+- Extract/copy to `$VORPAL_OUTPUT`
+- Set executable permissions
 
-### In CI
+Examples: argocd, awscli2, bat, beads, bottom, crane, cue, direnv, doppler, fd, fluxcd,
+golangci-lint, helm, jj, jq, just, k9s, kn, kubectl, kubeseal, lazygit, lima, neovim,
+openjdk, ripgrep, starship, terraform, vhs, yq.
 
-- CI achieves parallelism through GitHub Actions matrix strategy (4 platforms x N artifacts).
-- Each matrix cell runs independently with its own Vorpal instance.
+**Performance profile**: Network-bound. Build time is dominated by download speed and archive
+extraction. Typically seconds to low minutes per artifact.
 
----
+### 3.2 Source Compilation (Slow Path)
 
-## Known Bottlenecks
+Approximately 20 artifacts compile from source using `./configure && make` or CMake patterns.
+These are the most time-intensive:
 
-1. **Sequential artifact registration**: All 45+ artifacts are registered sequentially due to `&mut ConfigContext`. Even independent artifacts cannot be registered concurrently.
+**Autotools-based** (configure/make): ffmpeg, gpg, libevent, libgpg-error, libassuan, libgcrypt,
+libksba, ncurses, nginx, nnn, npth, pkg-config, readline, sqlite3, tmux, zsh, zlib.
 
-2. **Single-threaded `make`**: Source-built artifacts use bare `make` without `-j` flags. On multi-core CI runners, this wastes available CPU capacity during compilation of `ncurses`, `gpg`, `nginx`, `tmux`, `readline`, etc.
+**CMake-based**: json-c, libuv, libwebsockets, mbedtls, ttyd (on macOS).
 
-3. **GPG dependency chain depth**: The `gpg` artifact has the deepest dependency chain (5 library dependencies, each requiring source compilation). This creates the longest critical path in the build graph.
+**Performance profile**: CPU-bound during compilation, I/O-bound during configure steps.
 
-4. **No conditional compilation**: All 45+ artifact definitions are compiled into every binary, even when building a single artifact. The Vorpal engine selects which to build at runtime, but compile time includes all definitions.
+### 3.3 Parallel Make Usage
 
-5. **Git-sourced SDK dependency**: `vorpal-sdk` from Git branch `main` requires network access for every clean build. No pinned tag or crate registry version is used.
+Only 6 of the ~20 source-compiled artifacts use `make -j` for parallel compilation:
 
-6. **No Cargo build caching in CI**: Each CI run compiles the Rust binary from scratch (modulo any runner-level caching from the `setup-vorpal-action`).
+| Artifact | Parallel Make |
+|---|---|
+| ffmpeg | `make -j$(nproc 2>/dev/null \|\| sysctl -n hw.ncpu)` |
+| json-c | `make -j$(nproc 2>/dev/null \|\| sysctl -n hw.ncpu) install` |
+| libuv | `make -j$(nproc 2>/dev/null \|\| sysctl -n hw.ncpu) install` |
+| libwebsockets | `make -j$(nproc 2>/dev/null \|\| sysctl -n hw.ncpu) install` |
+| mbedtls | `make -j$(nproc 2>/dev/null \|\| sysctl -n hw.ncpu) install` |
+| zlib | `make -j$(nproc 2>/dev/null \|\| sysctl -n hw.ncpu) install` |
 
----
+**Gap**: The remaining ~14 source-compiled artifacts use single-threaded `make` without `-j`.
+This includes nginx, gpg, ncurses, readline, libevent, sqlite3, tmux, nnn, zsh, npth,
+libgpg-error, libassuan, libgcrypt, libksba, and pkg-config. Adding `-j$(nproc)` to these
+would reduce their build times on multi-core machines.
 
-## Benchmarking and Profiling
+### 3.4 Platform-Conditional Build Strategies
 
-### What Exists
-
-- **No benchmarking infrastructure**: No `cargo bench`, no criterion benchmarks, no performance tests.
-- **No timing instrumentation**: No elapsed-time logging, no build duration tracking within artifact definitions.
-- **No profiling configuration**: No `perf`, `flamegraph`, or profiling-related tooling configured.
-
-### What CI Provides
-
-- GitHub Actions provides job-level timing in the workflow UI.
-- Individual artifact build times are visible in the Vorpal build output (provided by the Vorpal engine, not this project).
-
----
-
-## Scaling Considerations
-
-### Current Scale
-
-- ~45 artifacts defined across 47 source files.
-- 4 target platforms (Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux).
-- Single `vorpal.rs` entry point that imports and builds all artifacts.
-
-### Scaling Concerns
-
-- **Linear growth in `vorpal.rs`**: Every new artifact adds import lines and build calls to `vorpal.rs`. At 45 artifacts this is manageable; at 200+ it would become unwieldy.
-- **Compile time growth**: Each new artifact module adds to the compile time of the single binary. No mechanism exists to compile subsets.
-- **CI matrix explosion**: Each new artifact adds a row to the CI matrix (artifact x 4 platforms). With 45 artifacts and 4 platforms, a full build is 180 CI jobs.
-- **Dependency fan-out**: Shared dependencies like `ncurses` create coupling. A version bump to `ncurses` would require rebuilding `tmux`, `zsh`, `nnn`, and `readline` (and transitively `nnn` again through `readline`).
-
-### What Would Help at Scale
-
-- Feature flags or workspace splits to compile artifact subsets.
-- Parallel artifact registration (would require Vorpal SDK changes to `ConfigContext`).
-- `make -j$(nproc)` for source-built artifacts.
-- Cargo build caching (`sccache` or `actions/cache`) in CI.
-- Download caching for artifact source tarballs.
+Some artifacts (ttyd, awscli2) use different strategies per platform. For example, ttyd downloads
+pre-built binaries on Linux but compiles from source on macOS. This means macOS CI runners
+experience longer build times for these artifacts.
 
 ---
 
-## Summary
+## 4. Caching Strategy
 
-The project has minimal performance engineering within its own codebase. Performance is primarily determined by:
+### 4.1 Vorpal SDK Content-Addressable Caching
 
-1. The Vorpal engine's caching and build execution strategy (outside this project).
-2. CI workflow design (changed-artifact detection, matrix parallelism, S3 registry caching).
-3. Individual artifact build characteristics (download vs. source compilation).
+The Vorpal build system uses content-addressable artifact storage. The `Vorpal.lock` file
+(2,689 lines) records source digests per platform:
 
-The main performance opportunities within this project's control are: adding `-j$(nproc)` to `make` invocations in source-built artifacts, adding Cargo build caching to CI, and potentially restructuring the codebase for selective compilation if the artifact count grows significantly.
+```toml
+[[sources]]
+name = "argocd"
+path = "https://github.com/argoproj/argo-cd/releases/download/v3.2.3/argocd-darwin-arm64"
+digest = "bd4b2683005fe932123093d357e8bb2c38048e0371cd27156ebb8a83de8a9bd5"
+platform = "aarch64-darwin"
+```
+
+Each source entry has a SHA-256 digest and platform specifier. This enables the Vorpal runtime
+to skip re-downloading unchanged sources. The caching and rebuild-avoidance logic lives in the
+Vorpal SDK/runtime, not in this codebase.
+
+### 4.2 S3 Registry Backend
+
+The CI workflow (`vorpal.yaml`) configures an S3 registry backend:
+
+```yaml
+registry-backend: s3
+registry-backend-s3-bucket: altf4llc-vorpal-registry
+```
+
+Built artifacts are stored in S3 (`altf4llc-vorpal-registry`), enabling cross-build caching.
+If an artifact with the same content hash already exists in the registry, the Vorpal runtime
+can skip rebuilding it. This is the primary caching mechanism.
+
+### 4.3 No Application-Level Caching
+
+This codebase contains no application-level caching (no in-memory caches, no disk caches, no
+Redis/Memcached). All caching is delegated to the Vorpal SDK and its S3 registry backend.
+
+---
+
+## 5. CI/CD Pipeline Performance
+
+### 5.1 Matrix Build Strategy
+
+The CI pipeline (`vorpal.yaml`) uses a matrix strategy across 4 runners:
+
+| Runner | Architecture | OS |
+|---|---|---|
+| `macos-latest` | ARM64 | macOS |
+| `macos-latest-large` | x86_64 | macOS |
+| `ubuntu-latest` | x86_64 | Linux |
+| `ubuntu-latest-arm64` | ARM64 | Linux |
+
+Builds run in parallel across all 4 runners for both the `build-dev` and `build` jobs.
+
+### 5.2 Changed Artifact Detection
+
+The `detect-changed-artifacts.sh` script implements incremental builds by comparing git diffs
+between commits:
+
+- Scans `src/artifact/*.rs` for changed files
+- Maps filename changes to artifact names (underscore to hyphen conversion)
+- Outputs a JSON array of changed artifacts for the CI matrix
+
+**Current limitation**: The detection is file-level only. It detects that `src/artifact/gpg.rs`
+changed but does **not** transitively detect that artifacts depending on gpg's dependencies
+should also rebuild. For example, changing `ncurses.rs` would only trigger a rebuild of `ncurses`,
+not `tmux`, `nnn`, `zsh`, or `readline` which depend on it.
+
+### 5.3 Pipeline Structure
+
+```
+build-changes (detect changed artifacts)
+     |
+build-dev (build "dev" environment on all 4 runners, in parallel)
+     |
+build (build each changed artifact x each runner, matrix, fail-fast: false)
+```
+
+The `build` job uses `fail-fast: false`, so a failure on one runner/artifact combination does not
+cancel other matrix entries. This maximizes build throughput at the cost of consuming runner
+minutes on potentially broken builds.
+
+### 5.4 Lima VM Resources
+
+Local cross-platform testing uses Lima VMs with configurable resources:
+
+```makefile
+LIMA_CPUS := 8
+LIMA_DISK := 100    # GB
+LIMA_MEMORY := 8    # GB
+```
+
+These defaults provide reasonable resources for from-source compilation. The rsync sync command
+excludes `.git` and `target` directories to minimize transfer overhead.
+
+---
+
+## 6. Rust Compilation Performance
+
+### 6.1 Cargo Build Configuration
+
+The `Cargo.toml` has no custom build profiles. There are no `[profile.release]` or
+`[profile.dev]` overrides for:
+
+- `opt-level`
+- `lto` (link-time optimization)
+- `codegen-units`
+- `strip`
+- `debug`
+
+The project compiles with default Cargo profile settings.
+
+### 6.2 Dependencies
+
+The project has 4 direct dependencies:
+
+| Dependency | Role |
+|---|---|
+| `anyhow` | Error handling |
+| `indoc` | Multi-line string formatting |
+| `tokio` (rt-multi-thread) | Async runtime |
+| `vorpal-sdk` (git dep) | Build system SDK |
+
+The `Cargo.lock` is committed, ensuring reproducible builds. The `tokio` dependency uses the
+`rt-multi-thread` feature, enabling the multi-threaded async runtime even though the current
+code uses a single sequential task flow.
+
+---
+
+## 7. Known Bottlenecks
+
+### 7.1 Source Compilation Without Parallel Make
+
+14 source-compiled artifacts use `make` without `-j` flags. On an 8-core machine, this means
+compilation uses ~12.5% of available CPU capacity. The most impactful targets for adding parallel
+make are the ones most frequently rebuilt or with the longest compile times: nginx, gpg, ncurses.
+
+### 7.2 Sequential Top-Level Registration
+
+All 55 artifacts are registered sequentially. While this may not matter if registration is
+purely in-memory, it becomes a bottleneck if the SDK performs I/O during registration (e.g.,
+verifying source digests against the lock file).
+
+### 7.3 Missing Transitive Dependency Tracking in CI
+
+The `detect-changed-artifacts.sh` script does not track transitive dependencies. A change to a
+foundational library like `ncurses` will not trigger rebuilds of dependent artifacts (tmux, nnn,
+zsh, readline, nnn) in CI. This is a correctness gap rather than a performance gap, but it
+means that full rebuilds are occasionally needed, which is a performance concern.
+
+### 7.4 Duplicate Dependency Registration
+
+Without explicit dependency sharing in `src/vorpal.rs`, shared libraries like `ncurses` and
+`cmake` may be registered multiple times through different dependency paths. Whether this results
+in duplicate work depends on the Vorpal SDK's deduplication behavior.
+
+### 7.5 Platform-Specific Build Asymmetry
+
+macOS builds are slower for some artifacts (e.g., ttyd) because they compile from source while
+Linux uses pre-built binaries. This creates asymmetric CI pipeline durations.
+
+---
+
+## 8. Benchmarking
+
+### 8.1 Current State
+
+There is **no benchmarking infrastructure** in this project. There are:
+
+- No Rust benchmarks (`#[bench]` or criterion)
+- No build time tracking or reporting
+- No artifact size monitoring
+- No CI timing dashboards
+
+### 8.2 Relevant Metrics to Track
+
+If benchmarking were added, the most useful metrics would be:
+
+- **Total CI pipeline duration** per platform
+- **Individual artifact build time** per platform
+- **Source download time** (network latency to upstream mirrors)
+- **Artifact output size** (to catch regressions from accidental debug builds)
+- **Lock file drift** (frequency of Vorpal.lock changes, indicating upstream version churn)
+
+---
+
+## 9. Rootfs Slimming Performance
+
+The `script/linux-vorpal-slim.sh` script addresses artifact **output size** performance by
+reducing a Linux rootfs from ~2.9GB to ~600-700MB. It removes:
+
+- GCC compiler infrastructure (~1.2GB)
+- Python/Perl runtimes (~338MB)
+- Static libraries (~252MB)
+- Locale data (~222MB + 76MB translations)
+- Documentation (~51MB)
+- i18n encodings (~43MB)
+- Headers (~34MB)
+- Sanitizer libraries (~31MB)
+
+The script supports dry-run mode, section-selective execution, and optional aggressive mode
+(binary stripping). This is a post-build optimization step, not a build-time performance tool.
+
+---
+
+## 10. Scaling Considerations
+
+### 10.1 Artifact Count Growth
+
+The project currently defines ~55 artifacts. As more artifacts are added:
+
+- Sequential registration time grows linearly
+- CI matrix size grows (artifacts x runners), increasing total runner minutes
+- Dependency graph complexity increases, making transitive rebuild detection more important
+- The `detect-changed-artifacts.sh` script's file-level detection becomes increasingly
+  insufficient
+
+### 10.2 Cross-Platform Coverage
+
+All 4 platform targets (aarch64-darwin, aarch64-linux, x86_64-darwin, x86_64-linux) are built
+for every artifact. The CI matrix is `artifacts x 4 runners`. Adding a 5th platform would
+increase CI cost by 25%.
+
+### 10.3 S3 Registry Scaling
+
+The S3 registry stores all built artifacts. Storage costs scale with:
+- Number of artifacts x number of platforms x number of versions retained
+- No visible garbage collection or version retention policy in this codebase
+
+---
+
+## 11. Gaps and Recommendations Summary
+
+| Area | Current State | Gap |
+|---|---|---|
+| Parallel make | 6 of 20 source builds | 14 builds use single-threaded make |
+| Artifact registration | Sequential | Could parallelize independent artifacts |
+| Dependency sharing | Builder pattern exists but unused at top level | Shared deps may be registered multiple times |
+| Transitive CI rebuilds | File-level only | Does not rebuild dependents |
+| Benchmarking | None | No build time or artifact size tracking |
+| Cargo profiles | Default | No release optimizations configured |
+| Build caching | Vorpal SDK + S3 | No visibility into cache hit rates |
+| Rootfs slimming | Script exists | Not integrated into CI pipeline |
+
+This document reflects what exists in the codebase as of the current state. Recommendations are
+identified as gaps, not prescriptions -- the right time to address each depends on whether it
+is actually causing problems in practice.
