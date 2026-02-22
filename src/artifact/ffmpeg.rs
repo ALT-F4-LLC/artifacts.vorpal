@@ -16,16 +16,16 @@ impl Ffmpeg {
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         let name = "ffmpeg";
-        let source_version = "8.0.1";
 
-        let source_path = format!("https://ffmpeg.org/releases/ffmpeg-{source_version}.tar.xz");
+        let version = "8.0.1";
 
+        let source_path = format!("https://ffmpeg.org/releases/ffmpeg-{version}.tar.xz");
         let source = ArtifactSource::new(name, &source_path).build();
 
         let step_script = formatdoc! {"
             mkdir -pv \"$VORPAL_OUTPUT\"
 
-            pushd ./source/{name}/ffmpeg-{source_version}
+            pushd ./source/{name}/ffmpeg-{version}
 
             ./configure \
                 --prefix=\"$VORPAL_OUTPUT\" \
@@ -42,7 +42,7 @@ impl Ffmpeg {
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 
         Artifact::new(name, steps, systems)
-            .with_aliases(vec![format!("{name}:{source_version}")])
+            .with_aliases(vec![format!("{name}:{version}")])
             .with_sources(vec![source])
             .build(context)
             .await
