@@ -324,7 +324,9 @@ Two insertions, both in **alphabetical order**:
 1. **Import**: Add `{snake_name}::{PascalName}` into the `use vorpal_artifacts::artifact::{...}` block, maintaining alphabetical order
 2. **Build call**: Add `{PascalName}::new().build(context).await?;` in the `// Artifacts` section, maintaining alphabetical order among existing build calls
 
-## Step 7: Verification
+## Step 7: Verification (Mandatory Gate)
+
+**IMPORTANT: The artifact is NOT considered done until `vorpal build <artifact-name>` succeeds. This step is a mandatory validation gate — do NOT mark the task as complete, close the issue, or report success unless the build passes.**
 
 Run these commands in order:
 
@@ -355,6 +357,8 @@ If the build fails, debug and fix the artifact implementation. Common issues:
 - Platform-specific build flags needed
 
 Re-run `vorpal build <artifact-name>` until it succeeds with no errors.
+
+**A successful `vorpal build <artifact-name>` is the ONLY criteria that validates the artifact works. The task MUST NOT be reported as complete or successful if this command has not run and passed.**
 
 ## Step 8: Edge Cases
 
