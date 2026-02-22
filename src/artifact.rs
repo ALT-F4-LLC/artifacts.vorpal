@@ -43,5 +43,6 @@ pub mod starship;
 pub mod terraform;
 pub mod tmux;
 pub mod umoci;
+pub mod vhs;
 pub mod yq;
 pub mod zsh;

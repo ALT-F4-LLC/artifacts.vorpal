@@ -2313,6 +2313,14 @@ digest = "1f10bfbd4ac7b3e8058fe837b0ed9274d2b3f603dc2d7cbc3d325dc612b06aaa"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "vhs"
+path = "https://github.com/charmbracelet/vhs/releases/download/v0.10.0/vhs_0.10.0_Darwin_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "9546938042c798bcee980f06270330e6dbf03c40faab5e2bafff1eaa94c720d5"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "xz"
 path = "https://github.com/tukaani-project/xz/releases/download/v5.8.1/xz-5.8.1.tar.xz"
 includes = []

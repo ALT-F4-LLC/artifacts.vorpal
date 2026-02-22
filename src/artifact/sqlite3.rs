@@ -20,9 +20,7 @@ impl Sqlite3 {
         let version_tag = "3510200";
         let year = "2026";
 
-        let path = format!(
-            "https://www.sqlite.org/{year}/sqlite-autoconf-{version_tag}.tar.gz"
-        );
+        let path = format!("https://www.sqlite.org/{year}/sqlite-autoconf-{version_tag}.tar.gz");
 
         let source = ArtifactSource::new(name, &path).build();
 

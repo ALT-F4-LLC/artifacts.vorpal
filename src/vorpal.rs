@@ -8,8 +8,8 @@ use vorpal_artifacts::{
         libevent::Libevent, libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba,
         lima::Lima, ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
         openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk, pkg_config::PkgConfig,
-        readline::Readline, ripgrep::Ripgrep, skopeo::Skopeo, sqlite3::Sqlite3,
-        starship::Starship, terraform::Terraform, tmux::Tmux, umoci::Umoci, yq::Yq, zsh::Zsh,
+        readline::Readline, ripgrep::Ripgrep, skopeo::Skopeo, sqlite3::Sqlite3, starship::Starship,
+        terraform::Terraform, tmux::Tmux, umoci::Umoci, vhs::Vhs, yq::Yq, zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
 };
@@ -139,6 +139,8 @@ async fn main() -> Result<()> {
         .await?;
 
     Umoci::new().build(context).await?;
+
+    Vhs::new().build(context).await?;
 
     Yq::new().build(context).await?;
 
