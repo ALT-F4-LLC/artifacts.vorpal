@@ -1,4 +1,4 @@
-use crate::artifact::{cmake, libuv, mbedtls, zlib};
+use crate::artifact::{cmake, libuv, mbedtls};
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
@@ -10,7 +10,6 @@ use vorpal_sdk::{
 #[derive(Default)]
 pub struct Libwebsockets<'a> {
     cmake: Option<&'a str>,
-    zlib: Option<&'a str>,
     libuv: Option<&'a str>,
     mbedtls: Option<&'a str>,
 }
@@ -19,7 +18,6 @@ impl<'a> Libwebsockets<'a> {
     pub fn new() -> Self {
         Self {
             cmake: None,
-            zlib: None,
             libuv: None,
             mbedtls: None,
         }
@@ -27,11 +25,6 @@ impl<'a> Libwebsockets<'a> {
 
     pub fn with_cmake(mut self, cmake: &'a str) -> Self {
         self.cmake = Some(cmake);
-        self
-    }
-
-    pub fn with_zlib(mut self, zlib: &'a str) -> Self {
-        self.zlib = Some(zlib);
         self
     }
 
@@ -49,22 +42,6 @@ impl<'a> Libwebsockets<'a> {
         let cmake = match self.cmake {
             Some(val) => val,
             None => &cmake::Cmake::new().build(context).await?,
-        };
-
-        let is_darwin = matches!(
-            context.get_system(),
-            Aarch64Darwin | X8664Darwin
-        );
-
-        let zlib_owned;
-        let zlib = if is_darwin {
-            zlib_owned = match self.zlib {
-                Some(val) => val.to_string(),
-                None => zlib::Zlib::new().build(context).await?,
-            };
-            Some(zlib_owned.as_str())
-        } else {
-            None
         };
 
         let libuv = match self.libuv {
@@ -85,20 +62,11 @@ impl<'a> Libwebsockets<'a> {
 
         let source = ArtifactSource::new(name, &path).build();
 
-        let cmake_prefix_path = if let Some(zlib) = zlib {
-            format!(
-                "{};{};{}",
-                get_env_key(&zlib.to_string()),
-                get_env_key(&libuv.to_string()),
-                get_env_key(&mbedtls.to_string()),
-            )
-        } else {
-            format!(
-                "{};{}",
-                get_env_key(&libuv.to_string()),
-                get_env_key(&mbedtls.to_string()),
-            )
-        };
+        let cmake_prefix_path = format!(
+            "{};{}",
+            get_env_key(&libuv.to_string()),
+            get_env_key(&mbedtls.to_string()),
+        );
 
         let script = formatdoc! {"
             mkdir -pv \"$VORPAL_OUTPUT\"
@@ -145,15 +113,11 @@ impl<'a> Libwebsockets<'a> {
             cmake = get_env_key(&cmake.to_string()),
         };
 
-        let mut step_artifacts = vec![
+        let step_artifacts = vec![
             cmake.to_string(),
             libuv.to_string(),
             mbedtls.to_string(),
         ];
-
-        if let Some(zlib) = zlib {
-            step_artifacts.push(zlib.to_string());
-        }
 
         let steps = vec![
             step::shell(

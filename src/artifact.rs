@@ -52,5 +52,4 @@ pub mod ttyd;
 pub mod umoci;
 pub mod vhs;
 pub mod yq;
-pub mod zlib;
 pub mod zsh;

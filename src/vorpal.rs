@@ -11,7 +11,7 @@ use vorpal_artifacts::{
         npth::Npth, openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk,
         pkg_config::PkgConfig, readline::Readline, ripgrep::Ripgrep, skopeo::Skopeo,
         sqlite3::Sqlite3, starship::Starship, terraform::Terraform, tmux::Tmux, ttyd::Ttyd,
-        umoci::Umoci, vhs::Vhs, yq::Yq, zlib::Zlib, zsh::Zsh,
+        umoci::Umoci, vhs::Vhs, yq::Yq, zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
 };
@@ -76,7 +76,6 @@ async fn main() -> Result<()> {
     Umoci::new().build(context).await?;
     Vhs::new().build(context).await?;
     Yq::new().build(context).await?;
-    Zlib::new().build(context).await?;
     Zsh::new().build(context).await?;
 
     // Development Environment

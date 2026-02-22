@@ -1,4 +1,4 @@
-use crate::artifact::{cmake, json_c, libuv, libwebsockets, mbedtls, zlib};
+use crate::artifact::{cmake, json_c, libuv, libwebsockets, mbedtls};
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
@@ -14,7 +14,6 @@ pub struct Ttyd<'a> {
     libuv: Option<&'a str>,
     libwebsockets: Option<&'a str>,
     mbedtls: Option<&'a str>,
-    zlib: Option<&'a str>,
 }
 
 impl<'a> Ttyd<'a> {
@@ -25,7 +24,6 @@ impl<'a> Ttyd<'a> {
             libuv: None,
             libwebsockets: None,
             mbedtls: None,
-            zlib: None,
         }
     }
 
@@ -51,11 +49,6 @@ impl<'a> Ttyd<'a> {
 
     pub fn with_mbedtls(mut self, mbedtls: &'a str) -> Self {
         self.mbedtls = Some(mbedtls);
-        self
-    }
-
-    pub fn with_zlib(mut self, zlib: &'a str) -> Self {
-        self.zlib = Some(zlib);
         self
     }
 
@@ -114,11 +107,6 @@ impl<'a> Ttyd<'a> {
                 (sources, script, vec![])
             }
             Aarch64Darwin | X8664Darwin => {
-                let zlib = match self.zlib {
-                    Some(val) => val.to_string(),
-                    None => zlib::Zlib::new().build(context).await?,
-                };
-
                 let ttyd_path =
                     format!("https://github.com/tsl0922/ttyd/archive/refs/tags/{version}.tar.gz");
 
@@ -132,7 +120,7 @@ impl<'a> Ttyd<'a> {
 
                     {cmake}/bin/cmake \
                         -DCMAKE_INSTALL_PREFIX=\"$VORPAL_OUTPUT\" \
-                        -DCMAKE_PREFIX_PATH=\"{zlib};{json_c};{libuv};{mbedtls};{libwebsockets}\" \
+                        -DCMAKE_PREFIX_PATH=\"{json_c};{libuv};{mbedtls};{libwebsockets}\" \
                         -DCMAKE_BUILD_TYPE=RELEASE \
                         -DLIBUV_INCLUDE_DIR=\"{libuv}/include\" \
                         -DLIBUV_LIBRARY=\"{libuv}/lib/libuv.a\" \
@@ -147,7 +135,6 @@ impl<'a> Ttyd<'a> {
                     libuv = get_env_key(&libuv.to_string()),
                     libwebsockets = get_env_key(&libwebsockets.to_string()),
                     mbedtls = get_env_key(&mbedtls.to_string()),
-                    zlib = get_env_key(&zlib),
                 };
 
                 let sources = vec![ArtifactSource::new(name, &ttyd_path).build()];
@@ -158,7 +145,6 @@ impl<'a> Ttyd<'a> {
                     libuv.to_string(),
                     libwebsockets.to_string(),
                     mbedtls.to_string(),
-                    zlib,
                 ];
 
                 (sources, script, artifacts)
