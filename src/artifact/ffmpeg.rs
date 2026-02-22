@@ -31,6 +31,7 @@ impl Ffmpeg {
                 --prefix=\"$VORPAL_OUTPUT\" \
                 --disable-doc \
                 --disable-debug \
+                --disable-x86asm \
                 --enable-gpl
 
             make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
