@@ -282,6 +282,14 @@ platform = "aarch64-darwin"
 
 [[sources]]
 name = "cmake"
+path = "https://github.com/Kitware/CMake/releases/download/v4.2.3/cmake-4.2.3-macos-universal.tar.gz"
+includes = []
+excludes = []
+digest = "0a581d07b2545bc00e9c2ea0c52f2d353ceb5dd365eeeecb5dbe1b8599a61eff"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "cmake"
 path = "https://github.com/Kitware/CMake/releases/download/v4.2.3/cmake-4.2.3-linux-aarch64.tar.gz"
 includes = []
 excludes = []
@@ -543,6 +551,14 @@ includes = []
 excludes = []
 digest = "721afb68d781b501c854d9d6193e357415bda37c27fb1051bd73e15ad6d3b309"
 platform = "x86_64-linux"
+
+[[sources]]
+name = "ffmpeg"
+path = "https://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz"
+includes = []
+excludes = []
+digest = "721afb68d781b501c854d9d6193e357415bda37c27fb1051bd73e15ad6d3b309"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "file"
@@ -985,6 +1001,14 @@ digest = "e11a320ef7d6cab0fdb8a1d6f760b7b9c328eaf851b8b233dd0ded77c9d59278"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "json-c"
+path = "https://github.com/json-c/json-c/archive/refs/tags/json-c-0.18-20240915.tar.gz"
+includes = []
+excludes = []
+digest = "e11a320ef7d6cab0fdb8a1d6f760b7b9c328eaf851b8b233dd0ded77c9d59278"
+platform = "x86_64-darwin"
+
+[[sources]]
 name = "just"
 path = "https://github.com/casey/just/releases/download/1.45.0/just-1.45.0-x86_64-unknown-linux-musl.tar.gz"
 includes = []
@@ -1409,6 +1433,14 @@ digest = "32d2486edb49f99004a39ea8b472ac68b0b38ff3d364c7391edf38fd6b5db13f"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "libuv"
+path = "https://github.com/libuv/libuv/archive/refs/tags/v1.52.0.tar.gz"
+includes = []
+excludes = []
+digest = "32d2486edb49f99004a39ea8b472ac68b0b38ff3d364c7391edf38fd6b5db13f"
+platform = "x86_64-darwin"
+
+[[sources]]
 name = "libwebsockets"
 path = "https://github.com/warmcat/libwebsockets/archive/refs/tags/v4.5.2.tar.gz"
 includes = []
@@ -1431,6 +1463,14 @@ includes = []
 excludes = []
 digest = "61c0a1af5787ca0bb73cbb51d15e4aabd083ab93b17bb3a2159aac31038a515a"
 platform = "x86_64-linux"
+
+[[sources]]
+name = "libwebsockets"
+path = "https://github.com/warmcat/libwebsockets/archive/refs/tags/v4.5.2.tar.gz"
+includes = []
+excludes = []
+digest = "61c0a1af5787ca0bb73cbb51d15e4aabd083ab93b17bb3a2159aac31038a515a"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "lima"
@@ -1535,6 +1575,14 @@ includes = []
 excludes = []
 digest = "70e07a39da6c6bd8c4591ab5d4ecf5fa7d37c566697dbdb478f46934f8961138"
 platform = "x86_64-linux"
+
+[[sources]]
+name = "mbedtls"
+path = "https://github.com/Mbed-TLS/mbedtls/releases/download/mbedtls-3.6.5/mbedtls-3.6.5.tar.bz2"
+includes = []
+excludes = []
+digest = "70e07a39da6c6bd8c4591ab5d4ecf5fa7d37c566697dbdb478f46934f8961138"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "mpc"
@@ -2249,6 +2297,14 @@ digest = "77b34b4a8179c19fb2542d6f9de8df8f9a8d816a7baf0bc157b08284153c5d3d"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "sqlite3"
+path = "https://www.sqlite.org/2026/sqlite-autoconf-3510200.tar.gz"
+includes = []
+excludes = []
+digest = "77b34b4a8179c19fb2542d6f9de8df8f9a8d816a7baf0bc157b08284153c5d3d"
+platform = "x86_64-darwin"
+
+[[sources]]
 name = "starship"
 path = "https://github.com/starship/starship/releases/download/v1.21.1/starship-aarch64-apple-darwin.tar.gz"
 includes = []
@@ -2401,6 +2457,14 @@ digest = "cc01828c5c863fa5c0e46bd66da7a27ba588c81c57e2580fe0f7f7ba31114bae"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "ttyd"
+path = "https://github.com/tsl0922/ttyd/archive/refs/tags/1.7.7.tar.gz"
+includes = []
+excludes = []
+digest = "cc01828c5c863fa5c0e46bd66da7a27ba588c81c57e2580fe0f7f7ba31114bae"
+platform = "x86_64-darwin"
+
+[[sources]]
 name = "umoci"
 path = "https://github.com/opencontainers/umoci/archive/refs/tags/v0.6.0.tar.gz"
 includes = []
@@ -2503,6 +2567,14 @@ includes = []
 excludes = []
 digest = "9546938042c798bcee980f06270330e6dbf03c40faab5e2bafff1eaa94c720d5"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "vhs"
+path = "https://github.com/charmbracelet/vhs/releases/download/v0.10.0/vhs_0.10.0_Darwin_x86_64.tar.gz"
+includes = []
+excludes = []
+digest = "98212c466a76e2b9982cfd1a1e0d8ec505d54a313d0646f5d578a677aa83dc1b"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "vhs"
