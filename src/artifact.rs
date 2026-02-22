@@ -8,6 +8,7 @@ pub mod cue;
 pub mod direnv;
 pub mod doppler;
 pub mod fd;
+pub mod ffmpeg;
 pub mod file;
 pub mod fluxcd;
 pub mod golangci_lint;

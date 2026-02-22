@@ -2,7 +2,7 @@ use anyhow::Result;
 use vorpal_artifacts::{
     artifact::{
         argocd::Argocd, awscli2::Awscli2, bat::Bat, beads::Beads, bottom::Bottom, crane::Crane,
-        cue::Cue, direnv::Direnv, doppler::Doppler, fd::Fd, fluxcd::Fluxcd,
+        cue::Cue, direnv::Direnv, doppler::Doppler, fd::Fd, ffmpeg::Ffmpeg, fluxcd::Fluxcd,
         golangci_lint::GolangciLint, gpg::Gpg, helm::Helm, jj::Jj, jq::Jq, just::Just, k9s::K9s,
         kn::Kn, kubectl::Kubectl, kubeseal::Kubeseal, lazygit::Lazygit, libassuan::Libassuan,
         libevent::Libevent, libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba,
@@ -72,6 +72,8 @@ async fn main() -> Result<()> {
     Doppler::new().build(context).await?;
 
     Fd::new().build(context).await?;
+
+    Ffmpeg::new().build(context).await?;
 
     Fluxcd::new().build(context).await?;
 

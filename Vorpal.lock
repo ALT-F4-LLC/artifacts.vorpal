@@ -497,6 +497,14 @@ digest = "fdaa40fadd825cb5a895baee0b353e569006fef98dae2c84190e53c1775ed88f"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "ffmpeg"
+path = "https://ffmpeg.org/releases/ffmpeg-7.1.3.tar.xz"
+includes = []
+excludes = []
+digest = "1c7288eededf776b645c0e6e555004098384412f0ed52e0b848e9252dc1a8d17"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "file"
 path = "https://astron.com/pub/file/file-5.46.tar.gz"
 includes = []
