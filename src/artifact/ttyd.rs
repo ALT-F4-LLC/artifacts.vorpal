@@ -10,32 +10,27 @@ use vorpal_sdk::{
 #[derive(Default)]
 pub struct Ttyd<'a> {
     cmake: Option<&'a str>,
-    zlib: Option<&'a str>,
     json_c: Option<&'a str>,
     libuv: Option<&'a str>,
-    mbedtls: Option<&'a str>,
     libwebsockets: Option<&'a str>,
+    mbedtls: Option<&'a str>,
+    zlib: Option<&'a str>,
 }
 
 impl<'a> Ttyd<'a> {
     pub fn new() -> Self {
         Self {
             cmake: None,
-            zlib: None,
             json_c: None,
             libuv: None,
-            mbedtls: None,
             libwebsockets: None,
+            mbedtls: None,
+            zlib: None,
         }
     }
 
     pub fn with_cmake(mut self, cmake: &'a str) -> Self {
         self.cmake = Some(cmake);
-        self
-    }
-
-    pub fn with_zlib(mut self, zlib: &'a str) -> Self {
-        self.zlib = Some(zlib);
         self
     }
 
@@ -49,13 +44,18 @@ impl<'a> Ttyd<'a> {
         self
     }
 
+    pub fn with_libwebsockets(mut self, libwebsockets: &'a str) -> Self {
+        self.libwebsockets = Some(libwebsockets);
+        self
+    }
+
     pub fn with_mbedtls(mut self, mbedtls: &'a str) -> Self {
         self.mbedtls = Some(mbedtls);
         self
     }
 
-    pub fn with_libwebsockets(mut self, libwebsockets: &'a str) -> Self {
-        self.libwebsockets = Some(libwebsockets);
+    pub fn with_zlib(mut self, zlib: &'a str) -> Self {
+        self.zlib = Some(zlib);
         self
     }
 
@@ -65,19 +65,9 @@ impl<'a> Ttyd<'a> {
             None => &cmake::Cmake::new().build(context).await?,
         };
 
-        let zlib = match self.zlib {
-            Some(val) => val,
-            None => &zlib::Zlib::new().build(context).await?,
-        };
-
         let json_c = match self.json_c {
             Some(val) => val,
-            None => {
-                &json_c::JsonC::new()
-                    .with_cmake(cmake)
-                    .build(context)
-                    .await?
-            }
+            None => &json_c::JsonC::new().build(context).await?,
         };
 
         let libuv = match self.libuv {
@@ -85,36 +75,28 @@ impl<'a> Ttyd<'a> {
             None => &libuv::Libuv::new().with_cmake(cmake).build(context).await?,
         };
 
-        let mbedtls = match self.mbedtls {
-            Some(val) => val,
-            None => {
-                &mbedtls::Mbedtls::new()
-                    .with_cmake(cmake)
-                    .build(context)
-                    .await?
-            }
-        };
-
         let libwebsockets = match self.libwebsockets {
             Some(val) => val,
-            None => {
-                &libwebsockets::Libwebsockets::new()
-                    .with_cmake(cmake)
-                    .with_zlib(zlib)
-                    .with_libuv(libuv)
-                    .with_mbedtls(mbedtls)
-                    .build(context)
-                    .await?
-            }
+            None => &libwebsockets::Libwebsockets::new().build(context).await?,
+        };
+
+        let mbedtls = match self.mbedtls {
+            Some(val) => val,
+            None => &mbedtls::Mbedtls::new().build(context).await?,
+        };
+
+        let zlib = match self.zlib {
+            Some(val) => val,
+            None => &zlib::Zlib::new().build(context).await?,
         };
 
         let name = "ttyd";
-        let source_version = "1.7.7";
+        let version = "1.7.7";
 
         let (sources, step_script, step_artifacts) = match context.get_system() {
             Aarch64Linux => {
                 let path = format!(
-                    "https://github.com/tsl0922/ttyd/releases/download/{source_version}/ttyd.aarch64"
+                    "https://github.com/tsl0922/ttyd/releases/download/{version}/ttyd.aarch64"
                 );
                 let script = formatdoc! {"
                     mkdir -pv \"$VORPAL_OUTPUT/bin\"
@@ -126,7 +108,7 @@ impl<'a> Ttyd<'a> {
             }
             X8664Linux => {
                 let path = format!(
-                    "https://github.com/tsl0922/ttyd/releases/download/{source_version}/ttyd.x86_64"
+                    "https://github.com/tsl0922/ttyd/releases/download/{version}/ttyd.x86_64"
                 );
                 let script = formatdoc! {"
                     mkdir -pv \"$VORPAL_OUTPUT/bin\"
@@ -137,9 +119,8 @@ impl<'a> Ttyd<'a> {
                 (sources, script, vec![])
             }
             Aarch64Darwin | X8664Darwin => {
-                let ttyd_path = format!(
-                    "https://github.com/tsl0922/ttyd/archive/refs/tags/{source_version}.tar.gz"
-                );
+                let ttyd_path =
+                    format!("https://github.com/tsl0922/ttyd/archive/refs/tags/{version}.tar.gz");
 
                 let script = formatdoc! {"
                     mkdir -pv \"$VORPAL_OUTPUT/bin\"
@@ -155,29 +136,29 @@ impl<'a> Ttyd<'a> {
                         -DCMAKE_BUILD_TYPE=RELEASE \
                         -DLIBUV_INCLUDE_DIR=\"{libuv}/include\" \
                         -DLIBUV_LIBRARY=\"{libuv}/lib/libuv.a\" \
-                        \"$(pwd)/../source/{name}/{name}-{source_version}\"
+                        \"$(pwd)/../source/{name}/{name}-{version}\"
 
                     make install
                     popd
 
                     chmod +x \"$VORPAL_OUTPUT/bin/ttyd\"",
                     cmake = get_env_key(&cmake.to_string()),
-                    zlib = get_env_key(&zlib.to_string()),
                     json_c = get_env_key(&json_c.to_string()),
                     libuv = get_env_key(&libuv.to_string()),
-                    mbedtls = get_env_key(&mbedtls.to_string()),
                     libwebsockets = get_env_key(&libwebsockets.to_string()),
+                    mbedtls = get_env_key(&mbedtls.to_string()),
+                    zlib = get_env_key(&zlib.to_string()),
                 };
 
                 let sources = vec![ArtifactSource::new(name, &ttyd_path).build()];
 
                 let artifacts = vec![
                     cmake.to_string(),
-                    zlib.to_string(),
                     json_c.to_string(),
                     libuv.to_string(),
-                    mbedtls.to_string(),
                     libwebsockets.to_string(),
+                    mbedtls.to_string(),
+                    zlib.to_string(),
                 ];
 
                 (sources, script, artifacts)
@@ -190,7 +171,7 @@ impl<'a> Ttyd<'a> {
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 
         Artifact::new(name, steps, systems)
-            .with_aliases(vec![format!("{name}:{source_version}")])
+            .with_aliases(vec![format!("{name}:{version}")])
             .with_sources(sources)
             .build(context)
             .await
