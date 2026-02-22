@@ -16,10 +16,9 @@ impl Ffmpeg {
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         let name = "ffmpeg";
-        let source_version = "7.1.3";
+        let source_version = "8.0.1";
 
-        let source_path =
-            format!("https://ffmpeg.org/releases/ffmpeg-{source_version}.tar.xz");
+        let source_path = format!("https://ffmpeg.org/releases/ffmpeg-{source_version}.tar.xz");
 
         let source = ArtifactSource::new(name, &source_path).build();
 

@@ -1,31 +1,117 @@
+use crate::artifact::{cmake, json_c, libuv, libwebsockets, mbedtls, zlib};
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
     api::artifact::ArtifactSystem::{Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux},
-    artifact::{step, Artifact, ArtifactSource},
+    artifact::{get_env_key, step, Artifact, ArtifactSource},
     context::ConfigContext,
 };
 
 #[derive(Default)]
-pub struct Ttyd;
+pub struct Ttyd<'a> {
+    cmake: Option<&'a str>,
+    zlib: Option<&'a str>,
+    json_c: Option<&'a str>,
+    libuv: Option<&'a str>,
+    mbedtls: Option<&'a str>,
+    libwebsockets: Option<&'a str>,
+}
 
-impl Ttyd {
+impl<'a> Ttyd<'a> {
     pub fn new() -> Self {
-        Self
+        Self {
+            cmake: None,
+            zlib: None,
+            json_c: None,
+            libuv: None,
+            mbedtls: None,
+            libwebsockets: None,
+        }
+    }
+
+    pub fn with_cmake(mut self, cmake: &'a str) -> Self {
+        self.cmake = Some(cmake);
+        self
+    }
+
+    pub fn with_zlib(mut self, zlib: &'a str) -> Self {
+        self.zlib = Some(zlib);
+        self
+    }
+
+    pub fn with_json_c(mut self, json_c: &'a str) -> Self {
+        self.json_c = Some(json_c);
+        self
+    }
+
+    pub fn with_libuv(mut self, libuv: &'a str) -> Self {
+        self.libuv = Some(libuv);
+        self
+    }
+
+    pub fn with_mbedtls(mut self, mbedtls: &'a str) -> Self {
+        self.mbedtls = Some(mbedtls);
+        self
+    }
+
+    pub fn with_libwebsockets(mut self, libwebsockets: &'a str) -> Self {
+        self.libwebsockets = Some(libwebsockets);
+        self
     }
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
+        let cmake = match self.cmake {
+            Some(val) => val,
+            None => &cmake::Cmake::new().build(context).await?,
+        };
+
+        let zlib = match self.zlib {
+            Some(val) => val,
+            None => &zlib::Zlib::new().build(context).await?,
+        };
+
+        let json_c = match self.json_c {
+            Some(val) => val,
+            None => {
+                &json_c::JsonC::new()
+                    .with_cmake(cmake)
+                    .build(context)
+                    .await?
+            }
+        };
+
+        let libuv = match self.libuv {
+            Some(val) => val,
+            None => &libuv::Libuv::new().with_cmake(cmake).build(context).await?,
+        };
+
+        let mbedtls = match self.mbedtls {
+            Some(val) => val,
+            None => {
+                &mbedtls::Mbedtls::new()
+                    .with_cmake(cmake)
+                    .build(context)
+                    .await?
+            }
+        };
+
+        let libwebsockets = match self.libwebsockets {
+            Some(val) => val,
+            None => {
+                &libwebsockets::Libwebsockets::new()
+                    .with_cmake(cmake)
+                    .with_zlib(zlib)
+                    .with_libuv(libuv)
+                    .with_mbedtls(mbedtls)
+                    .build(context)
+                    .await?
+            }
+        };
+
         let name = "ttyd";
         let source_version = "1.7.7";
 
-        let cmake_version = "3.31.6";
-        let zlib_version = "1.3.1";
-        let json_c_version = "0.17";
-        let libuv_version = "1.44.2";
-        let mbedtls_version = "2.28.5";
-        let lws_version = "4.3.3";
-
-        let (sources, step_script) = match context.get_system() {
+        let (sources, step_script, step_artifacts) = match context.get_system() {
             Aarch64Linux => {
                 let path = format!(
                     "https://github.com/tsl0922/ttyd/releases/download/{source_version}/ttyd.aarch64"
@@ -36,7 +122,7 @@ impl Ttyd {
                     chmod +x \"$VORPAL_OUTPUT/bin/ttyd\""
                 };
                 let sources = vec![ArtifactSource::new(name, &path).build()];
-                (sources, script)
+                (sources, script, vec![])
             }
             X8664Linux => {
                 let path = format!(
@@ -48,143 +134,58 @@ impl Ttyd {
                     chmod +x \"$VORPAL_OUTPUT/bin/ttyd\""
                 };
                 let sources = vec![ArtifactSource::new(name, &path).build()];
-                (sources, script)
+                (sources, script, vec![])
             }
             Aarch64Darwin | X8664Darwin => {
                 let ttyd_path = format!(
                     "https://github.com/tsl0922/ttyd/archive/refs/tags/{source_version}.tar.gz"
                 );
-                let cmake_path = format!(
-                    "https://github.com/Kitware/CMake/releases/download/v{cmake_version}/cmake-{cmake_version}-macos-universal.tar.gz"
-                );
-                let zlib_path = format!(
-                    "https://github.com/madler/zlib/releases/download/v{zlib_version}/zlib-{zlib_version}.tar.gz"
-                );
-                let json_c_path = format!(
-                    "https://s3.amazonaws.com/json-c_releases/releases/json-c-{json_c_version}.tar.gz"
-                );
-                let libuv_path = format!(
-                    "https://github.com/libuv/libuv/archive/refs/tags/v{libuv_version}.tar.gz"
-                );
-                let mbedtls_path = format!(
-                    "https://github.com/Mbed-TLS/mbedtls/archive/refs/tags/v{mbedtls_version}.tar.gz"
-                );
-                let lws_path = format!(
-                    "https://github.com/warmcat/libwebsockets/archive/refs/tags/v{lws_version}.tar.gz"
-                );
 
                 let script = formatdoc! {"
                     mkdir -pv \"$VORPAL_OUTPUT/bin\"
 
-                    STAGE_DIR=\"$(pwd)/stage\"
                     BUILD_DIR=\"$(pwd)/build\"
-                    mkdir -p \"$STAGE_DIR\" \"$BUILD_DIR\"
-                    export PKG_CONFIG_PATH=\"$STAGE_DIR/lib/pkgconfig\"
+                    mkdir -p \"$BUILD_DIR\"
 
-                    CMAKE=\"$(pwd)/source/ttyd-cmake/cmake-{cmake_version}-macos-universal/CMake.app/Contents/bin/cmake\"
+                    pushd \"$BUILD_DIR\"
 
-                    echo \"=== Building zlib ===\"
-                    pushd ./source/ttyd-zlib/zlib-{zlib_version}
-                    ./configure --static --prefix=\"$STAGE_DIR\"
-                    make -j$(sysctl -n hw.ncpu) install
-                    popd
-
-                    echo \"=== Building json-c ===\"
-                    mkdir -p \"$BUILD_DIR/json-c\" && pushd \"$BUILD_DIR/json-c\"
-                    \"$CMAKE\" \
-                        -DCMAKE_BUILD_TYPE=RELEASE \
-                        -DCMAKE_INSTALL_PREFIX=\"$STAGE_DIR\" \
-                        -DBUILD_SHARED_LIBS=OFF \
-                        -DBUILD_TESTING=OFF \
-                        -DDISABLE_THREAD_LOCAL_STORAGE=ON \
-                        \"$(pwd)/../../source/ttyd-json-c/json-c-{json_c_version}\"
-                    make -j$(sysctl -n hw.ncpu) install
-                    popd
-
-                    echo \"=== Building libuv ===\"
-                    mkdir -p \"$BUILD_DIR/libuv\" && pushd \"$BUILD_DIR/libuv\"
-                    \"$CMAKE\" \
-                        -DCMAKE_BUILD_TYPE=RELEASE \
-                        -DCMAKE_INSTALL_PREFIX=\"$STAGE_DIR\" \
-                        -DCMAKE_C_FLAGS=\"-fPIC\" \
-                        -DBUILD_TESTING=OFF \
-                        \"$(pwd)/../../source/ttyd-libuv/libuv-{libuv_version}\"
-                    make -j$(sysctl -n hw.ncpu) install
-                    popd
-
-                    # Remove shared libraries and create static lib symlink for libuv
-                    find \"$STAGE_DIR/lib\" -name '*.dylib' -delete 2>/dev/null || true
-                    ln -sf \"$STAGE_DIR/lib/libuv_a.a\" \"$STAGE_DIR/lib/libuv.a\"
-
-                    echo \"=== Building mbedtls ===\"
-                    mkdir -p \"$BUILD_DIR/mbedtls\" && pushd \"$BUILD_DIR/mbedtls\"
-                    \"$CMAKE\" \
-                        -DCMAKE_BUILD_TYPE=RELEASE \
-                        -DCMAKE_INSTALL_PREFIX=\"$STAGE_DIR\" \
-                        -DENABLE_TESTING=OFF \
-                        -DUSE_SHARED_MBEDTLS_LIBRARY=OFF \
-                        \"$(pwd)/../../source/ttyd-mbedtls/mbedtls-{mbedtls_version}\"
-                    make -j$(sysctl -n hw.ncpu) install
-                    popd
-
-                    echo \"=== Building libwebsockets ===\"
-                    LWS_SRC=\"$(pwd)/source/ttyd-lws/libwebsockets-{lws_version}\"
-                    sed 's/ websockets_shared//g' \"$LWS_SRC/cmake/libwebsockets-config.cmake.in\" > \"$LWS_SRC/cmake/libwebsockets-config.cmake.in.tmp\"
-                    mv \"$LWS_SRC/cmake/libwebsockets-config.cmake.in.tmp\" \"$LWS_SRC/cmake/libwebsockets-config.cmake.in\"
-                    mkdir -p \"$BUILD_DIR/lws\" && pushd \"$BUILD_DIR/lws\"
-                    \"$CMAKE\" \
-                        -DCMAKE_BUILD_TYPE=RELEASE \
-                        -DCMAKE_INSTALL_PREFIX=\"$STAGE_DIR\" \
-                        -DCMAKE_FIND_LIBRARY_SUFFIXES=\".a\" \
-                        -DLWS_WITHOUT_TESTAPPS=ON \
-                        -DLWS_WITH_MBEDTLS=ON \
-                        -DLWS_WITH_LIBUV=ON \
-                        -DLWS_STATIC_PIC=ON \
-                        -DLWS_WITH_SHARED=OFF \
-                        -DLWS_UNIX_SOCK=ON \
-                        -DLWS_IPV6=ON \
-                        -DLWS_ROLE_RAW_FILE=OFF \
-                        -DLWS_WITH_HTTP2=ON \
-                        -DLWS_WITH_HTTP_BASIC_AUTH=OFF \
-                        -DLWS_WITH_UDP=OFF \
-                        -DLWS_WITHOUT_CLIENT=ON \
-                        -DLWS_WITHOUT_EXTENSIONS=OFF \
-                        -DLWS_WITH_LEJP=OFF \
-                        -DLWS_WITH_LEJP_CONF=OFF \
-                        -DLWS_WITH_LWSAC=OFF \
-                        -DLWS_WITH_SEQUENCER=OFF \
-                        \"$LWS_SRC\"
-                    make -j$(sysctl -n hw.ncpu) install
-                    popd
-
-                    echo \"=== Building ttyd ===\"
-                    mkdir -p \"$BUILD_DIR/ttyd\" && pushd \"$BUILD_DIR/ttyd\"
-                    \"$CMAKE\" \
+                    {cmake}/bin/cmake \
                         -DCMAKE_INSTALL_PREFIX=\"$VORPAL_OUTPUT\" \
-                        -DCMAKE_PREFIX_PATH=\"$STAGE_DIR\" \
+                        -DCMAKE_PREFIX_PATH=\"{zlib};{json_c};{libuv};{mbedtls};{libwebsockets}\" \
                         -DCMAKE_BUILD_TYPE=RELEASE \
-                        \"$(pwd)/../../source/{name}/ttyd-{source_version}\"
+                        -DLIBUV_INCLUDE_DIR=\"{libuv}/include\" \
+                        -DLIBUV_LIBRARY=\"{libuv}/lib/libuv.a\" \
+                        \"$(pwd)/../source/{name}/{name}-{source_version}\"
+
                     make install
                     popd
 
-                    chmod +x \"$VORPAL_OUTPUT/bin/ttyd\""
+                    chmod +x \"$VORPAL_OUTPUT/bin/ttyd\"",
+                    cmake = get_env_key(&cmake.to_string()),
+                    zlib = get_env_key(&zlib.to_string()),
+                    json_c = get_env_key(&json_c.to_string()),
+                    libuv = get_env_key(&libuv.to_string()),
+                    mbedtls = get_env_key(&mbedtls.to_string()),
+                    libwebsockets = get_env_key(&libwebsockets.to_string()),
                 };
 
-                let sources = vec![
-                    ArtifactSource::new(name, &ttyd_path).build(),
-                    ArtifactSource::new("ttyd-cmake", &cmake_path).build(),
-                    ArtifactSource::new("ttyd-zlib", &zlib_path).build(),
-                    ArtifactSource::new("ttyd-json-c", &json_c_path).build(),
-                    ArtifactSource::new("ttyd-libuv", &libuv_path).build(),
-                    ArtifactSource::new("ttyd-mbedtls", &mbedtls_path).build(),
-                    ArtifactSource::new("ttyd-lws", &lws_path).build(),
+                let sources = vec![ArtifactSource::new(name, &ttyd_path).build()];
+
+                let artifacts = vec![
+                    cmake.to_string(),
+                    zlib.to_string(),
+                    json_c.to_string(),
+                    libuv.to_string(),
+                    mbedtls.to_string(),
+                    libwebsockets.to_string(),
                 ];
-                (sources, script)
+
+                (sources, script, artifacts)
             }
             _ => return Err(anyhow::anyhow!("Unsupported system for ttyd artifact")),
         };
 
-        let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+        let steps = vec![step::shell(context, step_artifacts, vec![], step_script, vec![]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 
