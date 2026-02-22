@@ -113,22 +113,9 @@ impl<'a> Libwebsockets<'a> {
             cmake = get_env_key(&cmake.to_string()),
         };
 
-        let step_artifacts = vec![
-            cmake.to_string(),
-            libuv.to_string(),
-            mbedtls.to_string(),
-        ];
+        let step_artifacts = vec![cmake.to_string(), libuv.to_string(), mbedtls.to_string()];
 
-        let steps = vec![
-            step::shell(
-                context,
-                step_artifacts,
-                vec![],
-                script,
-                vec![],
-            )
-            .await?,
-        ];
+        let steps = vec![step::shell(context, step_artifacts, vec![], script, vec![]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 

@@ -3,8 +3,8 @@ use vorpal_artifacts::{
     artifact::{
         argocd::Argocd, awscli2::Awscli2, bat::Bat, beads::Beads, bottom::Bottom, cmake::Cmake,
         crane::Crane, cue::Cue, direnv::Direnv, doppler::Doppler, fd::Fd, ffmpeg::Ffmpeg,
-        fluxcd::Fluxcd, golangci_lint::GolangciLint, gpg::Gpg, helm::Helm, jj::Jj, jq::Jq,
-        json_c::JsonC, just::Just, k9s::K9s, kn::Kn, kubectl::Kubectl, kubeseal::Kubeseal,
+        fluxcd::Fluxcd, glow::Glow, golangci_lint::GolangciLint, gpg::Gpg, helm::Helm, jj::Jj,
+        jq::Jq, json_c::JsonC, just::Just, k9s::K9s, kn::Kn, kubectl::Kubectl, kubeseal::Kubeseal,
         lazygit::Lazygit, libassuan::Libassuan, libevent::Libevent, libgcrypt::Libgcrypt,
         libgpg_error::LibgpgError, libksba::Libksba, libuv::Libuv, libwebsockets::Libwebsockets,
         lima::Lima, mbedtls::Mbedtls, ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn,
@@ -36,6 +36,7 @@ async fn main() -> Result<()> {
     Fd::new().build(context).await?;
     Ffmpeg::new().build(context).await?;
     Fluxcd::new().build(context).await?;
+    Glow::new().build(context).await?;
     GolangciLint::new().build(context).await?;
     Gpg::new().build(context).await?;
     Helm::new().build(context).await?;

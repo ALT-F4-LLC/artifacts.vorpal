@@ -12,6 +12,7 @@ pub mod fd;
 pub mod ffmpeg;
 pub mod file;
 pub mod fluxcd;
+pub mod glow;
 pub mod golangci_lint;
 pub mod gpg;
 pub mod helm;
