@@ -2,7 +2,7 @@ use crate::artifact::{cmake, libuv, mbedtls, zlib};
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
-    api::artifact::ArtifactSystem::{Aarch64Darwin, X8664Darwin},
+    api::artifact::ArtifactSystem::{Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux},
     artifact::{get_env_key, step, Artifact, ArtifactSource},
     context::ConfigContext,
 };
@@ -114,7 +114,7 @@ impl<'a> Libwebsockets<'a> {
                 -DLWS_WITH_DLO=OFF \
                 \"$LWS_SRC\"
 
-            make -j$(sysctl -n hw.ncpu) install
+            make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu) install
             popd",
             cmake = get_env_key(&cmake.to_string()),
             zlib = get_env_key(&zlib.to_string()),
@@ -138,7 +138,7 @@ impl<'a> Libwebsockets<'a> {
             .await?,
         ];
 
-        let systems = vec![Aarch64Darwin, X8664Darwin];
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 
         Artifact::new(name, steps, systems)
             .with_aliases(vec![format!("{name}:{version}")])

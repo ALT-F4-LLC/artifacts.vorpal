@@ -2,7 +2,7 @@ use crate::artifact::cmake;
 use anyhow::Result;
 use indoc::formatdoc;
 use vorpal_sdk::{
-    api::artifact::ArtifactSystem::{Aarch64Darwin, X8664Darwin},
+    api::artifact::ArtifactSystem::{Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux},
     artifact::{get_env_key, step, Artifact, ArtifactSource},
     context::ConfigContext,
 };
@@ -49,7 +49,7 @@ impl<'a> Libuv<'a> {
                 -DBUILD_TESTING=OFF \
                 -DLIBUV_BUILD_SHARED=OFF \
                 \"$(pwd)/../source/{name}/{name}-{version}\"
-            make -j$(sysctl -n hw.ncpu) install
+            make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu) install
             popd",
             cmake = get_env_key(&cmake.to_string()),
         };
@@ -57,7 +57,7 @@ impl<'a> Libuv<'a> {
         let steps =
             vec![step::shell(context, vec![cmake.to_string()], vec![], script, vec![]).await?];
 
-        let systems = vec![Aarch64Darwin, X8664Darwin];
+        let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 
         Artifact::new(name, steps, systems)
             .with_aliases(vec![format!("{name}:{version}")])
