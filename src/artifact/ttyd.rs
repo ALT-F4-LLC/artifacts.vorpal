@@ -85,11 +85,6 @@ impl<'a> Ttyd<'a> {
             None => &mbedtls::Mbedtls::new().build(context).await?,
         };
 
-        let zlib = match self.zlib {
-            Some(val) => val,
-            None => &zlib::Zlib::new().build(context).await?,
-        };
-
         let name = "ttyd";
         let version = "1.7.7";
 
@@ -119,6 +114,11 @@ impl<'a> Ttyd<'a> {
                 (sources, script, vec![])
             }
             Aarch64Darwin | X8664Darwin => {
+                let zlib = match self.zlib {
+                    Some(val) => val.to_string(),
+                    None => zlib::Zlib::new().build(context).await?,
+                };
+
                 let ttyd_path =
                     format!("https://github.com/tsl0922/ttyd/archive/refs/tags/{version}.tar.gz");
 
@@ -147,7 +147,7 @@ impl<'a> Ttyd<'a> {
                     libuv = get_env_key(&libuv.to_string()),
                     libwebsockets = get_env_key(&libwebsockets.to_string()),
                     mbedtls = get_env_key(&mbedtls.to_string()),
-                    zlib = get_env_key(&zlib.to_string()),
+                    zlib = get_env_key(&zlib),
                 };
 
                 let sources = vec![ArtifactSource::new(name, &ttyd_path).build()];
@@ -158,7 +158,7 @@ impl<'a> Ttyd<'a> {
                     libuv.to_string(),
                     libwebsockets.to_string(),
                     mbedtls.to_string(),
-                    zlib.to_string(),
+                    zlib,
                 ];
 
                 (sources, script, artifacts)

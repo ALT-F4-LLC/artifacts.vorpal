@@ -51,9 +51,20 @@ impl<'a> Libwebsockets<'a> {
             None => &cmake::Cmake::new().build(context).await?,
         };
 
-        let zlib = match self.zlib {
-            Some(val) => val,
-            None => &zlib::Zlib::new().build(context).await?,
+        let is_darwin = matches!(
+            context.get_system(),
+            Aarch64Darwin | X8664Darwin
+        );
+
+        let zlib_owned;
+        let zlib = if is_darwin {
+            zlib_owned = match self.zlib {
+                Some(val) => val.to_string(),
+                None => zlib::Zlib::new().build(context).await?,
+            };
+            Some(zlib_owned.as_str())
+        } else {
+            None
         };
 
         let libuv = match self.libuv {
@@ -74,6 +85,21 @@ impl<'a> Libwebsockets<'a> {
 
         let source = ArtifactSource::new(name, &path).build();
 
+        let cmake_prefix_path = if let Some(zlib) = zlib {
+            format!(
+                "{};{};{}",
+                get_env_key(&zlib.to_string()),
+                get_env_key(&libuv.to_string()),
+                get_env_key(&mbedtls.to_string()),
+            )
+        } else {
+            format!(
+                "{};{}",
+                get_env_key(&libuv.to_string()),
+                get_env_key(&mbedtls.to_string()),
+            )
+        };
+
         let script = formatdoc! {"
             mkdir -pv \"$VORPAL_OUTPUT\"
 
@@ -91,7 +117,7 @@ impl<'a> Libwebsockets<'a> {
                 -DCMAKE_BUILD_TYPE=RELEASE \
                 -DCMAKE_INSTALL_PREFIX=\"$VORPAL_OUTPUT\" \
                 -DCMAKE_FIND_LIBRARY_SUFFIXES=\".a\" \
-                -DCMAKE_PREFIX_PATH=\"{zlib};{libuv};{mbedtls}\" \
+                -DCMAKE_PREFIX_PATH=\"{cmake_prefix_path}\" \
                 -DLWS_WITHOUT_TESTAPPS=ON \
                 -DLWS_WITH_MBEDTLS=ON \
                 -DLWS_WITH_LIBUV=ON \
@@ -117,20 +143,22 @@ impl<'a> Libwebsockets<'a> {
             make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu) install
             popd",
             cmake = get_env_key(&cmake.to_string()),
-            zlib = get_env_key(&zlib.to_string()),
-            libuv = get_env_key(&libuv.to_string()),
-            mbedtls = get_env_key(&mbedtls.to_string()),
         };
+
+        let mut step_artifacts = vec![
+            cmake.to_string(),
+            libuv.to_string(),
+            mbedtls.to_string(),
+        ];
+
+        if let Some(zlib) = zlib {
+            step_artifacts.push(zlib.to_string());
+        }
 
         let steps = vec![
             step::shell(
                 context,
-                vec![
-                    cmake.to_string(),
-                    zlib.to_string(),
-                    libuv.to_string(),
-                    mbedtls.to_string(),
-                ],
+                step_artifacts,
                 vec![],
                 script,
                 vec![],
