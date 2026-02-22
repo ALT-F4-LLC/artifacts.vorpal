@@ -43,6 +43,7 @@ pub mod sqlite3;
 pub mod starship;
 pub mod terraform;
 pub mod tmux;
+pub mod ttyd;
 pub mod umoci;
 pub mod vhs;
 pub mod yq;

@@ -9,7 +9,7 @@ use vorpal_artifacts::{
         lima::Lima, ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
         openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk, pkg_config::PkgConfig,
         readline::Readline, ripgrep::Ripgrep, skopeo::Skopeo, sqlite3::Sqlite3, starship::Starship,
-        terraform::Terraform, tmux::Tmux, umoci::Umoci, vhs::Vhs, yq::Yq, zsh::Zsh,
+        terraform::Terraform, tmux::Tmux, ttyd::Ttyd, umoci::Umoci, vhs::Vhs, yq::Yq, zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
 };
@@ -133,6 +133,8 @@ async fn main() -> Result<()> {
     Starship::new().build(context).await?;
 
     Terraform::new().build(context).await?;
+
+    Ttyd::new().build(context).await?;
 
     Tmux::new()
         .with_libevent(&libevent)
