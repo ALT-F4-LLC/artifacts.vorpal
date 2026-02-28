@@ -46,7 +46,7 @@ impl ProjectEnvironment {
 
         // Artifact
 
-        vorpal_sdk::artifact::ProjectEnvironment::new(&self.name, self.systems)
+        vorpal_sdk::artifact::DevelopmentEnvironment::new(&self.name, self.systems)
             .with_artifacts(vec![lima, protoc, rust_toolchain.clone()])
             .with_environments(vec![
                 format!("PATH={}", rust_toolchain_bin),
