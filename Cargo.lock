@@ -2028,7 +2028,7 @@ dependencies = [
 [[package]]
 name = "vorpal-sdk"
 version = "0.1.0-beta.0"
-source = "git+https://github.com/ALT-F4-LLC/vorpal.git?branch=main#6150777dfd09a7c1c9878c61af22c4cb793fac51"
+source = "git+https://github.com/ALT-F4-LLC/vorpal.git?branch=main#5e4f7b4423fb0fedbde02d363a45e98cc7bf9d8e"
 dependencies = [
  "anyhow",
  "clap",
