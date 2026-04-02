@@ -16,7 +16,7 @@ impl GolangciLint {
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         let name = "golangci-lint";
-        let source_version = "2.7.2";
+        let source_version = "2.11.4";
 
         let source_system = match context.get_system() {
             Aarch64Darwin => "darwin-arm64",
