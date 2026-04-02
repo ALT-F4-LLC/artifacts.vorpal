@@ -55,4 +55,5 @@ pub mod umoci;
 pub mod uv;
 pub mod vhs;
 pub mod yq;
+pub mod zoxide;
 pub mod zsh;

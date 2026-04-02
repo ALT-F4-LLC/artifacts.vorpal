@@ -529,6 +529,14 @@ digest = "912df91581dee3a047324b107a08977d1d51a55b099a6690dc832c6fc7eac100"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "zoxide"
+path = "https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.9/zoxide-0.9.9-aarch64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "cc76b3bfa120e009ea5489f6d77157695534ad4818f0b3d33080beeb98b7fe7b"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "zsh"
 path = "https://downloads.sourceforge.net/project/zsh/zsh/5.9/zsh-5.9.tar.xz"
 includes = []
