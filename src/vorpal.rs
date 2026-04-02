@@ -9,7 +9,7 @@ use vorpal_artifacts::{
         libgpg_error::LibgpgError, libksba::Libksba, libuv::Libuv, libwebsockets::Libwebsockets,
         lima::Lima, mbedtls::Mbedtls, ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn,
         npth::Npth, openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk,
-        pkg_config::PkgConfig, readline::Readline, ripgrep::Ripgrep, skopeo::Skopeo,
+        pkg_config::PkgConfig, readline::Readline, ripgrep::Ripgrep, sesh::Sesh, skopeo::Skopeo,
         sqlite3::Sqlite3, starship::Starship, terraform::Terraform, tmux::Tmux, ttyd::Ttyd,
         umoci::Umoci, uv::Uv, vhs::Vhs, yq::Yq, zsh::Zsh,
     },
@@ -68,6 +68,7 @@ async fn main() -> Result<()> {
     PkgConfig::new().build(context).await?;
     Readline::new().build(context).await?;
     Ripgrep::new().build(context).await?;
+    Sesh::new().build(context).await?;
     Skopeo::new().build(context).await?;
     Sqlite3::new().build(context).await?;
     Starship::new().build(context).await?;

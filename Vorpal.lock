@@ -441,6 +441,14 @@ digest = "17b27bfbf46861bc587e5dc0e04fbc32cbd02f9b111867ffc79653261de7796a"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "sesh"
+path = "https://github.com/joshmedeski/sesh/releases/download/v2.24.2/sesh_Darwin_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "2efb04b9de0b7bc99f87ab3e2a0f20fa9de946f162b45b362a1b626849a19cf7"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "skopeo"
 path = "https://github.com/containers/skopeo/archive/refs/tags/v1.21.0.tar.gz"
 includes = []
