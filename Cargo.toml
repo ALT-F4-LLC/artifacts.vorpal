@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "vorpal-artifacts"
-version = "0.1.0-rc.0"
+version = "0.1.0"
 
 [[bin]]
 name = "vorpal"
@@ -11,4 +11,4 @@ path = "src/vorpal.rs"
 anyhow = "1"
 indoc = { version = "2" }
 tokio = { features = ["rt-multi-thread"], version = "1" }
-vorpal-sdk = { version = "0.1.0-alpha.3" }
+vorpal-sdk = { version = "0.1.0-alpha.4" }
