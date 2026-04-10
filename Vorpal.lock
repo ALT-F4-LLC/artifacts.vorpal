@@ -88,6 +88,30 @@ excludes = []
 digest = "baefba5765f348b83567b41101960588d2ae04512ecaf4f65ecd01ad3b67dfcc"
 platform = "aarch64-darwin"
 
+[sources]]
+name = "cargo"
+path = "https://static.rust-lang.org/dist/cargo-1.93.1-x86_64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "379b758b6be27ddd82ce70a5bbdb4bfe1030cd535271377f8fd51a426080ddee"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "cargo"
+path = "https://static.rust-lang.org/dist/cargo-1.93.1-aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "6b773215302a46b6cfd565539dabc0af9dad01bdd9c37587e7041907ab5b9212"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "cargo"
+path = "https://static.rust-lang.org/dist/cargo-1.93.1-x86_64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "951f83b94d7db62978f2ced9fad0adb201a7a61b993476aac468ec26c29c3798"
+platform = "x86_64-darwin"
+
 [[sources]]
 name = "cargo"
 path = "https://static.rust-lang.org/dist/cargo-1.93.1-aarch64-apple-darwin.tar.gz"
@@ -103,6 +127,30 @@ includes = []
 excludes = []
 digest = "098f2d1d808bc417bfa1dc63419ffedb1781ca65dd780858c0f8f67e9decb57b"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "clippy"
+path = "https://static.rust-lang.org/dist/clippy-1.93.1-aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "4c20fc23ed2870442608ced8a9e9c314a4b27fe78fed356e0092efd377c44681"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "clippy"
+path = "https://static.rust-lang.org/dist/clippy-1.93.1-x86_64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "a5515f5ede4c8c2c751647e710747a021e22df00d6c80778628cded51d24ec70"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "clippy"
+path = "https://static.rust-lang.org/dist/clippy-1.93.1-x86_64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "ccaa3b8977abdc174d1fa28c6cbcbf81848b2b53885ff1f16915d7e47de76087"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "cmake"
@@ -850,6 +898,30 @@ platform = "aarch64-darwin"
 
 [[sources]]
 name = "protoc"
+path = "https://github.com/protocolbuffers/protobuf/releases/download/v34.0/protoc-34.0-osx-x86_64.zip"
+includes = []
+excludes = []
+digest = "337d9687929aaccd10b82bd7103f7dfa57080f312d8c249ce27c7a0db0ab81b0"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "protoc"
+path = "https://github.com/protocolbuffers/protobuf/releases/download/v34.0/protoc-34.0-linux-x86_64.zip"
+includes = []
+excludes = []
+digest = "72ef7563c9bc34409ec1bbc2632479a47a1c99e458346fcb7f4e1ca0c2f4f008"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "protoc"
+path = "https://github.com/protocolbuffers/protobuf/releases/download/v34.0/protoc-34.0-linux-aarch_64.zip"
+includes = []
+excludes = []
+digest = "7c9aae2782708d82aee85e682d364a8cc11f352d55b5fe8ccfc8a6f3ab950d30"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "protoc"
 path = "https://github.com/protocolbuffers/protobuf/releases/download/v34.0/protoc-34.0-osx-aarch_64.zip"
 includes = []
 excludes = []
@@ -890,11 +962,35 @@ platform = "aarch64-darwin"
 
 [[sources]]
 name = "rust-analyzer"
+path = "https://static.rust-lang.org/dist/rust-analyzer-1.93.1-aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "5223513027a92ae11735b44130ac325b97ec0a0192dcf39c6a2c153fa888e05b"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "rust-analyzer"
 path = "https://static.rust-lang.org/dist/rust-analyzer-1.93.1-aarch64-apple-darwin.tar.gz"
 includes = []
 excludes = []
 digest = "5389db13945d33e320e4ddb44c558fda83923ceeac0d9931d6deae8ec2373bd6"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "rust-analyzer"
+path = "https://static.rust-lang.org/dist/rust-analyzer-1.93.1-x86_64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "58a5c8bb5a20021e546153e23211e806b9918ac147d1dfd0aa64688290dd3449"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "rust-analyzer"
+path = "https://static.rust-lang.org/dist/rust-analyzer-1.93.1-x86_64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "edac8e06763f599243d084d763d28ebc0fc4e2022b2bc235645c8e490b3044ca"
+platform = "x86_64-linux"
 
 [[sources]]
 name = "rust-src"
@@ -905,12 +1001,68 @@ digest = "52da4bcd8bd8e2d0ae2635e1503efa8f5838bd18958b983d52336d73896e7172"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "rust-src"
+path = "https://static.rust-lang.org/dist/rust-src-1.93.1.tar.gz"
+includes = []
+excludes = []
+digest = "52da4bcd8bd8e2d0ae2635e1503efa8f5838bd18958b983d52336d73896e7172"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "rust-src"
+path = "https://static.rust-lang.org/dist/rust-src-1.93.1.tar.gz"
+includes = []
+excludes = []
+digest = "52da4bcd8bd8e2d0ae2635e1503efa8f5838bd18958b983d52336d73896e7172"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "rust-src"
+path = "https://static.rust-lang.org/dist/rust-src-1.93.1.tar.gz"
+includes = []
+excludes = []
+digest = "52da4bcd8bd8e2d0ae2635e1503efa8f5838bd18958b983d52336d73896e7172"
+platform = "aarch64-linux"
+
+[[sources]]
 name = "rust-std"
 path = "https://static.rust-lang.org/dist/rust-std-1.93.1-aarch64-apple-darwin.tar.gz"
 includes = []
 excludes = []
 digest = "0db6b692d4782e80abd92bd18a1f0797229472c62f40417cdc975fb8f3413ee3"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "rust-std"
+path = "https://static.rust-lang.org/dist/rust-std-1.93.1-x86_64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "3aed444a8a36a07a4b6eada82981d10fceb8d89b9cfc7d49dfc0df0cf95f178a"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "rust-std"
+path = "https://static.rust-lang.org/dist/rust-std-1.93.1-aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "a1f91e63d9d4183645c49505752051c052b9b59a0a949de04673132bdcd85345"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "rust-std"
+path = "https://static.rust-lang.org/dist/rust-std-1.93.1-x86_64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "d2a48d1e65027c3382c76850179f85ac03c25f318adbf2a97f5b02271bb1eacf"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "rustc"
+path = "https://static.rust-lang.org/dist/rustc-1.93.1-aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "02c90dcbfd3609d669f037e58b2197b73e67519712cebd016bf38e146df41db1"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "rustc"
@@ -921,12 +1073,52 @@ digest = "53c9d5b83e6f2c6b826d29043e36c104a179cc8eeb354424d1799632ec82bd3a"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "rustc"
+path = "https://static.rust-lang.org/dist/rustc-1.93.1-x86_64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "6ff1c992044553d46afbcb9bf352ceb64a82c9d454bbba78eaf555e7d24bc685"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "rustc"
+path = "https://static.rust-lang.org/dist/rustc-1.93.1-x86_64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "9c776eef2f1d76a8ed6c4245e246700c5cd724f96181fb58edb23a172d460bcb"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "rustfmt"
+path = "https://static.rust-lang.org/dist/rustfmt-1.93.1-x86_64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "0c45566683fa70ae7dad317a2d9ef510a16a012cb4240dbd12a69e36ed543fab"
+platform = "x86_64-linux"
+
+[[sources]]
 name = "rustfmt"
 path = "https://static.rust-lang.org/dist/rustfmt-1.93.1-aarch64-apple-darwin.tar.gz"
 includes = []
 excludes = []
 digest = "17b27bfbf46861bc587e5dc0e04fbc32cbd02f9b111867ffc79653261de7796a"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "rustfmt"
+path = "https://static.rust-lang.org/dist/rustfmt-1.93.1-x86_64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "5e57b9561d9990473dd6713e9b3191da3bb2c4ff0f28e4b03e15f552812f437f"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "rustfmt"
+path = "https://static.rust-lang.org/dist/rustfmt-1.93.1-aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "7df0c4d99214e09a0826f9d4cd6259341be8cb324dd5c3d78103705374b76e6c"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "sed"
