@@ -18,9 +18,8 @@ impl Ncurses {
         let name = "ncurses";
         let version = "6.5-20250809";
 
-        let path =
-            format!("https://invisible-mirror.net/archives/ncurses/current/ncurses-{version}.tgz");
-        let source = ArtifactSource::new(name, &path).build();
+        let source_path = format!("https://sdk.vorpal.build/source/ncurses-{version}.tar.gz");
+        let source = ArtifactSource::new(name, &source_path).build();
 
         let step_script = formatdoc! {"
             mkdir -pv \"$VORPAL_OUTPUT\"

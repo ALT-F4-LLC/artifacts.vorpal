@@ -66,7 +66,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: ALT-F4-LLC/setup-vorpal-action@0.1.0
+      - uses: ALT-F4-LLC/setup-vorpal-action@0.1.1
         with:
           registry-backend: s3
           registry-backend-s3-bucket: altf4llc-vorpal-registry
@@ -100,7 +100,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: ALT-F4-LLC/setup-vorpal-action@0.1.0
+      - uses: ALT-F4-LLC/setup-vorpal-action@0.1.1
         with:
           registry-backend: s3
           registry-backend-s3-bucket: altf4llc-vorpal-registry
