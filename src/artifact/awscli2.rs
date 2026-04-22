@@ -27,6 +27,7 @@ impl Awscli2 {
                     mkdir -pv \"$VORPAL_OUTPUT\"
                     pushd ./source/{name}
                     chmod +x ./aws/install
+                    chmod +x ./aws/dist/aws ./aws/dist/aws_completer
                     ./aws/install --install-dir \"$VORPAL_OUTPUT\" --bin-dir \"$VORPAL_OUTPUT/bin\"",
                 };
                 (path, script)
@@ -39,6 +40,7 @@ impl Awscli2 {
                     mkdir -pv \"$VORPAL_OUTPUT\"
                     pushd ./source/{name}
                     chmod +x ./aws/install
+                    chmod +x ./aws/dist/aws ./aws/dist/aws_completer
                     ./aws/install --install-dir \"$VORPAL_OUTPUT\" --bin-dir \"$VORPAL_OUTPUT/bin\"",
                 };
                 (path, script)
