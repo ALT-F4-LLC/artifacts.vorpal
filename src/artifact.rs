@@ -45,6 +45,7 @@ pub mod openjdk;
 pub mod pkg_config;
 pub mod readline;
 pub mod ripgrep;
+pub mod sccache;
 pub mod sesh;
 pub mod skopeo;
 pub mod sqlite3;
