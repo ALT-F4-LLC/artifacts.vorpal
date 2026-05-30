@@ -929,6 +929,14 @@ digest = "127096050676822f1f9f18e2bdf847f74907ec691562959cdcbf07e7d524012c"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "gum"
+path = "https://github.com/charmbracelet/gum/releases/download/v0.17.0/gum_0.17.0_Darwin_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "ae3c5778aaf3e3c06757b7c1cf11771a6dddf96b215d1fc21d34aac4104f4eec"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "gzip"
 path = "https://sdk.vorpal.build/source/gzip-1.14.tar.gz"
 includes = []

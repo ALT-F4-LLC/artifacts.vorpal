@@ -16,6 +16,7 @@ pub mod fzf;
 pub mod glow;
 pub mod golangci_lint;
 pub mod gpg;
+pub mod gum;
 pub mod helm;
 pub mod jj;
 pub mod jq;
