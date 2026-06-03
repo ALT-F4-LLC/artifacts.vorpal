@@ -2,13 +2,13 @@ use anyhow::Result;
 use vorpal_artifacts::{
     artifact::{
         argocd::Argocd, awscli2::Awscli2, bat::Bat, beads::Beads, bottom::Bottom, cmake::Cmake,
-        crane::Crane, cue::Cue, direnv::Direnv, doppler::Doppler, fd::Fd, ffmpeg::Ffmpeg,
-        fluxcd::Fluxcd, fzf::Fzf, glow::Glow, golangci_lint::GolangciLint, gpg::Gpg, gum::Gum,
-        helm::Helm, jj::Jj, jq::Jq, json_c::JsonC, just::Just, k9s::K9s, kind::Kind, kn::Kn,
-        kubectl::Kubectl, kubeseal::Kubeseal, lazygit::Lazygit, libassuan::Libassuan,
-        libevent::Libevent, libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba,
-        libuv::Libuv, libwebsockets::Libwebsockets, lima::Lima, mbedtls::Mbedtls, ncurses::Ncurses,
-        neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
+        crane::Crane, cue::Cue, direnv::Direnv, doppler::Doppler, eksctl::Eksctl, fd::Fd,
+        ffmpeg::Ffmpeg, fluxcd::Fluxcd, fzf::Fzf, glow::Glow, golangci_lint::GolangciLint,
+        gpg::Gpg, gum::Gum, helm::Helm, jj::Jj, jq::Jq, json_c::JsonC, just::Just, k9s::K9s,
+        kind::Kind, kn::Kn, kubectl::Kubectl, kubeseal::Kubeseal, lazygit::Lazygit,
+        libassuan::Libassuan, libevent::Libevent, libgcrypt::Libgcrypt, libgpg_error::LibgpgError,
+        libksba::Libksba, libuv::Libuv, libwebsockets::Libwebsockets, lima::Lima, mbedtls::Mbedtls,
+        ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
         openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk, pkg_config::PkgConfig,
         readline::Readline, ripgrep::Ripgrep, sccache::Sccache, sesh::Sesh, skopeo::Skopeo,
         sqlite3::Sqlite3, starship::Starship, terraform::Terraform, tmux::Tmux, ttyd::Ttyd,
@@ -34,6 +34,7 @@ async fn main() -> Result<()> {
     Cue::new().build(context).await?;
     Direnv::new().build(context).await?;
     Doppler::new().build(context).await?;
+    Eksctl::new().build(context).await?;
     Fd::new().build(context).await?;
     Ffmpeg::new().build(context).await?;
     Fluxcd::new().build(context).await?;

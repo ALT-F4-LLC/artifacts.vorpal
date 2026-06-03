@@ -8,6 +8,7 @@ pub mod crane;
 pub mod cue;
 pub mod direnv;
 pub mod doppler;
+pub mod eksctl;
 pub mod fd;
 pub mod ffmpeg;
 pub mod file;
