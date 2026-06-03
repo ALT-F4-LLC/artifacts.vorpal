@@ -1145,6 +1145,14 @@ digest = "fcc42954aea2023650adcd8f73e1a186e1dff84b8563692536f593f8eb4d6d8c"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "kind"
+path = "https://github.com/kubernetes-sigs/kind/releases/download/v0.31.0/kind-darwin-arm64"
+includes = []
+excludes = []
+digest = "7ef32c70c300b401008dc76a529b30d7fcf6dae289648d51168e520d2b0f6ecc"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "kn"
 path = "https://github.com/knative/client/releases/download/knative-v1.20.0/kn-linux-arm64"
 includes = []

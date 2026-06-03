@@ -4,10 +4,10 @@ use vorpal_artifacts::{
         argocd::Argocd, awscli2::Awscli2, bat::Bat, beads::Beads, bottom::Bottom, cmake::Cmake,
         crane::Crane, cue::Cue, direnv::Direnv, doppler::Doppler, fd::Fd, ffmpeg::Ffmpeg,
         fluxcd::Fluxcd, fzf::Fzf, glow::Glow, golangci_lint::GolangciLint, gpg::Gpg, gum::Gum,
-        helm::Helm, jj::Jj, jq::Jq, json_c::JsonC, just::Just, k9s::K9s, kn::Kn, kubectl::Kubectl,
-        kubeseal::Kubeseal, lazygit::Lazygit, libassuan::Libassuan, libevent::Libevent,
-        libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba, libuv::Libuv,
-        libwebsockets::Libwebsockets, lima::Lima, mbedtls::Mbedtls, ncurses::Ncurses,
+        helm::Helm, jj::Jj, jq::Jq, json_c::JsonC, just::Just, k9s::K9s, kind::Kind, kn::Kn,
+        kubectl::Kubectl, kubeseal::Kubeseal, lazygit::Lazygit, libassuan::Libassuan,
+        libevent::Libevent, libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba,
+        libuv::Libuv, libwebsockets::Libwebsockets, lima::Lima, mbedtls::Mbedtls, ncurses::Ncurses,
         neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
         openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk, pkg_config::PkgConfig,
         readline::Readline, ripgrep::Ripgrep, sccache::Sccache, sesh::Sesh, skopeo::Skopeo,
@@ -48,6 +48,7 @@ async fn main() -> Result<()> {
     JsonC::new().build(context).await?;
     Just::new().build(context).await?;
     K9s::new().build(context).await?;
+    Kind::new().build(context).await?;
     Kn::new().build(context).await?;
     Kubectl::new().build(context).await?;
     Kubeseal::new().build(context).await?;

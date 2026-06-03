@@ -23,6 +23,7 @@ pub mod jq;
 pub mod json_c;
 pub mod just;
 pub mod k9s;
+pub mod kind;
 pub mod kn;
 pub mod kubectl;
 pub mod kubeseal;
