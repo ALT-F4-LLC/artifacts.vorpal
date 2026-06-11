@@ -11,8 +11,8 @@ use vorpal_artifacts::{
         ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
         openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk, pkg_config::PkgConfig,
         readline::Readline, ripgrep::Ripgrep, sccache::Sccache, sesh::Sesh, skopeo::Skopeo,
-        sqlite3::Sqlite3, starship::Starship, terraform::Terraform, tmux::Tmux, ttyd::Ttyd,
-        umoci::Umoci, uv::Uv, vhs::Vhs, yq::Yq, zoxide::Zoxide, zsh::Zsh,
+        sqlite3::Sqlite3, starship::Starship, talosctl::Talosctl, terraform::Terraform, tmux::Tmux,
+        ttyd::Ttyd, umoci::Umoci, uv::Uv, vhs::Vhs, yq::Yq, zoxide::Zoxide, zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
 };
@@ -78,6 +78,7 @@ async fn main() -> Result<()> {
     Skopeo::new().build(context).await?;
     Sqlite3::new().build(context).await?;
     Starship::new().build(context).await?;
+    Talosctl::new().build(context).await?;
     Terraform::new().build(context).await?;
     Tmux::new().build(context).await?;
     Ttyd::new().build(context).await?;

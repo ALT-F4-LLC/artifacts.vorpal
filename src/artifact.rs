@@ -53,6 +53,7 @@ pub mod sesh;
 pub mod skopeo;
 pub mod sqlite3;
 pub mod starship;
+pub mod talosctl;
 pub mod terraform;
 pub mod tmux;
 pub mod ttyd;
