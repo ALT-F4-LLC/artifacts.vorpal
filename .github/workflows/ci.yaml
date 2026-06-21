@@ -1,4 +1,4 @@
-name: vorpal
+name: ci
 
 on:
   pull_request:
@@ -11,49 +11,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
 jobs:
-  build-changes:
-    runs-on: ubuntu-latest
-    outputs:
-      artifacts: ${{ steps.filter.outputs.artifacts }}
-      has_changes: ${{ steps.filter.outputs.has_changes }}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Detect changed artifacts
-        id: filter
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BASE_SHA="${{ github.event.pull_request.base.sha }}"
-          else
-            BASE_SHA="${{ github.event.before }}"
-
-            if [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
-              BASE_SHA=""
-            fi
-          fi
-
-          if [ -z "$BASE_SHA" ]; then
-            echo "No base SHA available, building all artifacts"
-
-            ARTIFACTS_JSON=$(script/detect-changed-artifacts.sh --all)
-          else
-            echo "Comparing $BASE_SHA to ${{ github.sha }}"
-
-            ARTIFACTS_JSON=$(script/detect-changed-artifacts.sh "$BASE_SHA" "${{ github.sha }}")
-          fi
-
-          echo "Artifacts to build: $ARTIFACTS_JSON"
-
-          if [ "$ARTIFACTS_JSON" = "[]" ]; then
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-            echo "artifacts=[]" >> $GITHUB_OUTPUT
-          else
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-            echo "artifacts=$ARTIFACTS_JSON" >> $GITHUB_OUTPUT
-          fi
-
   build-dev:
     runs-on: ${{ matrix.runner }}
     strategy:
@@ -83,15 +40,79 @@ jobs:
           path: Vorpal.lock
 
   build:
-    if: needs.build-changes.outputs.has_changes == 'true'
     needs:
       - build-dev
-      - build-changes
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        artifact: ${{ fromJson(needs.build-changes.outputs.artifacts) }}
+        artifact:
+          # - argocd
+          # - awscli2
+          # - bat
+          # - beads
+          # - bottom
+          # - cmake
+          # - crane
+          # - cue
+          # - direnv
+          # - doppler
+          # - eksctl
+          # - fd
+          # - ffmpeg
+          # - file
+          # - fluxcd
+          # - fzf
+          # - glow
+          # - golangci_lint
+          # - gpg
+          # - gum
+          # - helm
+          # - jj
+          # - jq
+          # - json_c
+          # - just
+          # - k9s
+          # - kind
+          # - kn
+          # - kubectl
+          # - kubeseal
+          # - lazygit
+          # - libassuan
+          # - libevent
+          # - libgcrypt
+          # - libgpg_error
+          # - libksba
+          # - libuv
+          # - libwebsockets
+          # - lima
+          # - mbedtls
+          # - ncurses
+          # - neovim
+          # - nginx
+          # - nnn
+          # - npth
+          # - openapi_generator_cli
+          # - openjdk
+          # - pkg_config
+          # - readline
+          # - ripgrep
+          # - sccache
+          # - sesh
+          # - skopeo
+          # - sqlite3
+          # - starship
+          # - talosctl
+          # - terraform
+          # - tmux
+          # - ttyd
+          # - umoci
+          - uv
+          # - vhs
+          # - yq
+          # - zlib
+          # - zoxide
+          # - zsh
         runner:
           - macos-latest
           - macos-latest-large
