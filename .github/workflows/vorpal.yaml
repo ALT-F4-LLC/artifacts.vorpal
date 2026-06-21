@@ -40,10 +40,8 @@ jobs:
           path: Vorpal.lock
 
   build:
-    if: needs.build-changes.outputs.has_changes == 'true'
     needs:
       - build-dev
-      - build-changes
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
