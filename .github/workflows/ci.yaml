@@ -1,4 +1,4 @@
-name: vorpal
+name: ci
 
 on:
   pull_request:
