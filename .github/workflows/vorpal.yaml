@@ -17,7 +17,7 @@ jobs:
       artifacts: ${{ steps.filter.outputs.artifacts }}
       has_changes: ${{ steps.filter.outputs.has_changes }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -64,7 +64,7 @@ jobs:
           - ubuntu-latest
           - ubuntu-latest-arm64
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: ALT-F4-LLC/setup-vorpal-action@0.1.1
         with:
@@ -99,7 +99,7 @@ jobs:
           - ubuntu-latest
           - ubuntu-latest-arm64
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: ALT-F4-LLC/setup-vorpal-action@0.1.1
         with:
