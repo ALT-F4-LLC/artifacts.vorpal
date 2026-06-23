@@ -6,6 +6,7 @@ pub mod bottom;
 pub mod cmake;
 pub mod crane;
 pub mod cue;
+pub mod delta;
 pub mod direnv;
 pub mod doppler;
 pub mod eksctl;
