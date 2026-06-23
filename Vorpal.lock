@@ -417,6 +417,14 @@ digest = "2f4bfe5eb47cf2325d70469a0488a20d0b451d622c5b4bbf02935c5661d9de36"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "delta"
+path = "https://github.com/dandavison/delta/releases/download/0.18.2/delta-0.18.2-aarch64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "5d91e97d17f534ad0edbebcc1d424d22163b1c93d0555d325c76094d5a047a98"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "diffutils"
 path = "https://sdk.vorpal.build/source/diffutils-3.12.tar.xz"
 includes = []

@@ -2,8 +2,8 @@ use anyhow::Result;
 use vorpal_artifacts::{
     artifact::{
         argocd::Argocd, awscli2::Awscli2, bat::Bat, beads::Beads, bottom::Bottom, cmake::Cmake,
-        crane::Crane, cue::Cue, direnv::Direnv, doppler::Doppler, eksctl::Eksctl, fd::Fd,
-        ffmpeg::Ffmpeg, fluxcd::Fluxcd, fzf::Fzf, glow::Glow, golangci_lint::GolangciLint,
+        crane::Crane, cue::Cue, delta::Delta, direnv::Direnv, doppler::Doppler, eksctl::Eksctl,
+        fd::Fd, ffmpeg::Ffmpeg, fluxcd::Fluxcd, fzf::Fzf, glow::Glow, golangci_lint::GolangciLint,
         gpg::Gpg, gum::Gum, helm::Helm, jj::Jj, jq::Jq, json_c::JsonC, just::Just, k9s::K9s,
         kind::Kind, kn::Kn, kubectl::Kubectl, kubeseal::Kubeseal, lazygit::Lazygit,
         libassuan::Libassuan, libevent::Libevent, libgcrypt::Libgcrypt, libgpg_error::LibgpgError,
@@ -32,6 +32,7 @@ async fn main() -> Result<()> {
     Cmake::new().build(context).await?;
     Crane::new().build(context).await?;
     Cue::new().build(context).await?;
+    Delta::new().build(context).await?;
     Direnv::new().build(context).await?;
     Doppler::new().build(context).await?;
     Eksctl::new().build(context).await?;
