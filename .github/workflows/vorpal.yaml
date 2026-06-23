@@ -1,0 +1,114 @@
+name: vorpal
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+
+jobs:
+  build-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      artifacts: ${{ steps.filter.outputs.artifacts }}
+      has_changes: ${{ steps.filter.outputs.has_changes }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed artifacts
+        id: filter
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE_SHA="${{ github.event.before }}"
+
+            if [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+              BASE_SHA=""
+            fi
+          fi
+
+          if [ -z "$BASE_SHA" ]; then
+            echo "No base SHA available, building all artifacts"
+
+            ARTIFACTS_JSON=$(script/detect-changed-artifacts.sh --all)
+          else
+            echo "Comparing $BASE_SHA to ${{ github.sha }}"
+
+            ARTIFACTS_JSON=$(script/detect-changed-artifacts.sh "$BASE_SHA" "${{ github.sha }}")
+          fi
+
+          echo "Artifacts to build: $ARTIFACTS_JSON"
+
+          if [ "$ARTIFACTS_JSON" = "[]" ]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "artifacts=[]" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "artifacts=$ARTIFACTS_JSON" >> $GITHUB_OUTPUT
+          fi
+
+  build-dev:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        runner:
+          - macos-latest
+          - macos-latest-large
+          - ubuntu-latest
+          - ubuntu-latest-arm64
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ALT-F4-LLC/setup-vorpal-action@0.1.1
+        with:
+          registry-backend: "s3"
+          registry-backend-s3-bucket: "altf4llc-vorpal-registry"
+          version: "0.2.2"
+        env:
+          AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+          AWS_DEFAULT_REGION: "${{ vars.AWS_DEFAULT_REGION }}"
+          AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+
+      - run: vorpal build 'dev'
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ runner.arch }}-${{ runner.os }}-vorpal-lock
+          path: Vorpal.lock
+
+  build:
+    if: needs.build-changes.outputs.has_changes == 'true'
+    needs:
+      - build-dev
+      - build-changes
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        artifact: ${{ fromJson(needs.build-changes.outputs.artifacts) }}
+        runner:
+          - macos-latest
+          - macos-latest-large
+          - ubuntu-latest
+          - ubuntu-latest-arm64
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ALT-F4-LLC/setup-vorpal-action@0.1.1
+        with:
+          registry-backend: "s3"
+          registry-backend-s3-bucket: "altf4llc-vorpal-registry"
+          version: "0.2.2"
+        env:
+          AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+          AWS_DEFAULT_REGION: "${{ vars.AWS_DEFAULT_REGION }}"
+          AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+
+      - run: vorpal build '${{ matrix.artifact }}'
