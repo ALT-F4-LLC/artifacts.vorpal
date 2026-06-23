@@ -2410,35 +2410,11 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "starship"
-path = "https://github.com/starship/starship/releases/download/v1.21.1/starship-aarch64-apple-darwin.tar.gz"
+path = "https://github.com/starship/starship/releases/download/v1.25.1/starship-aarch64-apple-darwin.tar.gz"
 includes = []
 excludes = []
-digest = "38aa27a0ae3eed8a6ebf1039caf1b01dd849380fd26f41bcad989476665251ee"
+digest = "43fcef328b7ddd3f8e2b2ceb7adefb9dca5719c853627f26a25ac7f2a1e2faee"
 platform = "aarch64-darwin"
-
-[[sources]]
-name = "starship"
-path = "https://github.com/starship/starship/releases/download/v1.21.1/starship-x86_64-apple-darwin.tar.gz"
-includes = []
-excludes = []
-digest = "971e28de87b263f0c20cba89b3719c053c6bc45aeea8fbab9545709efb7547b9"
-platform = "x86_64-darwin"
-
-[[sources]]
-name = "starship"
-path = "https://github.com/starship/starship/releases/download/v1.21.1/starship-x86_64-unknown-linux-musl.tar.gz"
-includes = []
-excludes = []
-digest = "c1de2c33b37d6d72bf65e4416e050fec3ca952bf472a835ca178526ed9a79c2f"
-platform = "x86_64-linux"
-
-[[sources]]
-name = "starship"
-path = "https://github.com/starship/starship/releases/download/v1.21.1/starship-aarch64-unknown-linux-musl.tar.gz"
-includes = []
-excludes = []
-digest = "d8556139752336799737c98ebacbadc0c8c1c7268da2f0b89110b391bd93b19c"
-platform = "aarch64-linux"
 
 [[sources]]
 name = "talosctl"

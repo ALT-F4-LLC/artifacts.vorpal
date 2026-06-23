@@ -16,7 +16,7 @@ impl Starship {
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         let name = "starship";
-        let source_version = "1.21.1";
+        let source_version = "1.25.1";
 
         let source_system = match context.get_system() {
             Aarch64Darwin => "aarch64-apple-darwin",
