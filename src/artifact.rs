@@ -64,6 +64,7 @@ pub mod typescript_language_server;
 pub mod umoci;
 pub mod uv;
 pub mod vhs;
+pub mod vscode_langservers_extracted;
 pub mod yq;
 pub mod zoxide;
 pub mod zsh;
