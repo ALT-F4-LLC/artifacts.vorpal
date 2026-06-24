@@ -1,21 +1,21 @@
 use anyhow::Result;
 use vorpal_artifacts::{
     artifact::{
-        argocd::Argocd, awscli2::Awscli2, bat::Bat, beads::Beads, bottom::Bottom, cmake::Cmake,
-        crane::Crane, cue::Cue, delta::Delta, direnv::Direnv, doppler::Doppler, eksctl::Eksctl,
-        fd::Fd, ffmpeg::Ffmpeg, fluxcd::Fluxcd, fzf::Fzf, glow::Glow, golangci_lint::GolangciLint,
-        gpg::Gpg, gum::Gum, helm::Helm, jj::Jj, jq::Jq, json_c::JsonC, just::Just, k9s::K9s,
-        kind::Kind, kn::Kn, kubectl::Kubectl, kubeseal::Kubeseal, lazygit::Lazygit,
-        libassuan::Libassuan, libevent::Libevent, libgcrypt::Libgcrypt, libgpg_error::LibgpgError,
-        libksba::Libksba, libuv::Libuv, libwebsockets::Libwebsockets, lima::Lima,
-        lua_language_server::LuaLanguageServer, mbedtls::Mbedtls, ncurses::Ncurses, neovim::Neovim,
-        nginx::Nginx, nnn::Nnn, npth::Npth, openapi_generator_cli::OpenapiGeneratorCli,
-        openjdk::Openjdk, pkg_config::PkgConfig, readline::Readline, ripgrep::Ripgrep,
-        sccache::Sccache, sesh::Sesh, skopeo::Skopeo, sqlite3::Sqlite3, starship::Starship,
-        talosctl::Talosctl, terraform::Terraform, terraform_ls::TerraformLs, tmux::Tmux,
-        tree_sitter::TreeSitter, ttyd::Ttyd, typescript::Typescript,
-        typescript_language_server::TypescriptLanguageServer, umoci::Umoci, uv::Uv, vhs::Vhs,
-        vscode_langservers_extracted::VscodeLangserversExtracted,
+        argocd::Argocd, awscli2::Awscli2, bash_language_server::BashLanguageServer, bat::Bat,
+        beads::Beads, bottom::Bottom, cmake::Cmake, crane::Crane, cue::Cue, delta::Delta,
+        direnv::Direnv, doppler::Doppler, eksctl::Eksctl, fd::Fd, ffmpeg::Ffmpeg, fluxcd::Fluxcd,
+        fzf::Fzf, glow::Glow, golangci_lint::GolangciLint, gpg::Gpg, gum::Gum, helm::Helm, jj::Jj,
+        jq::Jq, json_c::JsonC, just::Just, k9s::K9s, kind::Kind, kn::Kn, kubectl::Kubectl,
+        kubeseal::Kubeseal, lazygit::Lazygit, libassuan::Libassuan, libevent::Libevent,
+        libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba, libuv::Libuv,
+        libwebsockets::Libwebsockets, lima::Lima, lua_language_server::LuaLanguageServer,
+        mbedtls::Mbedtls, ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
+        openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk, pkg_config::PkgConfig,
+        readline::Readline, ripgrep::Ripgrep, sccache::Sccache, sesh::Sesh, skopeo::Skopeo,
+        sqlite3::Sqlite3, starship::Starship, talosctl::Talosctl, terraform::Terraform,
+        terraform_ls::TerraformLs, tmux::Tmux, tree_sitter::TreeSitter, ttyd::Ttyd,
+        typescript::Typescript, typescript_language_server::TypescriptLanguageServer, umoci::Umoci,
+        uv::Uv, vhs::Vhs, vscode_langservers_extracted::VscodeLangserversExtracted,
         yaml_language_server::YamlLanguageServer, yq::Yq, zoxide::Zoxide, zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
@@ -30,6 +30,7 @@ async fn main() -> Result<()> {
 
     Argocd::new().build(context).await?;
     Awscli2::new().build(context).await?;
+    BashLanguageServer::new().build(context).await?;
     Bat::new().build(context).await?;
     Beads::new().build(context).await?;
     Bottom::new().build(context).await?;
