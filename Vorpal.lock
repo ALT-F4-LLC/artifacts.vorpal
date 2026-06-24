@@ -2553,6 +2553,14 @@ digest = "44444464088bfaca1b661ae019259cd92586fd91a80209aabaac9a3fe0dc912a"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "typescript-language-server"
+path = "https://registry.npmjs.org/typescript-language-server/-/typescript-language-server-5.3.0.tgz"
+includes = []
+excludes = []
+digest = "a7a1f522fb471627564b358892dce3f611fdbe1224e05a2e993d0cd01ea776ad"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "umoci"
 path = "https://github.com/opencontainers/umoci/archive/refs/tags/v0.6.0.tar.gz"
 includes = []
