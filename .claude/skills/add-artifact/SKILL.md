@@ -326,7 +326,7 @@ Two insertions, both in **alphabetical order**:
 
 ## Step 7: Verification (Mandatory Gate)
 
-**IMPORTANT: The artifact is NOT considered done until `vorpal build <artifact-name>` succeeds. This step is a mandatory validation gate — do NOT mark the task as complete, close the issue, or report success unless the build passes.**
+**IMPORTANT: The artifact is NOT considered done until `vorpal build <artifact-name>` succeeds on the native host OS. This step is a mandatory validation gate — do NOT mark the task as complete, close the issue, or report success unless the build passes.**
 
 Run these commands in order:
 
@@ -350,6 +350,8 @@ If `cargo check` passes after formatting, run the build for each new artifact:
 vorpal build <artifact-name>
 ```
 
+`vorpal build` targets the native host OS and architecture by default (the `--system` flag defaults to the host system, e.g. `aarch64-darwin` on Apple Silicon). Do NOT pass `--system` to target a different platform, and do NOT attempt Lima (Linux-on-macOS VM) builds unless the operator explicitly instructs you to do so.
+
 If the build fails, debug and fix the artifact implementation. Common issues:
 - Wrong download URL or URL pattern
 - Wrong archive extraction path (check what directory the archive creates)
@@ -358,7 +360,7 @@ If the build fails, debug and fix the artifact implementation. Common issues:
 
 Re-run `vorpal build <artifact-name>` until it succeeds with no errors.
 
-**A successful `vorpal build <artifact-name>` is the ONLY criteria that validates the artifact works. The task MUST NOT be reported as complete or successful if this command has not run and passed.**
+**A successful `vorpal build <artifact-name>` on the native host is the ONLY criteria that validates the artifact works. The task MUST NOT be reported as complete or successful if this command has not run and passed.**
 
 ## Step 8: Edge Cases
 
