@@ -16,7 +16,7 @@ impl Neovim {
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         let name = "neovim";
-        let source_version = "0.11.5";
+        let source_version = "0.12.3";
 
         let source_system = match context.get_system() {
             Aarch64Darwin => "macos-arm64",

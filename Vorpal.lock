@@ -1746,34 +1746,10 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "neovim"
-path = "https://github.com/neovim/neovim/releases/download/v0.11.5/nvim-linux-arm64.tar.gz"
+path = "https://github.com/neovim/neovim/releases/download/v0.12.3/nvim-macos-arm64.tar.gz"
 includes = []
 excludes = []
-digest = "6e03e77f6d8a8f34b895dee805b5f7d15fd484cbfa11b59e095de6b0b7dfcb5e"
-platform = "aarch64-linux"
-
-[[sources]]
-name = "neovim"
-path = "https://github.com/neovim/neovim/releases/download/v0.11.5/nvim-macos-x86_64.tar.gz"
-includes = []
-excludes = []
-digest = "7fc3c32bffdc8b5f41e020cc4a74bb3abeb18b7ebfb91678acc55fe52ddfeb6b"
-platform = "x86_64-darwin"
-
-[[sources]]
-name = "neovim"
-path = "https://github.com/neovim/neovim/releases/download/v0.11.5/nvim-linux-x86_64.tar.gz"
-includes = []
-excludes = []
-digest = "be12bbc585adb677e1e606f566bf89c59d55e7fcd1ac64e00f63dfd7a72661b4"
-platform = "x86_64-linux"
-
-[[sources]]
-name = "neovim"
-path = "https://github.com/neovim/neovim/releases/download/v0.11.5/nvim-macos-arm64.tar.gz"
-includes = []
-excludes = []
-digest = "da3c22a264be57f9aa55f1596360f5d599e57d2f447c3e8fbe54782c762709ae"
+digest = "54110529d739e5b8811f222df075c49d4d17ac442f8d95153f1ca4d434035949"
 platform = "aarch64-darwin"
 
 [[sources]]
