@@ -12,10 +12,10 @@ use vorpal_artifacts::{
         nginx::Nginx, nnn::Nnn, npth::Npth, openapi_generator_cli::OpenapiGeneratorCli,
         openjdk::Openjdk, pkg_config::PkgConfig, readline::Readline, ripgrep::Ripgrep,
         sccache::Sccache, sesh::Sesh, skopeo::Skopeo, sqlite3::Sqlite3, starship::Starship,
-        talosctl::Talosctl, terraform::Terraform, tmux::Tmux, tree_sitter::TreeSitter, ttyd::Ttyd,
-        typescript::Typescript, typescript_language_server::TypescriptLanguageServer, umoci::Umoci,
-        uv::Uv, vhs::Vhs, vscode_langservers_extracted::VscodeLangserversExtracted, yq::Yq,
-        zoxide::Zoxide, zsh::Zsh,
+        talosctl::Talosctl, terraform::Terraform, terraform_ls::TerraformLs, tmux::Tmux,
+        tree_sitter::TreeSitter, ttyd::Ttyd, typescript::Typescript,
+        typescript_language_server::TypescriptLanguageServer, umoci::Umoci, uv::Uv, vhs::Vhs,
+        vscode_langservers_extracted::VscodeLangserversExtracted, yq::Yq, zoxide::Zoxide, zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
 };
@@ -85,6 +85,7 @@ async fn main() -> Result<()> {
     Starship::new().build(context).await?;
     Talosctl::new().build(context).await?;
     Terraform::new().build(context).await?;
+    TerraformLs::new().build(context).await?;
     Tmux::new().build(context).await?;
     TreeSitter::new().build(context).await?;
     Ttyd::new().build(context).await?;
