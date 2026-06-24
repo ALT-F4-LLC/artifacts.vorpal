@@ -12,7 +12,8 @@ use vorpal_artifacts::{
         openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk, pkg_config::PkgConfig,
         readline::Readline, ripgrep::Ripgrep, sccache::Sccache, sesh::Sesh, skopeo::Skopeo,
         sqlite3::Sqlite3, starship::Starship, talosctl::Talosctl, terraform::Terraform, tmux::Tmux,
-        ttyd::Ttyd, umoci::Umoci, uv::Uv, vhs::Vhs, yq::Yq, zoxide::Zoxide, zsh::Zsh,
+        tree_sitter::TreeSitter, ttyd::Ttyd, umoci::Umoci, uv::Uv, vhs::Vhs, yq::Yq,
+        zoxide::Zoxide, zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
 };
@@ -82,6 +83,7 @@ async fn main() -> Result<()> {
     Talosctl::new().build(context).await?;
     Terraform::new().build(context).await?;
     Tmux::new().build(context).await?;
+    TreeSitter::new().build(context).await?;
     Ttyd::new().build(context).await?;
     Umoci::new().build(context).await?;
     Uv::new().build(context).await?;

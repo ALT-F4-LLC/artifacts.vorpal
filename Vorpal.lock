@@ -2497,6 +2497,14 @@ digest = "70691bfbbe623d25d99561192dfb52211ca7e1fa120271c57ae56fe24ca97521"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "tree-sitter"
+path = "https://github.com/tree-sitter/tree-sitter/releases/download/v0.26.9/tree-sitter-cli-macos-arm64.zip"
+includes = []
+excludes = []
+digest = "a2fcfe68911f1076f81258f9bed01cb6c53f7be3068ea71dc0d3f08857922a6f"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "ttyd"
 path = "https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.aarch64"
 includes = []
