@@ -38,6 +38,7 @@ pub mod libksba;
 pub mod libuv;
 pub mod libwebsockets;
 pub mod lima;
+pub mod lua_language_server;
 pub mod mbedtls;
 pub mod ncurses;
 pub mod neovim;
