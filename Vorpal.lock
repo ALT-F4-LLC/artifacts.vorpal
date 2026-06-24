@@ -1817,6 +1817,14 @@ digest = "a0a9e0cff52847ffdd91673adc7dffbda2177e67a87d7fdba5717c898ea0518f"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "nodejs"
+path = "https://sdk.vorpal.build/source/node-v22.22.0-darwin-arm64.tar.gz"
+includes = []
+excludes = []
+digest = "852a244f9da062f7d22326a7bc3d7836745521232bd44b06468ec48e1cf359e4"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "npth"
 path = "https://gnupg.org/ftp/gcrypt/npth/npth-1.8.tar.bz2"
 includes = []
@@ -2535,6 +2543,14 @@ includes = []
 excludes = []
 digest = "cc01828c5c863fa5c0e46bd66da7a27ba588c81c57e2580fe0f7f7ba31114bae"
 platform = "x86_64-darwin"
+
+[[sources]]
+name = "typescript"
+path = "https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz"
+includes = []
+excludes = []
+digest = "44444464088bfaca1b661ae019259cd92586fd91a80209aabaac9a3fe0dc912a"
+platform = "aarch64-darwin"
 
 [[sources]]
 name = "umoci"
