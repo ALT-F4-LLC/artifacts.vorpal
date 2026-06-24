@@ -7,14 +7,15 @@ use vorpal_artifacts::{
         gpg::Gpg, gum::Gum, helm::Helm, jj::Jj, jq::Jq, json_c::JsonC, just::Just, k9s::K9s,
         kind::Kind, kn::Kn, kubectl::Kubectl, kubeseal::Kubeseal, lazygit::Lazygit,
         libassuan::Libassuan, libevent::Libevent, libgcrypt::Libgcrypt, libgpg_error::LibgpgError,
-        libksba::Libksba, libuv::Libuv, libwebsockets::Libwebsockets, lima::Lima, mbedtls::Mbedtls,
-        ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
-        openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk, pkg_config::PkgConfig,
-        readline::Readline, ripgrep::Ripgrep, sccache::Sccache, sesh::Sesh, skopeo::Skopeo,
-        sqlite3::Sqlite3, starship::Starship, talosctl::Talosctl, terraform::Terraform, tmux::Tmux,
-        tree_sitter::TreeSitter, ttyd::Ttyd, typescript::Typescript,
-        typescript_language_server::TypescriptLanguageServer, umoci::Umoci, uv::Uv, vhs::Vhs,
-        vscode_langservers_extracted::VscodeLangserversExtracted, yq::Yq, zoxide::Zoxide, zsh::Zsh,
+        libksba::Libksba, libuv::Libuv, libwebsockets::Libwebsockets, lima::Lima,
+        lua_language_server::LuaLanguageServer, mbedtls::Mbedtls, ncurses::Ncurses, neovim::Neovim,
+        nginx::Nginx, nnn::Nnn, npth::Npth, openapi_generator_cli::OpenapiGeneratorCli,
+        openjdk::Openjdk, pkg_config::PkgConfig, readline::Readline, ripgrep::Ripgrep,
+        sccache::Sccache, sesh::Sesh, skopeo::Skopeo, sqlite3::Sqlite3, starship::Starship,
+        talosctl::Talosctl, terraform::Terraform, tmux::Tmux, tree_sitter::TreeSitter, ttyd::Ttyd,
+        typescript::Typescript, typescript_language_server::TypescriptLanguageServer, umoci::Umoci,
+        uv::Uv, vhs::Vhs, vscode_langservers_extracted::VscodeLangserversExtracted, yq::Yq,
+        zoxide::Zoxide, zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
 };
@@ -65,6 +66,7 @@ async fn main() -> Result<()> {
     Libuv::new().build(context).await?;
     Libwebsockets::new().build(context).await?;
     Lima::new().build(context).await?;
+    LuaLanguageServer::new().build(context).await?;
     Mbedtls::new().build(context).await?;
     Ncurses::new().build(context).await?;
     Neovim::new().build(context).await?;

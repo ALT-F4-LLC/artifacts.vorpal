@@ -1705,6 +1705,14 @@ digest = "40d7204e3d3f1112f0fb32d32cd18421db103a8564c7b277c2b83d54df5b2ff2"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "lua-language-server"
+path = "https://github.com/LuaLS/lua-language-server/releases/download/3.18.2/lua-language-server-3.18.2-darwin-arm64.tar.gz"
+includes = []
+excludes = []
+digest = "0af75d2d31b1c1918cc0f47403b724da62ae01e936ca9fa161d1f262e8631884"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "m4"
 path = "https://sdk.vorpal.build/source/m4-1.4.20.tar.gz"
 includes = []
