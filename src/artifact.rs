@@ -9,6 +9,7 @@ pub mod crane;
 pub mod cue;
 pub mod delta;
 pub mod direnv;
+pub mod dockerfile_language_server;
 pub mod doppler;
 pub mod eksctl;
 pub mod fd;

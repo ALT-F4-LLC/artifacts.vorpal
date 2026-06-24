@@ -825,6 +825,78 @@ digest = "8204ab746effc28aa1dd329c50b585e86ff322607f255bea09e2bd654b4fcdb8"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "dls-dockerfile-ast"
+path = "https://registry.npmjs.org/dockerfile-ast/-/dockerfile-ast-0.7.1.tgz"
+includes = []
+excludes = []
+digest = "32dd3b51c553526ea738549a25ab4f1d30ca71fb3d2ebea904be6745959ef2f2"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "dls-dockerfile-language-service"
+path = "https://registry.npmjs.org/dockerfile-language-service/-/dockerfile-language-service-0.16.1.tgz"
+includes = []
+excludes = []
+digest = "8ef018415d968347cac1715557aa9d324ce29193d198ae1e3e3ecb464a506db6"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "dls-dockerfile-utils"
+path = "https://registry.npmjs.org/dockerfile-utils/-/dockerfile-utils-0.16.3.tgz"
+includes = []
+excludes = []
+digest = "643b16315cfa31288fb67828170729b60692ec85a896282d95471b7e2e3979fd"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "dls-vscode-jsonrpc"
+path = "https://registry.npmjs.org/vscode-jsonrpc/-/vscode-jsonrpc-8.0.2.tgz"
+includes = []
+excludes = []
+digest = "654278949d7d75cdf73fd9cdf4d61d036d6eaae26302bcd177d0d94f84adf1e0"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "dls-vscode-languageserver"
+path = "https://registry.npmjs.org/vscode-languageserver/-/vscode-languageserver-8.0.2.tgz"
+includes = []
+excludes = []
+digest = "b861e4dcfa4fac9a3d5ea30e3aad490ded66073c27203a7669c5f0361bf43531"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "dls-vscode-languageserver-protocol"
+path = "https://registry.npmjs.org/vscode-languageserver-protocol/-/vscode-languageserver-protocol-3.17.2.tgz"
+includes = []
+excludes = []
+digest = "aaa1213ccd584485b0b3a4e8cafa00d43bdd927a4f2b174d6219b6a214d52c85"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "dls-vscode-languageserver-textdocument"
+path = "https://registry.npmjs.org/vscode-languageserver-textdocument/-/vscode-languageserver-textdocument-1.0.12.tgz"
+includes = []
+excludes = []
+digest = "bfac61d25c7266cc4f0a91795c0177435f8b421fd61c564f075d813a87a760c0"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "dls-vscode-languageserver-types"
+path = "https://registry.npmjs.org/vscode-languageserver-types/-/vscode-languageserver-types-3.17.3.tgz"
+includes = []
+excludes = []
+digest = "7a61cdd0749248b3047e9a6b23030c8e03454eae44a29edd820e2194dfeb19d6"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "dockerfile-language-server-nodejs"
+path = "https://registry.npmjs.org/dockerfile-language-server-nodejs/-/dockerfile-language-server-nodejs-0.15.0.tgz"
+includes = []
+excludes = []
+digest = "249278e96eac95896998fb0d9ce51870bad18b41a759c873f5d091c85e2a1a37"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "dom-serializer"
 path = "https://registry.npmjs.org/dom-serializer/-/dom-serializer-2.0.0.tgz"
 includes = []
