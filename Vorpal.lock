@@ -2601,6 +2601,14 @@ digest = "b4a4bd942ba8007adc5261c7611dca53cc5b5e10f9bbb334a6ec8b1645f13bd0"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "terraform-ls"
+path = "https://releases.hashicorp.com/terraform-ls/0.38.7/terraform-ls_0.38.7_darwin_arm64.zip"
+includes = []
+excludes = []
+digest = "cf7670351a43307e6f1e86264ef6521432f98ddd3cfcb8e00b8a4a13e3590639"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "texinfo"
 path = "https://sdk.vorpal.build/source/texinfo-7.2.tar.gz"
 includes = []

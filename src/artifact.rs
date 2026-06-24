@@ -57,6 +57,7 @@ pub mod sqlite3;
 pub mod starship;
 pub mod talosctl;
 pub mod terraform;
+pub mod terraform_ls;
 pub mod tmux;
 pub mod tree_sitter;
 pub mod ttyd;
