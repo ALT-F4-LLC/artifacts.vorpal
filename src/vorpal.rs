@@ -15,7 +15,8 @@ use vorpal_artifacts::{
         talosctl::Talosctl, terraform::Terraform, terraform_ls::TerraformLs, tmux::Tmux,
         tree_sitter::TreeSitter, ttyd::Ttyd, typescript::Typescript,
         typescript_language_server::TypescriptLanguageServer, umoci::Umoci, uv::Uv, vhs::Vhs,
-        vscode_langservers_extracted::VscodeLangserversExtracted, yq::Yq, zoxide::Zoxide, zsh::Zsh,
+        vscode_langservers_extracted::VscodeLangserversExtracted,
+        yaml_language_server::YamlLanguageServer, yq::Yq, zoxide::Zoxide, zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
 };
@@ -95,6 +96,7 @@ async fn main() -> Result<()> {
     Uv::new().build(context).await?;
     Vhs::new().build(context).await?;
     VscodeLangserversExtracted::new().build(context).await?;
+    YamlLanguageServer::new().build(context).await?;
     Yq::new().build(context).await?;
     Zoxide::new().build(context).await?;
     Zsh::new().build(context).await?;

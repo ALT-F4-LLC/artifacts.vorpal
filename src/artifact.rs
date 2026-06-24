@@ -67,6 +67,7 @@ pub mod umoci;
 pub mod uv;
 pub mod vhs;
 pub mod vscode_langservers_extracted;
+pub mod yaml_language_server;
 pub mod yq;
 pub mod zoxide;
 pub mod zsh;

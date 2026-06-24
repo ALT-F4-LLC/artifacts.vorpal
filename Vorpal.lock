@@ -3145,6 +3145,174 @@ digest = "24827cfbd8504ed6499a08262caf7d4c4584a5ee2505843526f0f020daf9ab93"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "yaml-language-server"
+path = "https://registry.npmjs.org/yaml-language-server/-/yaml-language-server-1.23.0.tgz"
+includes = []
+excludes = []
+digest = "a622f5be54da6b02083e300f5058fa143d8e8ff70529ee64103bd460fdc2142f"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-ajv"
+path = "https://registry.npmjs.org/ajv/-/ajv-8.20.0.tgz"
+includes = []
+excludes = []
+digest = "a0ef90036d7f210e358ad2e170b2ee921eb697023cd7182888c8e894329cbc7c"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-ajv-draft-04"
+path = "https://registry.npmjs.org/ajv-draft-04/-/ajv-draft-04-1.0.0.tgz"
+includes = []
+excludes = []
+digest = "a4a531fd47c2e05e1918e41165d6673a184dae16b040efca78be03fd0bb916d3"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-ajv-i18n"
+path = "https://registry.npmjs.org/ajv-i18n/-/ajv-i18n-4.2.0.tgz"
+includes = []
+excludes = []
+digest = "76867268fcdaa6bbe49e59add7a75cf3ae1e9610d74aa26f7dc0455fdb033c71"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-fast-deep-equal"
+path = "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz"
+includes = []
+excludes = []
+digest = "6763f654eb92f5b1ec2431ae4a60923ad01617a68f8cb9033babb988d8318edf"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-fast-uri"
+path = "https://registry.npmjs.org/fast-uri/-/fast-uri-3.1.2.tgz"
+includes = []
+excludes = []
+digest = "2e440470838fe3f30eb483cd91bbead68ba18fb8559d98ac3384db2755401d36"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-json-schema-traverse"
+path = "https://registry.npmjs.org/json-schema-traverse/-/json-schema-traverse-1.0.0.tgz"
+includes = []
+excludes = []
+digest = "e6ee77f952e27e346dd6e8cbbab182e157c535679ff326b0a792c15f48b2987d"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-jsonc-parser"
+path = "https://registry.npmjs.org/jsonc-parser/-/jsonc-parser-3.3.1.tgz"
+includes = []
+excludes = []
+digest = "0c07ac7a46068e04667268026ae825fbc6c4a1204bad8e67d04e0bdd06aaab06"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-prettier"
+path = "https://registry.npmjs.org/prettier/-/prettier-3.8.4.tgz"
+includes = []
+excludes = []
+digest = "1fd159d6652dd85d3190adab9f42b20081bbbbb3b86f1a8a66b904402e2171e1"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-request-light"
+path = "https://registry.npmjs.org/request-light/-/request-light-0.5.8.tgz"
+includes = []
+excludes = []
+digest = "0b5c4acbb76ccd47bf17b63f9aafb0c76dbbc91e613b7ac1b8d94703598afbdf"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-require-from-string"
+path = "https://registry.npmjs.org/require-from-string/-/require-from-string-2.0.2.tgz"
+includes = []
+excludes = []
+digest = "5ab713ae092a5eae232b5d035b7713de3e8a66693d646a409841869f3f115e9a"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-vscode-json-languageservice"
+path = "https://registry.npmjs.org/vscode-json-languageservice/-/vscode-json-languageservice-4.1.8.tgz"
+includes = []
+excludes = []
+digest = "f63fba2935070f01db92066a570e2f44b94577b70e629527dcea067dc3aac5d3"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-vscode-jsonrpc"
+path = "https://registry.npmjs.org/vscode-jsonrpc/-/vscode-jsonrpc-8.2.0.tgz"
+includes = []
+excludes = []
+digest = "ee3367dab7d8048cfcf3b38ea26f64255afafb954e876945f766a62bc35edf12"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-vscode-l10n"
+path = "https://registry.npmjs.org/@vscode/l10n/-/l10n-0.0.18.tgz"
+includes = []
+excludes = []
+digest = "f51294bb2038cef307be242f7c2346a3d2af92aeb0d281720fb4c448e2dbb2dc"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-vscode-languageserver"
+path = "https://registry.npmjs.org/vscode-languageserver/-/vscode-languageserver-9.0.1.tgz"
+includes = []
+excludes = []
+digest = "f42a33bc9f833f747e3825dd2d8d57608c49ed3bcb2244a7499f43043631ce60"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-vscode-languageserver-protocol"
+path = "https://registry.npmjs.org/vscode-languageserver-protocol/-/vscode-languageserver-protocol-3.17.5.tgz"
+includes = []
+excludes = []
+digest = "829769485e9c762c336e3d730def7f9fd236578cc59df7ce3ebc726830fed03e"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-vscode-languageserver-textdocument"
+path = "https://registry.npmjs.org/vscode-languageserver-textdocument/-/vscode-languageserver-textdocument-1.0.13.tgz"
+includes = []
+excludes = []
+digest = "84d69006e41b5d8ea37bead0a240dc572402128d5f1fded980aa98272ad95096"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-vscode-languageserver-types"
+path = "https://registry.npmjs.org/vscode-languageserver-types/-/vscode-languageserver-types-3.17.5.tgz"
+includes = []
+excludes = []
+digest = "6a3ebf4ea45489f50fffd514a91c011dd317036f5c1debe89a947cab1e714061"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-vscode-nls"
+path = "https://registry.npmjs.org/vscode-nls/-/vscode-nls-5.2.0.tgz"
+includes = []
+excludes = []
+digest = "3ef164c5d32b72db8e1e0467df00ef9f98ca66a9d1b287e40baca745abffc0e3"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-vscode-uri"
+path = "https://registry.npmjs.org/vscode-uri/-/vscode-uri-3.1.0.tgz"
+includes = []
+excludes = []
+digest = "c96d56c27c33fa4c7ce81a34281772bc84684f8ef119c061cb896864831827d6"
+platform = "aarch64-darwin"
+
+[[sources]]
+name = "yls-yaml"
+path = "https://registry.npmjs.org/yaml/-/yaml-2.8.3.tgz"
+includes = []
+excludes = []
+digest = "a0412e454289b3a32833c5a3a0869c19601ebb008429580a04fdcbf94679501d"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "yq"
 path = "https://github.com/mikefarah/yq/releases/download/v4.50.1/yq_linux_arm64.tar.gz"
 includes = []
