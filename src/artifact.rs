@@ -59,6 +59,7 @@ pub mod terraform;
 pub mod tmux;
 pub mod tree_sitter;
 pub mod ttyd;
+pub mod typescript;
 pub mod umoci;
 pub mod uv;
 pub mod vhs;
