@@ -3,13 +3,14 @@ use vorpal_artifacts::{
     artifact::{
         argocd::Argocd, awscli2::Awscli2, bash_language_server::BashLanguageServer, bat::Bat,
         beads::Beads, bottom::Bottom, cmake::Cmake, crane::Crane, cue::Cue, delta::Delta,
-        direnv::Direnv, doppler::Doppler, eksctl::Eksctl, fd::Fd, ffmpeg::Ffmpeg, fluxcd::Fluxcd,
-        fzf::Fzf, glow::Glow, golangci_lint::GolangciLint, gpg::Gpg, gum::Gum, helm::Helm, jj::Jj,
-        jq::Jq, json_c::JsonC, just::Just, k9s::K9s, kind::Kind, kn::Kn, kubectl::Kubectl,
-        kubeseal::Kubeseal, lazygit::Lazygit, libassuan::Libassuan, libevent::Libevent,
-        libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba, libuv::Libuv,
-        libwebsockets::Libwebsockets, lima::Lima, lua_language_server::LuaLanguageServer,
-        mbedtls::Mbedtls, ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
+        direnv::Direnv, dockerfile_language_server::DockerfileLanguageServer, doppler::Doppler,
+        eksctl::Eksctl, fd::Fd, ffmpeg::Ffmpeg, fluxcd::Fluxcd, fzf::Fzf, glow::Glow,
+        golangci_lint::GolangciLint, gpg::Gpg, gum::Gum, helm::Helm, jj::Jj, jq::Jq, json_c::JsonC,
+        just::Just, k9s::K9s, kind::Kind, kn::Kn, kubectl::Kubectl, kubeseal::Kubeseal,
+        lazygit::Lazygit, libassuan::Libassuan, libevent::Libevent, libgcrypt::Libgcrypt,
+        libgpg_error::LibgpgError, libksba::Libksba, libuv::Libuv, libwebsockets::Libwebsockets,
+        lima::Lima, lua_language_server::LuaLanguageServer, mbedtls::Mbedtls, ncurses::Ncurses,
+        neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
         openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk, pkg_config::PkgConfig,
         readline::Readline, ripgrep::Ripgrep, sccache::Sccache, sesh::Sesh, skopeo::Skopeo,
         sqlite3::Sqlite3, starship::Starship, talosctl::Talosctl, terraform::Terraform,
@@ -39,6 +40,7 @@ async fn main() -> Result<()> {
     Cue::new().build(context).await?;
     Delta::new().build(context).await?;
     Direnv::new().build(context).await?;
+    DockerfileLanguageServer::new().build(context).await?;
     Doppler::new().build(context).await?;
     Eksctl::new().build(context).await?;
     Fd::new().build(context).await?;
