@@ -52,6 +52,7 @@ pub mod op;
 pub mod openapi_generator_cli;
 pub mod opencode;
 pub mod openjdk;
+pub mod pi;
 pub mod pkg_config;
 pub mod readline;
 pub mod ripgrep;

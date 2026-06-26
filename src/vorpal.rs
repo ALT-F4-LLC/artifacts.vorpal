@@ -12,8 +12,8 @@ use vorpal_artifacts::{
         libwebsockets::Libwebsockets, lima::Lima, lua_language_server::LuaLanguageServer,
         mbedtls::Mbedtls, ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
         op::Op, openapi_generator_cli::OpenapiGeneratorCli, opencode::Opencode, openjdk::Openjdk,
-        pkg_config::PkgConfig, readline::Readline, ripgrep::Ripgrep, sccache::Sccache, sesh::Sesh,
-        skopeo::Skopeo, sqlite3::Sqlite3, starship::Starship, talosctl::Talosctl,
+        pi::Pi, pkg_config::PkgConfig, readline::Readline, ripgrep::Ripgrep, sccache::Sccache,
+        sesh::Sesh, skopeo::Skopeo, sqlite3::Sqlite3, starship::Starship, talosctl::Talosctl,
         terraform::Terraform, terraform_ls::TerraformLs, tmux::Tmux, tree_sitter::TreeSitter,
         ttyd::Ttyd, typescript::Typescript, typescript_language_server::TypescriptLanguageServer,
         umoci::Umoci, uv::Uv, vhs::Vhs, vscode_langservers_extracted::VscodeLangserversExtracted,
@@ -82,6 +82,7 @@ async fn main() -> Result<()> {
     OpenapiGeneratorCli::new().build(context).await?;
     Opencode::new().build(context).await?;
     Openjdk::new().build(context).await?;
+    Pi::new().build(context).await?;
     PkgConfig::new().build(context).await?;
     Readline::new().build(context).await?;
     Ripgrep::new().build(context).await?;
