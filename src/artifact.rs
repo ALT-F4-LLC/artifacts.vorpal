@@ -48,6 +48,7 @@ pub mod neovim;
 pub mod nginx;
 pub mod nnn;
 pub mod npth;
+pub mod op;
 pub mod openapi_generator_cli;
 pub mod openjdk;
 pub mod pkg_config;

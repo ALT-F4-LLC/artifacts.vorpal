@@ -2369,6 +2369,14 @@ digest = "884e88fb74a458186a6c3e58398af5f4de8b3d1db8ca2af7415e7dfe14999c02"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "op"
+path = "https://cache.agilebits.com/dist/1P/op2/pkg/v2.34.1/op_darwin_arm64_v2.34.1.zip"
+includes = []
+excludes = []
+digest = "a178768e4a235c4bccf1350b81c2af0225e7f8029cc73a1d58d7c22ee72be769"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "openapi-generator-cli"
 path = "https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/7.18.0/openapi-generator-cli-7.18.0.jar"
 includes = []

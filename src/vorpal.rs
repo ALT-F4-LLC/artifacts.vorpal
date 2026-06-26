@@ -11,12 +11,12 @@ use vorpal_artifacts::{
         libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba, libuv::Libuv,
         libwebsockets::Libwebsockets, lima::Lima, lua_language_server::LuaLanguageServer,
         mbedtls::Mbedtls, ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
-        openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk, pkg_config::PkgConfig,
-        readline::Readline, ripgrep::Ripgrep, sccache::Sccache, sesh::Sesh, skopeo::Skopeo,
-        sqlite3::Sqlite3, starship::Starship, talosctl::Talosctl, terraform::Terraform,
-        terraform_ls::TerraformLs, tmux::Tmux, tree_sitter::TreeSitter, ttyd::Ttyd,
-        typescript::Typescript, typescript_language_server::TypescriptLanguageServer, umoci::Umoci,
-        uv::Uv, vhs::Vhs, vscode_langservers_extracted::VscodeLangserversExtracted,
+        op::Op, openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk,
+        pkg_config::PkgConfig, readline::Readline, ripgrep::Ripgrep, sccache::Sccache, sesh::Sesh,
+        skopeo::Skopeo, sqlite3::Sqlite3, starship::Starship, talosctl::Talosctl,
+        terraform::Terraform, terraform_ls::TerraformLs, tmux::Tmux, tree_sitter::TreeSitter,
+        ttyd::Ttyd, typescript::Typescript, typescript_language_server::TypescriptLanguageServer,
+        umoci::Umoci, uv::Uv, vhs::Vhs, vscode_langservers_extracted::VscodeLangserversExtracted,
         yaml_language_server::YamlLanguageServer, yq::Yq, zoxide::Zoxide, zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
@@ -78,6 +78,7 @@ async fn main() -> Result<()> {
     Nginx::new().build(context).await?;
     Nnn::new().build(context).await?;
     Npth::new().build(context).await?;
+    Op::new().build(context).await?;
     OpenapiGeneratorCli::new().build(context).await?;
     Openjdk::new().build(context).await?;
     PkgConfig::new().build(context).await?;
