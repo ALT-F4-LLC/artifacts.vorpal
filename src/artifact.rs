@@ -50,6 +50,7 @@ pub mod nnn;
 pub mod npth;
 pub mod op;
 pub mod openapi_generator_cli;
+pub mod opencode;
 pub mod openjdk;
 pub mod pkg_config;
 pub mod readline;
