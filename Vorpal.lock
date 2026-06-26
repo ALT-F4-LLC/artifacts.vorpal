@@ -1473,6 +1473,14 @@ digest = "8c47e48f689bd861177c77171f491f4301e938ce39e8d6c1e88f27af7c347e7b"
 platform = "x86_64-darwin"
 
 [[sources]]
+name = "herdr"
+path = "https://github.com/ogulcancelik/herdr/releases/download/v0.7.1/herdr-macos-aarch64"
+includes = []
+excludes = []
+digest = "df1986c6712f5ae735f6f2a5ecfd441ceb9d82c3de586d3bbcce8c2b8ed397c1"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "jj"
 path = "https://github.com/jj-vcs/jj/releases/download/v0.37.0/jj-v0.37.0-aarch64-apple-darwin.tar.gz"
 includes = []

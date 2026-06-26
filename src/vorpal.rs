@@ -5,12 +5,12 @@ use vorpal_artifacts::{
         beads::Beads, bottom::Bottom, cmake::Cmake, crane::Crane, cue::Cue, delta::Delta,
         direnv::Direnv, dockerfile_language_server::DockerfileLanguageServer, doppler::Doppler,
         eksctl::Eksctl, fd::Fd, ffmpeg::Ffmpeg, fluxcd::Fluxcd, fzf::Fzf, glow::Glow,
-        golangci_lint::GolangciLint, gpg::Gpg, gum::Gum, helm::Helm, jj::Jj, jq::Jq, json_c::JsonC,
-        just::Just, k9s::K9s, kind::Kind, kn::Kn, kubectl::Kubectl, kubeseal::Kubeseal,
-        lazygit::Lazygit, libassuan::Libassuan, libevent::Libevent, libgcrypt::Libgcrypt,
-        libgpg_error::LibgpgError, libksba::Libksba, libuv::Libuv, libwebsockets::Libwebsockets,
-        lima::Lima, lua_language_server::LuaLanguageServer, mbedtls::Mbedtls, ncurses::Ncurses,
-        neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
+        golangci_lint::GolangciLint, gpg::Gpg, gum::Gum, helm::Helm, herdr::Herdr, jj::Jj, jq::Jq,
+        json_c::JsonC, just::Just, k9s::K9s, kind::Kind, kn::Kn, kubectl::Kubectl,
+        kubeseal::Kubeseal, lazygit::Lazygit, libassuan::Libassuan, libevent::Libevent,
+        libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba, libuv::Libuv,
+        libwebsockets::Libwebsockets, lima::Lima, lua_language_server::LuaLanguageServer,
+        mbedtls::Mbedtls, ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
         openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk, pkg_config::PkgConfig,
         readline::Readline, ripgrep::Ripgrep, sccache::Sccache, sesh::Sesh, skopeo::Skopeo,
         sqlite3::Sqlite3, starship::Starship, talosctl::Talosctl, terraform::Terraform,
@@ -52,6 +52,7 @@ async fn main() -> Result<()> {
     Gpg::new().build(context).await?;
     Gum::new().build(context).await?;
     Helm::new().build(context).await?;
+    Herdr::new().build(context).await?;
     Jj::new().build(context).await?;
     Jq::new().build(context).await?;
     JsonC::new().build(context).await?;
