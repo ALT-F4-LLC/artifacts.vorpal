@@ -11,7 +11,7 @@ use vorpal_artifacts::{
         libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba, libuv::Libuv,
         libwebsockets::Libwebsockets, lima::Lima, lua_language_server::LuaLanguageServer,
         mbedtls::Mbedtls, ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
-        op::Op, openapi_generator_cli::OpenapiGeneratorCli, openjdk::Openjdk,
+        op::Op, openapi_generator_cli::OpenapiGeneratorCli, opencode::Opencode, openjdk::Openjdk,
         pkg_config::PkgConfig, readline::Readline, ripgrep::Ripgrep, sccache::Sccache, sesh::Sesh,
         skopeo::Skopeo, sqlite3::Sqlite3, starship::Starship, talosctl::Talosctl,
         terraform::Terraform, terraform_ls::TerraformLs, tmux::Tmux, tree_sitter::TreeSitter,
@@ -80,6 +80,7 @@ async fn main() -> Result<()> {
     Npth::new().build(context).await?;
     Op::new().build(context).await?;
     OpenapiGeneratorCli::new().build(context).await?;
+    Opencode::new().build(context).await?;
     Openjdk::new().build(context).await?;
     PkgConfig::new().build(context).await?;
     Readline::new().build(context).await?;
