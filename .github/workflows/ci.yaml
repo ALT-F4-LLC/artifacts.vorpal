@@ -40,80 +40,47 @@ jobs:
           name: ${{ runner.arch }}-${{ runner.os }}-vorpal-lock
           path: Vorpal.lock
 
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      chunks: ${{ steps.generate.outputs.chunks }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - id: generate
+        shell: bash
+        run: |
+          MAX_CHUNKS=50
+          TARGET_CHUNK_SIZE=8
+
+          ARTIFACTS="$(bash script/detect-changed-artifacts.sh --all)"
+          N="$(jq 'length' <<< "$ARTIFACTS")"
+          K=$(( (N + TARGET_CHUNK_SIZE - 1) / TARGET_CHUNK_SIZE ))
+          if (( K < 1 )); then
+            K=1
+          fi
+          if (( K > MAX_CHUNKS )); then
+            K="$MAX_CHUNKS"
+          fi
+
+          if (( K * 4 > 256 )); then
+            echo "chunk matrix would exceed GitHub Actions limit: $K * 4 > 256" >&2
+            exit 1
+          fi
+
+          CHUNKS="$(jq -c --argjson k "$K" '[ to_entries | group_by(.key % $k)[] | map(.value) ]' <<< "$ARTIFACTS")"
+          jq -e 'length > 0' <<< "$CHUNKS" >/dev/null
+          echo "chunks=$CHUNKS" >> "$GITHUB_OUTPUT"
+
   build:
     needs:
       - build-dev
+      - generate-matrix
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        artifact:
-          - argocd
-          - awscli2
-          - bat
-          - beads
-          - bottom
-          - cmake
-          - crane
-          - cue
-          - direnv
-          - doppler
-          - eksctl
-          - fd
-          - ffmpeg
-          - file
-          - fluxcd
-          - fzf
-          - glow
-          - golangci_lint
-          - gpg
-          - gum
-          - helm
-          - jj
-          - jq
-          - json_c
-          - just
-          - k9s
-          - kind
-          - kn
-          - kubectl
-          - kubeseal
-          - lazygit
-          - libassuan
-          - libevent
-          - libgcrypt
-          - libgpg_error
-          - libksba
-          - libuv
-          - libwebsockets
-          - lima
-          - mbedtls
-          - ncurses
-          - neovim
-          - nginx
-          - nnn
-          - npth
-          - openapi_generator_cli
-          - openjdk
-          - pkg_config
-          - readline
-          - ripgrep
-          - sccache
-          - sesh
-          - skopeo
-          - sqlite3
-          - starship
-          - talosctl
-          - terraform
-          - tmux
-          - ttyd
-          - umoci
-          - uv
-          - vhs
-          - yq
-          - zlib
-          - zoxide
-          - zsh
+        chunk: ${{ fromJSON(needs.generate-matrix.outputs.chunks) }}
         runner:
           - macos-latest
           - macos-latest-large
@@ -132,4 +99,19 @@ jobs:
           AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - run: vorpal build '${{ matrix.artifact }}'
+      - shell: bash
+        run: |
+          failed=()
+          while IFS= read -r artifact; do
+            if vorpal build "$artifact"; then
+              echo "::notice::$artifact OK"
+            else
+              echo "::error::$artifact FAILED"
+              failed+=("$artifact")
+            fi
+          done < <(echo '${{ toJSON(matrix.chunk) }}' | jq -r '.[]')
+
+          if [ ${#failed[@]} -gt 0 ]; then
+            echo "Failed artifacts in chunk: ${failed[*]}"
+            exit 1
+          fi
