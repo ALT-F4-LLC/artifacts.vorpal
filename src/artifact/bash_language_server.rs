@@ -23,7 +23,7 @@ const frame = (msg) => {
   return 'Content-Length: ' + Buffer.byteLength(body, 'utf8') + '\r\n\r\n' + body;
 };
 
-const server = spawn(serverBin, ['--stdio'], { stdio: ['pipe', 'pipe', 'pipe'] });
+const server = spawn(serverBin, ['start'], { stdio: ['pipe', 'pipe', 'pipe'] });
 
 let stdout = '';
 let stderr = '';
