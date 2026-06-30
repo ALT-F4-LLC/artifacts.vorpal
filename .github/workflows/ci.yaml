@@ -27,6 +27,7 @@ jobs:
         with:
           registry-backend: s3
           registry-backend-s3-bucket: altf4llc-vorpal-registry
+          version: 0.2.2
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
@@ -47,72 +48,72 @@ jobs:
       fail-fast: false
       matrix:
         artifact:
-          # - argocd
-          # - awscli2
-          # - bat
-          # - beads
-          # - bottom
-          # - cmake
-          # - crane
-          # - cue
-          # - direnv
-          # - doppler
-          # - eksctl
-          # - fd
-          # - ffmpeg
-          # - file
-          # - fluxcd
-          # - fzf
-          # - glow
-          # - golangci_lint
-          # - gpg
-          # - gum
-          # - helm
-          # - jj
-          # - jq
-          # - json_c
-          # - just
-          # - k9s
-          # - kind
-          # - kn
-          # - kubectl
-          # - kubeseal
-          # - lazygit
-          # - libassuan
-          # - libevent
-          # - libgcrypt
-          # - libgpg_error
-          # - libksba
-          # - libuv
-          # - libwebsockets
-          # - lima
-          # - mbedtls
-          # - ncurses
-          # - neovim
-          # - nginx
-          # - nnn
-          # - npth
-          # - openapi_generator_cli
-          # - openjdk
-          # - pkg_config
-          # - readline
-          # - ripgrep
-          # - sccache
-          # - sesh
-          # - skopeo
-          # - sqlite3
-          # - starship
-          # - talosctl
-          # - terraform
-          # - tmux
-          # - ttyd
-          # - umoci
+          - argocd
+          - awscli2
+          - bat
+          - beads
+          - bottom
+          - cmake
+          - crane
+          - cue
+          - direnv
+          - doppler
+          - eksctl
+          - fd
+          - ffmpeg
+          - file
+          - fluxcd
+          - fzf
+          - glow
+          - golangci_lint
+          - gpg
+          - gum
+          - helm
+          - jj
+          - jq
+          - json_c
+          - just
+          - k9s
+          - kind
+          - kn
+          - kubectl
+          - kubeseal
+          - lazygit
+          - libassuan
+          - libevent
+          - libgcrypt
+          - libgpg_error
+          - libksba
+          - libuv
+          - libwebsockets
+          - lima
+          - mbedtls
+          - ncurses
+          - neovim
+          - nginx
+          - nnn
+          - npth
+          - openapi_generator_cli
+          - openjdk
+          - pkg_config
+          - readline
+          - ripgrep
+          - sccache
+          - sesh
+          - skopeo
+          - sqlite3
+          - starship
+          - talosctl
+          - terraform
+          - tmux
+          - ttyd
+          - umoci
           - uv
-          # - vhs
-          # - yq
-          # - zlib
-          # - zoxide
-          # - zsh
+          - vhs
+          - yq
+          - zlib
+          - zoxide
+          - zsh
         runner:
           - macos-latest
           - macos-latest-large
@@ -125,6 +126,7 @@ jobs:
         with:
           registry-backend: s3
           registry-backend-s3-bucket: altf4llc-vorpal-registry
+          version: 0.2.2
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
