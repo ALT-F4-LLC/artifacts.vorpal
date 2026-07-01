@@ -24,6 +24,7 @@ pub mod gpg;
 pub mod gum;
 pub mod helm;
 pub mod herdr;
+pub mod hunk;
 pub mod jj;
 pub mod jq;
 pub mod json_c;
