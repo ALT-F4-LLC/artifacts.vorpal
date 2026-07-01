@@ -1,8 +1,8 @@
 use anyhow::Result;
 use vorpal_artifacts::{
     artifact::{
-        argocd::Argocd, awscli2::Awscli2, bash_language_server::BashLanguageServer, bat::Bat,
-        beads::Beads, bottom::Bottom, cmake::Cmake, crane::Crane, cue::Cue, delta::Delta,
+        abtop::Abtop, argocd::Argocd, awscli2::Awscli2, bash_language_server::BashLanguageServer,
+        bat::Bat, beads::Beads, bottom::Bottom, cmake::Cmake, crane::Crane, cue::Cue, delta::Delta,
         direnv::Direnv, dockerfile_language_server::DockerfileLanguageServer, doppler::Doppler,
         eksctl::Eksctl, fd::Fd, ffmpeg::Ffmpeg, fluxcd::Fluxcd, fzf::Fzf, glow::Glow,
         golangci_lint::GolangciLint, gpg::Gpg, gum::Gum, helm::Helm, herdr::Herdr, jj::Jj, jq::Jq,
@@ -29,6 +29,7 @@ async fn main() -> Result<()> {
 
     // Artifacts
 
+    Abtop::new().build(context).await?;
     Argocd::new().build(context).await?;
     Awscli2::new().build(context).await?;
     BashLanguageServer::new().build(context).await?;
