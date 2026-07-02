@@ -25,11 +25,11 @@ For each artifact, research the official project:
 
 1. Search for the official project website or GitHub repository
 2. Find the **latest stable version** (not pre-release, not nightly)
-3. Find download URLs for all 4 target platforms:
-   - `aarch64-apple-darwin` (macOS ARM)
-   - `aarch64-unknown-linux-gnu` or `aarch64-linux` (Linux ARM)
-   - `x86_64-apple-darwin` (macOS x86)
-   - `x86_64-unknown-linux-gnu` or `x86_64-linux` (Linux x86)
+3. Find download URLs for all 4 target platforms. The strings below are **naming-convention examples only** — copy the EXACT platform string the project uses in its release asset filenames. Common variants:
+   - `aarch64-apple-darwin` (macOS ARM) — also seen as `darwin-arm64`, `macos-arm64`
+   - `aarch64-unknown-linux-gnu` / `aarch64-unknown-linux-musl` (Linux ARM) — also `linux-arm64`, `aarch64-linux`
+   - `x86_64-apple-darwin` (macOS x86) — also `darwin-amd64`, `macos-x86_64`
+   - `x86_64-unknown-linux-gnu` OR `x86_64-unknown-linux-musl` (Linux x86) — also `linux-amd64`, `x86_64-linux`. **Note:** Linux x86 ships as `musl` in some projects (e.g. `bat`) and `gnu` in others — do not assume; read the asset list.
 
 **STRICT RULE**: ONLY use official sources — GitHub releases from the project's own repository, or official project websites (e.g., `ffmpeg.org`, `sqlite.org`, `gnupg.org`). NEVER use third-party mirrors, package managers, or unofficial builds.
 
@@ -56,6 +56,8 @@ Use when building from source **requires other libraries** that must be built fi
 Use when pre-built binaries exist for **some** platforms but not others. Uses per-system match arms with different strategies.
 
 **Reference file**: `src/artifact/ttyd.rs`
+
+The match returns a `(sources, step_script, step_artifacts)` tuple. Each system that has a pre-built binary gets its own arm; systems that must compile from source are grouped together with `|` (e.g. `Aarch64Darwin | X8664Darwin`). Source-compile arms pass their dependency artifact strings in `step_artifacts`; pre-built arms pass `vec![]`.
 
 ## Step 4: Write the Artifact File
 
@@ -119,7 +121,7 @@ impl PascalName {
 ```
 
 **Notes for Pattern A:**
-- Adjust `source_system` match arms to match the project's naming convention for platforms
+- The `source_system` Rust target triple per match arm MUST match the project's actual release-asset naming — including the `gnu` vs `musl` libc variant and whether platforms are encoded as a combined triple (`aarch64-apple-darwin`) or split `(os, arch)` tuple (`darwin`, `arm64`). Never guess; copy from the release assets.
 - Some projects use `(os, arch)` tuples instead of combined strings — see `src/artifact/kubectl.rs` for this variant
 - Adjust the `source_path` URL format to match the project's release URL pattern
 - Adjust the `step_script` to handle the archive structure (tar.gz with subdirectory, flat archive, raw binary, zip, etc.)
@@ -344,11 +346,19 @@ cargo fmt
 cargo check
 ```
 
-If `cargo check` passes after formatting, run the build for each new artifact:
+If `cargo check` passes after formatting, validate the registry wiring cheaply before a full build:
+
+```bash
+vorpal build <artifact-name> --list
+```
+
+`--list` resolves the artifact and its dependency graph (name + digest) without building, catching wiring/registration mistakes in seconds. If it fails, re-check Step 6. Once it succeeds, run the full build for each new artifact:
 
 ```bash
 vorpal build <artifact-name>
 ```
+
+> **Prerequisite:** the `vorpal` CLI must be installed and on `PATH` (the build talks to the Vorpal service over its socket). If `vorpal` is not found, install/initialize it before proceeding — this gate cannot be satisfied without it.
 
 `vorpal build` targets the native host OS and architecture by default (the `--system` flag defaults to the host system, e.g. `aarch64-darwin` on Apple Silicon). Do NOT pass `--system` to target a different platform, and do NOT attempt Lima (Linux-on-macOS VM) builds unless the operator explicitly instructs you to do so.
 
