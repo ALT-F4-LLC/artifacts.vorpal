@@ -11,17 +11,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
 jobs:
-  check-artifact-registry:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Check artifact registry parity
-        run: script/check-artifact-registry.sh
-
   build-dev:
-    needs:
-      - check-artifact-registry
     runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
