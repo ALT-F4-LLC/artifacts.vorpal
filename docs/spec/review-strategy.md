@@ -232,8 +232,6 @@ awscli2 (source install with platform-specific steps)
   pull requests and pushes to main.
 - **Changed artifact detection**: `script/detect-changed-artifacts.sh` identifies which
   artifacts were modified, enabling incremental CI builds.
-- **Regression tests for CI scripts**: `script/test-detect-changed-artifacts.sh` provides
-  regression tests for the change detection logic.
 - **Renovate**: Automated dependency update bot configured with recommended defaults.
 - **Vorpal.lock**: Content-addressable source integrity verification via SHA-256 digests.
 - **S3 registry backend**: Built artifacts are stored in an S3 registry

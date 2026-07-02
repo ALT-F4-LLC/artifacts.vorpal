@@ -54,7 +54,6 @@ The project produces a single binary (`vorpal`) that, when executed with `vorpal
 │       └── ...
 ├── script/
 │   ├── detect-changed-artifacts.sh      # CI: identifies changed artifacts for selective builds
-│   ├── test-detect-changed-artifacts.sh # Tests for the detection script
 │   ├── lima.sh                          # Lima VM provisioning for Linux builds on macOS
 │   └── linux-vorpal-slim.sh             # Rootfs slimming utility for Vorpal Linux
 ├── .github/

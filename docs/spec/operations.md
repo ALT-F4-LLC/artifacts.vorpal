@@ -223,18 +223,6 @@ A comprehensive rootfs slimming script that reduces Vorpal Linux installations f
 - Post-removal verification of essential files
 - Aggressive mode for binary stripping
 
-### 6.3 Change Detection Tests
-
-**File**: `script/test-detect-changed-artifacts.sh`
-
-Regression tests for the change detection script, covering:
-
-- Basic listing and JSON output
-- Empty diff handling
-- Regression: non-artifact file changes do not trigger full rebuild
-- Regression: deleted artifact files are excluded from build list
-- Regression: no hardcoded artifact mechanisms (CORE_FILES, DEPENDENTS removed)
-
 ---
 
 ## 7. Release & Versioning

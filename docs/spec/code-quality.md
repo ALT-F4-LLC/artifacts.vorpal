@@ -33,7 +33,6 @@ src/
     file.rs          # Utility artifact (excluded from CI auto-discovery)
 script/
   detect-changed-artifacts.sh       # CI artifact detection script
-  test-detect-changed-artifacts.sh  # Regression tests for detection script
   lima.sh                           # Lima VM provisioning script
   linux-vorpal-slim.sh              # Linux slim build script
 ```

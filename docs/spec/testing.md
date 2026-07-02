@@ -8,43 +8,12 @@ software packages (CLI tools, libraries, development environments) across four t
 (aarch64-darwin, aarch64-linux, x86_64-darwin, x86_64-linux).
 
 Testing in this project is minimal. There are **no Rust unit tests, no integration test
-harnesses, no `[dev-dependencies]` in `Cargo.toml`, and no `#[cfg(test)]` or `#[test]`
-attributes** anywhere in the Rust source code. The only tests that exist are shell-based
-regression tests for the CI helper script `detect-changed-artifacts.sh`.
+harnesses, no `[dev-dependencies]` in `Cargo.toml`, no `#[cfg(test)]` or `#[test]`
+attributes, and no shell script tests** anywhere in the project.
 
 ---
 
 ## What Currently Exists
-
-### Shell Script Tests
-
-**Location:** `script/test-detect-changed-artifacts.sh`
-
-The sole test file in the project. It is a hand-rolled bash test harness that validates the
-`script/detect-changed-artifacts.sh` script, which is responsible for detecting which artifacts
-need rebuilding based on git diffs between commits.
-
-**Test count:** 8 assertions across 6 test functions.
-
-**Test functions:**
-
-| Test | What It Verifies |
-|---|---|
-| `test_list_returns_artifacts` | `--list` flag returns a non-zero count of artifacts |
-| `test_all_returns_json` | `--all` flag returns valid JSON array (validated with `jq`) |
-| `test_empty_diff_returns_empty` | Comparing `HEAD` to `HEAD` returns empty array `[]` |
-| `test_non_artifact_changes_dont_trigger_full_rebuild` | Changes to non-artifact files (e.g., `src/vorpal.rs`, `Cargo.lock`, workflow files) do NOT trigger a full rebuild -- only the specific changed artifact modules are included (regression test) |
-| `test_deleted_files_excluded` | Deleted artifact `.rs` files are excluded from the build list (regression test) |
-| `test_no_hardcoded_artifacts` | Verifies that removed mechanisms (`CORE_FILES`, `is_core_file`, `DEPENDENTS`) do not reappear in the script (regression test) |
-
-**Test runner:** Direct bash execution (`./test-detect-changed-artifacts.sh`). No test framework.
-Uses colored PASS/FAIL output and exits with code 1 if any test fails.
-
-**Dependencies:** Requires `jq` and a git repository with commit history (some tests reference
-specific commit SHAs like `5fc8933e` and `98beb7a`).
-
-**Note:** These tests are NOT integrated into the CI workflow (`vorpal.yaml`). They must be run
-manually.
 
 ### CI Build Verification
 
@@ -84,12 +53,11 @@ These are build-time sanity checks embedded in shell scripts, not structured tes
 |---|---|---|---|
 | **Unit tests** | 0 | None | No `#[test]` attributes, no `#[cfg(test)]` modules, no `[dev-dependencies]` |
 | **Integration tests** | 0 | None | No `tests/` directory, no integration test crate |
-| **Shell script tests** | 6 functions (8 assertions) | Hand-rolled bash | Only for `detect-changed-artifacts.sh`; not in CI |
+| **Shell script tests** | 0 | None | No shell test files exist |
 | **E2E / Build verification** | Implicit via CI | GitHub Actions + Vorpal | Verifies artifacts build on 4 platforms |
 
-The test pyramid is effectively **inverted** -- the only structured testing is at the script
-level, and the primary validation mechanism is full CI builds (the most expensive and slowest
-form of verification).
+The test pyramid is effectively **empty** -- the only validation mechanism is full CI builds
+(the most expensive and slowest form of verification).
 
 ---
 
@@ -97,7 +65,6 @@ form of verification).
 
 ### Test Runners
 
-- **Shell tests:** Direct bash execution, no framework.
 - **Rust tests:** `cargo test` is available (Cargo.toml is properly configured) but never invoked.
   No CI step runs it.
 
@@ -107,26 +74,15 @@ None. No coverage tooling is configured or referenced anywhere in the project.
 
 ### Mocking and Fixtures
 
-None. The Rust source has no test utilities, mock implementations, or test fixtures. The shell
-test file uses real git history (specific commit SHAs) as test fixtures, which makes them
-coupled to the repository's commit history.
+None. The Rust source has no test utilities, mock implementations, or test fixtures.
 
 ### Test Utilities
 
-None beyond the `pass()` and `fail()` helper functions in
-`script/test-detect-changed-artifacts.sh`.
+None.
 
 ---
 
 ## How to Run Tests
-
-### Shell Script Tests
-
-```bash
-./script/test-detect-changed-artifacts.sh
-```
-
-Requires: `bash`, `jq`, full git history (tests reference specific SHAs).
 
 ### Rust Tests (No Tests Exist)
 
@@ -163,8 +119,8 @@ Currently the only way to validate that Rust source code is correct.
    rustfmt are distributed as part of the Rust toolchain, but they are not used in any
    automated pipeline.
 
-4. **Shell tests not in CI.** The existing shell regression tests are not executed by the GitHub
-   Actions workflow.
+4. **No shell script tests.** There is no regression coverage for `detect-changed-artifacts.sh`
+   or any other script in `script/`.
 
 ### Moderate Gaps
 
@@ -182,12 +138,7 @@ Currently the only way to validate that Rust source code is correct.
 
 ### Minor Gaps
 
-8. **Shell test fixtures use hardcoded commit SHAs.** Tests like
-   `test_non_artifact_changes_dont_trigger_full_rebuild` depend on specific commits
-   (`5fc8933e5f5ddb18b00d2d307d676e4c503814c7`). These will break if the repository is rebased,
-   shallow-cloned, or if history is rewritten.
-
-9. **No test documentation.** There is no guidance for contributors on what tests to write when
+8. **No test documentation.** There is no guidance for contributors on what tests to write when
    adding a new artifact module.
 
 ---
@@ -200,8 +151,6 @@ These are observations about what would be reasonable to add, ordered by impact 
 
 - **Add `cargo test` and `cargo clippy` steps to CI.** Even with zero tests, this catches
   compilation errors and common Rust anti-patterns automatically.
-- **Add shell script tests to CI.** Add a job that runs
-  `./script/test-detect-changed-artifacts.sh` (requires `jq` and full git history).
 
 ### High Value, Medium Effort
 
