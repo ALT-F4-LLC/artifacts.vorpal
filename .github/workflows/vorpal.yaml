@@ -11,7 +11,17 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
 jobs:
+  check-artifact-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check artifact registry parity
+        run: script/check-artifact-registry.sh
+
   build-dev:
+    needs:
+      - check-artifact-registry
     runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
@@ -68,6 +78,7 @@ jobs:
       - name: Build all artifacts
         run: |
           status=0
+          failed_artifacts=()
 
           while IFS= read -r artifact; do
             echo "::group::vorpal build $artifact"
@@ -75,9 +86,18 @@ jobs:
             if ! vorpal build "$artifact"; then
               echo "::error::build failed for artifact: $artifact"
               status=1
+              failed_artifacts+=("$artifact")
             fi
 
             echo "::endgroup::"
           done < <(script/list-artifacts.sh)
+
+          if [[ "$status" -ne 0 ]]; then
+            echo "Failed artifacts: ${failed_artifacts[*]}"
+            {
+              echo "### Failed artifacts"
+              printf -- '- %s\n' "${failed_artifacts[@]}"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
 
           exit "$status"
