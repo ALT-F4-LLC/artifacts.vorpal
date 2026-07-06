@@ -5969,6 +5969,14 @@ digest = "fc17196fc98070d02c9eabf5e523329e34ee4d0bcabcee521f22cdee5c2a0caa"
 platform = "x86_64-darwin"
 
 [[sources]]
+name = "x264"
+path = "https://download.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20191217-2245-stable.tar.bz2"
+includes = []
+excludes = []
+digest = "e9ffd69a8892266c0e5872036c6783683b494b3fcd34c5617ba8fe8666fb8efc"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "xz"
 path = "https://sdk.vorpal.build/source/xz-5.8.1.tar.xz"
 includes = []
