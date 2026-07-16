@@ -2754,35 +2754,19 @@ platform = "x86_64-darwin"
 
 [[sources]]
 name = "herdr"
-path = "https://github.com/ogulcancelik/herdr/releases/download/v0.7.1/herdr-linux-aarch64"
+path = "https://github.com/ogulcancelik/herdr/releases/download/v0.7.4/herdr-macos-aarch64"
 includes = []
 excludes = []
-digest = "a596cb8f35ec5f3b1db7baa42fba28d9bb707f2af4e56d5f04fa9372be3eac9c"
-platform = "aarch64-linux"
-
-[[sources]]
-name = "herdr"
-path = "https://github.com/ogulcancelik/herdr/releases/download/v0.7.1/herdr-macos-aarch64"
-includes = []
-excludes = []
-digest = "df1986c6712f5ae735f6f2a5ecfd441ceb9d82c3de586d3bbcce8c2b8ed397c1"
+digest = "78147d22f8d83e26fb704bafe45a081bda5acccf52a069930cdb4259089d8b07"
 platform = "aarch64-darwin"
 
 [[sources]]
 name = "herdr"
-path = "https://github.com/ogulcancelik/herdr/releases/download/v0.7.1/herdr-macos-x86_64"
+path = "https://github.com/ogulcancelik/herdr/releases/download/v0.7.4/herdr-macos-x86_64"
 includes = []
 excludes = []
-digest = "f8ad043458b865b7cad4fc6ae51fb0de76eb418c9e2c66ee21133bf5189af55e"
+digest = "d042f410b0b15f01ace79913a84e3644e3eb117cd4d6f100470da0950514b76e"
 platform = "x86_64-darwin"
-
-[[sources]]
-name = "herdr"
-path = "https://github.com/ogulcancelik/herdr/releases/download/v0.7.1/herdr-linux-x86_64"
-includes = []
-excludes = []
-digest = "f9d2aff90ced43770278759d863678741d8de32b53dd04123a5b485cafa9174f"
-platform = "x86_64-linux"
 
 [[sources]]
 name = "hunk"
@@ -4969,6 +4953,22 @@ digest = "dd2886fe8104f119c13d63bdc36cde501a4e08a3fce5ac65c9f7fd2e3e1da09a"
 platform = "x86_64-linux"
 
 [[sources]]
+name = "virtctl"
+path = "https://github.com/kubevirt/kubevirt/releases/download/v1.8.4/virtctl-v1.8.4-darwin-amd64"
+includes = []
+excludes = []
+digest = "06f2d43a5245079733f17a66a833a5cfb151d181de3afffb20f53ec42b751587"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "virtctl"
+path = "https://github.com/kubevirt/kubevirt/releases/download/v1.8.4/virtctl-v1.8.4-darwin-arm64"
+includes = []
+excludes = []
+digest = "4d3132852c72bf721c6eead8c7f9c23864d0312447ab7316b5d1fa2ecb0a2fdf"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "vlse-boolbase"
 path = "https://registry.npmjs.org/boolbase/-/boolbase-1.0.0.tgz"
 includes = []
@@ -5975,6 +5975,14 @@ includes = []
 excludes = []
 digest = "e9ffd69a8892266c0e5872036c6783683b494b3fcd34c5617ba8fe8666fb8efc"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "x264"
+path = "https://download.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20191217-2245-stable.tar.bz2"
+includes = []
+excludes = []
+digest = "e9ffd69a8892266c0e5872036c6783683b494b3fcd34c5617ba8fe8666fb8efc"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "xz"

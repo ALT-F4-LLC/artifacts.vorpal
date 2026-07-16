@@ -7,34 +7,36 @@ use vorpal_sdk::{
 };
 
 #[derive(Default)]
-pub struct Herdr;
+pub struct Virtctl;
 
-impl Herdr {
+impl Virtctl {
     pub fn new() -> Self {
         Self
     }
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
-        let name = "herdr";
-        let version = "0.7.4";
+        let name = "virtctl";
+        let source_version = "1.8.4";
 
         let source_system = match context.get_system() {
-            Aarch64Darwin => "macos-aarch64",
-            Aarch64Linux => "linux-aarch64",
-            X8664Darwin => "macos-x86_64",
-            X8664Linux => "linux-x86_64",
+            Aarch64Darwin => "darwin-arm64",
+            Aarch64Linux => "linux-arm64",
+            X8664Darwin => "darwin-amd64",
+            X8664Linux => "linux-amd64",
             _ => return Err(anyhow::anyhow!("Unsupported system for {name} artifact")),
         };
 
+        let source_file = format!("{name}-v{source_version}-{source_system}");
+
         let source_path = format!(
-            "https://github.com/ogulcancelik/herdr/releases/download/v{version}/{name}-{source_system}"
+            "https://github.com/kubevirt/kubevirt/releases/download/v{source_version}/{source_file}"
         );
 
         let source = ArtifactSource::new(name, &source_path).build();
 
         let step_script = formatdoc! {"
             mkdir -pv \"$VORPAL_OUTPUT/bin\"
-            cp ./source/{name}/{name}-{source_system} \"$VORPAL_OUTPUT/bin/{name}\"
+            cp ./source/{name}/{source_file} \"$VORPAL_OUTPUT/bin/{name}\"
             chmod +x \"$VORPAL_OUTPUT/bin/{name}\"",
         };
 
@@ -43,7 +45,7 @@ impl Herdr {
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 
         Artifact::new(name, steps, systems)
-            .with_aliases(vec![format!("{name}:{version}")])
+            .with_aliases(vec![format!("{name}:{source_version}")])
             .with_sources(vec![source])
             .build(context)
             .await

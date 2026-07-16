@@ -16,8 +16,9 @@ use vorpal_artifacts::{
         sesh::Sesh, skopeo::Skopeo, sqlite3::Sqlite3, starship::Starship, talosctl::Talosctl,
         terraform::Terraform, terraform_ls::TerraformLs, tmux::Tmux, tree_sitter::TreeSitter,
         ttyd::Ttyd, typescript::Typescript, typescript_language_server::TypescriptLanguageServer,
-        umoci::Umoci, uv::Uv, vhs::Vhs, vscode_langservers_extracted::VscodeLangserversExtracted,
-        x264::X264, yaml_language_server::YamlLanguageServer, yq::Yq, zoxide::Zoxide, zsh::Zsh,
+        umoci::Umoci, uv::Uv, vhs::Vhs, virtctl::Virtctl,
+        vscode_langservers_extracted::VscodeLangserversExtracted, x264::X264,
+        yaml_language_server::YamlLanguageServer, yq::Yq, zoxide::Zoxide, zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
 };
@@ -104,6 +105,7 @@ async fn main() -> Result<()> {
     Umoci::new().build(context).await?;
     Uv::new().build(context).await?;
     Vhs::new().build(context).await?;
+    Virtctl::new().build(context).await?;
     VscodeLangserversExtracted::new().build(context).await?;
     X264::new().build(context).await?;
     YamlLanguageServer::new().build(context).await?;

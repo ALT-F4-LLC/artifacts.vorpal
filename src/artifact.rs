@@ -74,6 +74,7 @@ pub mod typescript_language_server;
 pub mod umoci;
 pub mod uv;
 pub mod vhs;
+pub mod virtctl;
 pub mod vscode_langservers_extracted;
 pub mod x264;
 pub mod yaml_language_server;
