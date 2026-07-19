@@ -2762,6 +2762,14 @@ platform = "aarch64-darwin"
 
 [[sources]]
 name = "herdr"
+path = "https://github.com/ogulcancelik/herdr/releases/download/v0.7.4/herdr-linux-aarch64"
+includes = []
+excludes = []
+digest = "ab0327d5c8c84618ad95b9abe0dc4d118de44ff26f1cf16ea7ec18c0f4f89f4d"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "herdr"
 path = "https://github.com/ogulcancelik/herdr/releases/download/v0.7.4/herdr-macos-x86_64"
 includes = []
 excludes = []
@@ -4962,6 +4970,14 @@ platform = "x86_64-darwin"
 
 [[sources]]
 name = "virtctl"
+path = "https://github.com/kubevirt/kubevirt/releases/download/v1.8.4/virtctl-v1.8.4-linux-arm64"
+includes = []
+excludes = []
+digest = "2a16cb13405952fa56bae35dc066ede8ed1ebc6050df8ee99cc0d12467b4dc37"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "virtctl"
 path = "https://github.com/kubevirt/kubevirt/releases/download/v1.8.4/virtctl-v1.8.4-darwin-arm64"
 includes = []
 excludes = []
@@ -5983,6 +5999,14 @@ includes = []
 excludes = []
 digest = "e9ffd69a8892266c0e5872036c6783683b494b3fcd34c5617ba8fe8666fb8efc"
 platform = "x86_64-darwin"
+
+[[sources]]
+name = "x264"
+path = "https://download.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20191217-2245-stable.tar.bz2"
+includes = []
+excludes = []
+digest = "e9ffd69a8892266c0e5872036c6783683b494b3fcd34c5617ba8fe8666fb8efc"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "xz"
