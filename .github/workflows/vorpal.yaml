@@ -11,9 +11,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
 jobs:
-  build-dev:
+  prepare:
     runs-on: ${{ matrix.runner }}
     strategy:
+      fail-fast: false
       matrix:
         runner:
           - macos-latest
@@ -23,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: ALT-F4-LLC/setup-vorpal-action@0.1.1
+      - uses: ALT-F4-LLC/setup-vorpal-action@0.2.0
         with:
           registry-backend: "s3"
           registry-backend-s3-bucket: "altf4llc-vorpal-registry"
@@ -33,16 +34,36 @@ jobs:
           AWS_DEFAULT_REGION: "${{ vars.AWS_DEFAULT_REGION }}"
           AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
 
-      - run: vorpal build 'dev'
+      - name: Prepare all artifacts
+        run: |
+          while IFS= read -r artifact; do
+            echo "::group::vorpal prepare $artifact"
+            vorpal prepare "$artifact"
+            echo "::endgroup::"
+          done < <(script/list-artifacts.sh)
 
-      - uses: actions/upload-artifact@v7
+          if git diff --quiet -- Vorpal.lock; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload prepared lockfile
+        if: ${{ steps.prepare_lock.outputs.changed == 'true' }}
+        uses: actions/upload-artifact@v7
         with:
-          name: ${{ runner.arch }}-${{ runner.os }}-vorpal-lock
+          name: vorpal-lock-${{ env.ARCH }}-${{ env.OS }}
           path: Vorpal.lock
+
+      - name: Fail on lockfile drift
+        if: ${{ steps.prepare_lock.outputs.changed == 'true' }}
+        run: |
+          echo "::error file=Vorpal.lock::vorpal prepare changed Vorpal.lock. Download the vorpal-lock-${ARCH}-${OS} artifact, replace Vorpal.lock, commit it, and re-push."
+          exit 1
 
   build:
     needs:
-      - build-dev
+      - prepare
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
