@@ -17,7 +17,6 @@ jobs:
       fail-fast: false
       matrix:
         runner:
-          - altf4llc
           - macos-latest
           - macos-latest-large
           - ubuntu-latest
@@ -72,7 +71,6 @@ jobs:
       fail-fast: false
       matrix:
         runner:
-          - altf4llc
           - macos-latest
           - macos-latest-large
           - ubuntu-latest
