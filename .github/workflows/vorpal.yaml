@@ -11,17 +11,28 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      runners: ${{ steps.set.outputs.runners }}
+    steps:
+      - id: set
+        env:
+          INCLUDE_SELFHOSTED: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+        run: |
+          if [[ "$INCLUDE_SELFHOSTED" == "true" ]]; then
+            echo 'runners=["altf4llc","macos-latest","macos-latest-large","ubuntu-latest","ubuntu-latest-arm64"]' >> "$GITHUB_OUTPUT"
+          else
+            echo 'runners=["macos-latest","macos-latest-large","ubuntu-latest","ubuntu-latest-arm64"]' >> "$GITHUB_OUTPUT"
+          fi
+
   prepare:
+    needs: [setup]
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        runner:
-          - altf4llc
-          - macos-latest
-          - macos-latest-large
-          - ubuntu-latest
-          - ubuntu-latest-arm64
+        runner: ${{ fromJSON(needs.setup.outputs.runners) }}
     steps:
       - uses: actions/checkout@v7
 
@@ -65,18 +76,12 @@ jobs:
           exit 1
 
   build:
-    needs:
-      - prepare
+    needs: [setup, prepare]
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        runner:
-          - altf4llc
-          - macos-latest
-          - macos-latest-large
-          - ubuntu-latest
-          - ubuntu-latest-arm64
+        runner: ${{ fromJSON(needs.setup.outputs.runners) }}
     steps:
       - uses: actions/checkout@v7
 
