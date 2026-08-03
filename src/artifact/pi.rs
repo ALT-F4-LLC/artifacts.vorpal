@@ -16,7 +16,7 @@ impl Pi {
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         let name = "pi";
-        let version = "0.80.2";
+        let version = "0.83.0";
 
         let source_system = match context.get_system() {
             Aarch64Darwin => "darwin-arm64",
