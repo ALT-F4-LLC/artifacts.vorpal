@@ -2754,35 +2754,11 @@ platform = "x86_64-darwin"
 
 [[sources]]
 name = "herdr"
-path = "https://github.com/ogulcancelik/herdr/releases/download/v0.7.4/herdr-linux-x86_64"
+path = "https://github.com/ogulcancelik/herdr/releases/download/v0.8.0/herdr-macos-aarch64"
 includes = []
 excludes = []
-digest = "5071761c9e7b2c886c94d92ba9bef8b03bced690abce5b84f526d1a6c6b067b5"
-platform = "x86_64-linux"
-
-[[sources]]
-name = "herdr"
-path = "https://github.com/ogulcancelik/herdr/releases/download/v0.7.4/herdr-linux-aarch64"
-includes = []
-excludes = []
-digest = "ab0327d5c8c84618ad95b9abe0dc4d118de44ff26f1cf16ea7ec18c0f4f89f4d"
-platform = "aarch64-linux"
-
-[[sources]]
-name = "herdr"
-path = "https://github.com/ogulcancelik/herdr/releases/download/v0.7.5/herdr-macos-aarch64"
-includes = []
-excludes = []
-digest = "bf445b210b35429cc72aa7c5555449dc1bbfd2466fc438ee55af704d9760af63"
+digest = "74a0e53b8e0246df50013e464df2f465b8a54d4b37058c8715105502f5451f28"
 platform = "aarch64-darwin"
-
-[[sources]]
-name = "herdr"
-path = "https://github.com/ogulcancelik/herdr/releases/download/v0.7.4/herdr-macos-x86_64"
-includes = []
-excludes = []
-digest = "d042f410b0b15f01ace79913a84e3644e3eb117cd4d6f100470da0950514b76e"
-platform = "x86_64-darwin"
 
 [[sources]]
 name = "hunk"
