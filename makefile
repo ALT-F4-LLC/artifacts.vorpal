@@ -1,29 +1,31 @@
-CARGO := cargo
-VORPAL := vorpal
-VORPAL_ARTIFACT := dev
-VORPAL_FLAGS :=
-
 .DEFAULT_GOAL := check
 
-.PHONY: check fmt fmt-check clippy build vorpal-build vorpal-prepare
+# Artifact built by the vorpal-* targets; override for one-off builds, e.g.
+# `make vorpal-build VORPAL_ARTIFACT=kubectl`.
+VORPAL_ARTIFACT ?= dev
 
-check:
-	$(CARGO) check
-
-fmt:
-	$(CARGO) fmt --all
-
-fmt-check:
-	$(CARGO) fmt --all -- --check
-
-clippy:
-	$(CARGO) clippy --all-targets --all-features
+.PHONY: build check clippy fmt fmt-check registry-check vorpal-build vorpal-prepare
 
 build:
-	$(CARGO) build
+	cargo build --locked
+
+check:
+	cargo check --locked
+
+clippy:
+	cargo clippy --locked -- --deny warnings
+
+fmt:
+	cargo fmt --all
+
+fmt-check:
+	cargo fmt --all -- --check
+
+registry-check:
+	bash script/check-artifact-registry.sh
 
 vorpal-build:
-	$(VORPAL) build $(VORPAL_FLAGS) $(VORPAL_ARTIFACT)
+	vorpal build $(VORPAL_ARTIFACT)
 
 vorpal-prepare:
-	$(VORPAL) prepare $(VORPAL_FLAGS) $(VORPAL_ARTIFACT)
+	vorpal prepare $(VORPAL_ARTIFACT)

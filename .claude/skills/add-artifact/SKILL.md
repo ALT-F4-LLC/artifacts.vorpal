@@ -330,23 +330,29 @@ Two insertions, both in **alphabetical order**:
 
 **IMPORTANT: The artifact is NOT considered done until `vorpal build <artifact-name>` succeeds on the native host OS. This step is a mandatory validation gate — do NOT mark the task as complete, close the issue, or report success unless the build passes.**
 
-Run these commands in order:
+Run these commands in order — they are the same gate CI runs, so passing here is passing there:
 
 ```bash
-cargo check
+make check
 ```
 
-If `cargo check` fails, fix the errors and re-run until it passes.
+If `make check` fails, fix the errors and re-run until it passes.
 
 ```bash
-cargo fmt
+make fmt
 ```
 
 ```bash
-cargo check
+make clippy
 ```
 
-If `cargo check` passes after formatting, validate the registry wiring cheaply before a full build:
+`make clippy` denies warnings, exactly as CI does, so a lint left behind fails the build.
+
+Once it passes, validate the registry wiring cheaply before a full build:
+
+```bash
+make registry-check
+```
 
 ```bash
 vorpal build <artifact-name> --list
@@ -360,7 +366,7 @@ vorpal build <artifact-name>
 
 > **Prerequisite:** the `vorpal` CLI must be installed and on `PATH` (the build talks to the Vorpal service over its socket). If `vorpal` is not found, install/initialize it before proceeding — this gate cannot be satisfied without it.
 
-`vorpal build` targets the native host OS and architecture by default (the `--system` flag defaults to the host system, e.g. `aarch64-darwin` on Apple Silicon). Do NOT pass `--system` to target a different platform — this repo has no Lima (Linux-on-macOS VM) tooling to fall back on, so cross-platform builds are not available here.
+`vorpal build` targets the native host OS and architecture by default (the `--system` flag defaults to the host system, e.g. `aarch64-darwin` on Apple Silicon). Do NOT pass `--system` to target a different platform — this repo has no Lima dev-VM tooling to fall back on, so cross-platform builds are not available here. (The `lima` artifact published from `src/artifact/lima.rs` is an unrelated published tool, not a build path for this repo.)
 
 If the build fails, debug and fix the artifact implementation. Common issues:
 - Wrong download URL or URL pattern

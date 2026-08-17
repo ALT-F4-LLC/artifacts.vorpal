@@ -11,19 +11,36 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
 jobs:
-  lint:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+
+      # vorpal-sdk's build script runs prost/tonic codegen, which needs protoc
+      # on PATH; the GitHub-hosted Ubuntu image does not ship it.
+      - name: Install protoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Check artifact registry
+        run: make registry-check
 
       - name: Check formatting
         run: make fmt-check
 
       - name: Run clippy
         run: make clippy
-
-      - name: Run cargo check
-        run: make check
 
       - name: Run cargo build
         run: make build

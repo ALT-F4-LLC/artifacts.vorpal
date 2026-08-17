@@ -119,7 +119,8 @@ impl<'a> DockerfileLanguageServer<'a> {
 
         let env_node = get_env_key(&node.to_string());
 
-        let pkg_dir = format!("$VORPAL_OUTPUT/lib/node_modules/dockerfile-language-server-nodejs");
+        let pkg_dir =
+            "$VORPAL_OUTPUT/lib/node_modules/dockerfile-language-server-nodejs".to_string();
 
         let step_script = formatdoc! {"
             mkdir -pv \"{pkg_dir}\" \"$VORPAL_OUTPUT/bin\"

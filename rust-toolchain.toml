@@ -1,0 +1,7 @@
+# Pins rustup (locally and on CI runners) to the same toolchain the vorpal
+# `dev` environment injects via RUSTUP_TOOLCHAIN, so lint verdicts track the
+# code rather than whatever Rust a runner image happens to ship. Keep in sync
+# with vorpal_sdk::artifact::rust_toolchain::version() (see src/lib.rs).
+[toolchain]
+channel = "1.93.1"
+components = ["clippy", "rustfmt"]
