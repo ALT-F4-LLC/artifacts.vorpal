@@ -1,29 +1,29 @@
-ARCH := $(shell uname -m | tr '[:upper:]' '[:lower:]' | sed 's/arm64/aarch64/')
-LIMA_ARCH := $(ARCH)
-LIMA_CPUS := 8
-LIMA_DISK := 100
-LIMA_MEMORY := 8
-WORK_DIR := $(shell pwd)
+CARGO := cargo
+VORPAL := vorpal
 VORPAL_ARTIFACT := dev
+VORPAL_FLAGS :=
 
-# Lima environment
+.DEFAULT_GOAL := check
 
-lima-clean:
-	limactl stop "artifacts-$(LIMA_ARCH)" || true
-	limactl delete "artifacts-$(LIMA_ARCH)" || true
+.PHONY: check fmt fmt-check clippy build vorpal-build vorpal-prepare
 
-lima: lima-clean
-	cat lima.yaml | limactl create --arch "$(LIMA_ARCH)" --cpus "$(LIMA_CPUS)" --disk "$(LIMA_DISK)" --memory "$(LIMA_MEMORY)" --name "artifacts-$(LIMA_ARCH)" -
-	limactl start "artifacts-$(LIMA_ARCH)"
-	limactl shell "artifacts-$(LIMA_ARCH)" $(WORK_DIR)/script/lima.sh deps
-	limactl stop "artifacts-$(LIMA_ARCH)"
-	limactl start "artifacts-$(LIMA_ARCH)"
+check:
+	$(CARGO) check
 
-lima-sync:
-	limactl shell "artifacts-$(LIMA_ARCH)" ./script/lima.sh sync
+fmt:
+	$(CARGO) fmt --all
 
-lima-vorpal:
-	limactl shell "artifacts-$(LIMA_ARCH)" bash -c 'cd ~/vorpal && target/debug/vorpal build $(VORPAL_FLAGS) $(VORPAL_ARTIFACT)'
+fmt-check:
+	$(CARGO) fmt --all -- --check
 
-lima-vorpal-start:
-	limactl shell "artifacts-$(LIMA_ARCH)" bash -c '~/vorpal/target/debug/vorpal services start $(VORPAL_FLAGS)'
+clippy:
+	$(CARGO) clippy --all-targets --all-features
+
+build:
+	$(CARGO) build
+
+vorpal-build:
+	$(VORPAL) build $(VORPAL_FLAGS) $(VORPAL_ARTIFACT)
+
+vorpal-prepare:
+	$(VORPAL) prepare $(VORPAL_FLAGS) $(VORPAL_ARTIFACT)

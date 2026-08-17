@@ -360,7 +360,7 @@ vorpal build <artifact-name>
 
 > **Prerequisite:** the `vorpal` CLI must be installed and on `PATH` (the build talks to the Vorpal service over its socket). If `vorpal` is not found, install/initialize it before proceeding — this gate cannot be satisfied without it.
 
-`vorpal build` targets the native host OS and architecture by default (the `--system` flag defaults to the host system, e.g. `aarch64-darwin` on Apple Silicon). Do NOT pass `--system` to target a different platform, and do NOT attempt Lima (Linux-on-macOS VM) builds unless the operator explicitly instructs you to do so.
+`vorpal build` targets the native host OS and architecture by default (the `--system` flag defaults to the host system, e.g. `aarch64-darwin` on Apple Silicon). Do NOT pass `--system` to target a different platform — this repo has no Lima (Linux-on-macOS VM) tooling to fall back on, so cross-platform builds are not available here.
 
 If the build fails, debug and fix the artifact implementation. Common issues:
 - Wrong download URL or URL pattern

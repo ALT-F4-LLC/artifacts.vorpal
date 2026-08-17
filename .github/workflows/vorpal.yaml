@@ -11,6 +11,23 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check formatting
+        run: make fmt-check
+
+      - name: Run clippy
+        run: make clippy
+
+      - name: Run cargo check
+        run: make check
+
+      - name: Run cargo build
+        run: make build
+
   setup:
     runs-on: ubuntu-latest
     outputs:
