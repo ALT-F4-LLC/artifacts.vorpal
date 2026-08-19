@@ -16,7 +16,7 @@ impl Herdr {
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         let name = "herdr";
-        let version = "0.8.0";
+        let version = "0.8.2";
 
         let source_system = match context.get_system() {
             Aarch64Darwin => "macos-aarch64",
