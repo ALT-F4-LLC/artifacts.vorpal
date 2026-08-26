@@ -2762,6 +2762,14 @@ platform = "aarch64-linux"
 
 [[sources]]
 name = "herdr"
+path = "https://github.com/ogulcancelik/herdr/releases/download/v0.8.2/herdr-macos-x86_64"
+includes = []
+excludes = []
+digest = "2c49d12c71da74ddbcfbd1ce04a1ff4150d281ae40ff647d6a03ba322a09fc02"
+platform = "x86_64-darwin"
+
+[[sources]]
+name = "herdr"
 path = "https://github.com/ogulcancelik/herdr/releases/download/v0.8.2/herdr-linux-x86_64"
 includes = []
 excludes = []
@@ -3975,6 +3983,14 @@ includes = []
 excludes = []
 digest = "19d2611f4953c149855b2c2be0b446e9c1fd0ffe87bc1145755403351b5f3c3d"
 platform = "x86_64-linux"
+
+[[sources]]
+name = "pi"
+path = "https://github.com/earendil-works/pi/releases/download/v0.84.3/pi-darwin-x64.tar.gz"
+includes = []
+excludes = []
+digest = "514cfc7d86f58bdfc96e381264e0b7f3bdd20003b04e03e28fd2de98c3a057ab"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "pi"
