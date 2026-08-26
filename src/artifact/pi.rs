@@ -16,7 +16,7 @@ impl Pi {
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         let name = "pi";
-        let version = "0.83.0";
+        let version = "0.84.3";
 
         let source_system = match context.get_system() {
             Aarch64Darwin => "darwin-arm64",
@@ -35,11 +35,6 @@ impl Pi {
         let step_script = formatdoc! {"
             mkdir -pv \"$VORPAL_OUTPUT/bin\" \"$VORPAL_OUTPUT/lib\"
 
-            # pi is a Bun-compiled binary that resolves every bundled asset (theme/, export-html/,
-            # assets/, docs/, ...) relative to dirname(process.execPath). Copy the whole upstream
-            # tree under lib/{name} to preserve that layout, then drop a thin wrapper in bin/ that
-            # execs the real binary by absolute path so execPath = lib/{name}/{name} and the assets
-            # resolve at lib/{name}/theme. Copying only the binary drops theme/ -> ENOENT at startup.
             cp -R ./source/{name}/{name} \"$VORPAL_OUTPUT/lib/{name}\"
             chmod +x \"$VORPAL_OUTPUT/lib/{name}/{name}\"
 
@@ -50,16 +45,6 @@ impl Pi {
 
             chmod +x \"$VORPAL_OUTPUT/bin/{name}\"
 
-            # Build-step packaging check: this build host's CPU may not support executing the
-            # upstream {name} binary (e.g. a Bun-compiled binary hitting SIGILL on an
-            # incompatible microarch) even though the packaged output on disk is byte-identical
-            # across build hosts. The build gate verifies packaging is complete and
-            # host-independent; it does not verify the binary can execute on the current build
-            # host - that's a separate, host-coupled concern intentionally out of scope here.
-            # So assert the on-disk layout without ever exec'ing the binary: the bundled asset
-            # directories the upstream release ships (confirmed present in the release archive)
-            # exist and are non-empty, the wrapper exists and is executable, and the wrapper's
-            # exec target resolves to the real binary's absolute path.
             echo 'Running pi packaging check (structural, no binary execution)...'
 
             for asset_dir in theme export-html assets docs; do
