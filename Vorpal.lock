@@ -2754,6 +2754,14 @@ platform = "x86_64-darwin"
 
 [[sources]]
 name = "herdr"
+path = "https://github.com/ogulcancelik/herdr/releases/download/v0.8.2/herdr-linux-x86_64"
+includes = []
+excludes = []
+digest = "6d3a8f517b62996e54951e355f8d3ae3cc71c3785041ea4a19c36ba40c63f45b"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "herdr"
 path = "https://github.com/ogulcancelik/herdr/releases/download/v0.8.2/herdr-macos-aarch64"
 includes = []
 excludes = []
@@ -3950,6 +3958,14 @@ path = "https://sdk.vorpal.build/source/perl-5.42.0.tar.xz"
 includes = []
 excludes = []
 digest = "43a6f8cf15fcedeb66e95c4957ec8bc43db40515de89483e507c01c255fce853"
+platform = "x86_64-linux"
+
+[[sources]]
+name = "pi"
+path = "https://github.com/earendil-works/pi/releases/download/v0.84.3/pi-linux-x64.tar.gz"
+includes = []
+excludes = []
+digest = "19d2611f4953c149855b2c2be0b446e9c1fd0ffe87bc1145755403351b5f3c3d"
 platform = "x86_64-linux"
 
 [[sources]]
