@@ -61,7 +61,9 @@ jobs:
           fi
 
   prepare:
-    needs: [setup]
+    needs:
+      - check
+      - setup
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -110,7 +112,9 @@ jobs:
           exit 1
 
   build:
-    needs: [setup, prepare]
+    needs:
+      - prepare
+      - setup
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
