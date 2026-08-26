@@ -3954,35 +3954,11 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "pi"
-path = "https://github.com/earendil-works/pi/releases/download/v0.80.2/pi-linux-arm64.tar.gz"
+path = "https://github.com/earendil-works/pi/releases/download/v0.84.3/pi-darwin-arm64.tar.gz"
 includes = []
 excludes = []
-digest = "2a6cf632d666fa3ae8f55056fc9753088b140bedfa307ac8313f540755d8d19d"
-platform = "aarch64-linux"
-
-[[sources]]
-name = "pi"
-path = "https://github.com/earendil-works/pi/releases/download/v0.83.0/pi-darwin-arm64.tar.gz"
-includes = []
-excludes = []
-digest = "3523a9b925587d36e81c61d5a8ef99f4b626f1c7222e193698ced1ced383ef79"
+digest = "b80d08f617687d4cc8adb1c90708433c7c0b70aa6872617ab684dc0149f8685f"
 platform = "aarch64-darwin"
-
-[[sources]]
-name = "pi"
-path = "https://github.com/earendil-works/pi/releases/download/v0.80.2/pi-darwin-x64.tar.gz"
-includes = []
-excludes = []
-digest = "afe432c4e2bd6f51b6df3d407cc672d426df0ea07518349e84c5be879abde12d"
-platform = "x86_64-darwin"
-
-[[sources]]
-name = "pi"
-path = "https://github.com/earendil-works/pi/releases/download/v0.80.2/pi-linux-x64.tar.gz"
-includes = []
-excludes = []
-digest = "d7df08e1afe43896577591952f67979a1203076d124bedbb0d81e256710c3b85"
-platform = "x86_64-linux"
 
 [[sources]]
 name = "picomatch"
