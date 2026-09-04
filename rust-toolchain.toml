@@ -3,5 +3,5 @@
 # code rather than whatever Rust a runner image happens to ship. Keep in sync
 # with vorpal_sdk::artifact::rust_toolchain::version() (see src/lib.rs).
 [toolchain]
-channel = "1.93.1"
+channel = "1.98.1"
 components = ["clippy", "rustfmt"]
