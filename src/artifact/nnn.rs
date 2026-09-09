@@ -61,6 +61,31 @@ impl<'a> Nnn<'a> {
 
         let source = ArtifactSource::new(name, &path).build();
 
+        // On Linux, link ncurses and readline statically so nnn does not load
+        // shared libraries built against the sandbox glibc, which may be newer
+        // than the host's. The static ncurses archive still references
+        // cfgetospeed, which glibc 2.42 re-versioned, so nnn carries the
+        // pre-2.42 implementation itself instead of binding to the sandbox's.
+        let (linux_shim, make_args) = match context.get_system() {
+            Aarch64Linux | X8664Linux => (
+                formatdoc! {"
+                    cat > cfgetospeed.c <<'EOF'
+                    #define _GNU_SOURCE
+                    #include <termios.h>
+
+                    speed_t cfgetospeed(const struct termios *t) {{ return t->c_cflag & (CBAUD | CBAUDEX); }}
+                    EOF
+                    ${{CC:-cc}} -c -o cfgetospeed.o cfgetospeed.c
+                "},
+                format!(
+                    "LDLIBS=\"$PWD/cfgetospeed.o {readline}/lib/libreadline.a {ncurses}/lib/libncursesw.a {ncurses}/lib/libtinfow.a -lpthread\"",
+                    ncurses = get_env_key(&ncurses.to_string()),
+                    readline = get_env_key(&readline.to_string()),
+                ),
+            ),
+            _ => (String::new(), String::new()),
+        };
+
         let script = formatdoc! {"
             mkdir -pv \"$VORPAL_OUTPUT\"
 
@@ -71,8 +96,9 @@ impl<'a> Nnn<'a> {
             export LDFLAGS=\"-L{ncurses}/lib -L{readline}/lib -Wl,-rpath,{ncurses}/lib -Wl,-rpath,{readline}/lib\"
             export PKG_CONFIG_PATH=\"{ncurses}/lib/pkgconfig:{readline}/lib/pkgconfig\"
 
-            make PREFIX=\"$VORPAL_OUTPUT\"
-            make PREFIX=\"$VORPAL_OUTPUT\" install",
+            {linux_shim}
+            make PREFIX=\"$VORPAL_OUTPUT\" {make_args}
+            make PREFIX=\"$VORPAL_OUTPUT\" {make_args} install",
             ncurses = get_env_key(&ncurses.to_string()),
             pkg_config = get_env_key(&pkg_config.to_string()),
             readline = get_env_key(&readline.to_string()),
