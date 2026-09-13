@@ -63,17 +63,17 @@ impl<'a> Tmux<'a> {
 
             make
             make install",
-            libevent = get_env_key(&libevent.to_string()),
-            ncurses = get_env_key(&ncurses.to_string()),
+            libevent = get_env_key(libevent),
+            ncurses = get_env_key(ncurses),
         };
 
         let steps = vec![
             step::shell(
                 context,
-                vec![libevent.to_string(), ncurses.to_string()],
-                vec![],
+                &[libevent.to_string(), ncurses.to_string()],
+                &[],
                 script,
-                vec![],
+                &[],
             )
             .await?,
         ];

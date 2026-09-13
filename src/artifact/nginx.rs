@@ -40,7 +40,7 @@ impl Nginx {
             ln -svf $VORPAL_OUTPUT/sbin/nginx $VORPAL_OUTPUT/bin/nginx",
         };
 
-        let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+        let steps = vec![step::shell(context, &[], &[], step_script, &[]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 

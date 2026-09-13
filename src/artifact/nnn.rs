@@ -107,14 +107,14 @@ impl<'a> Nnn<'a> {
         let steps = vec![
             step::shell(
                 context,
-                vec![
+                &[
                     ncurses.to_string(),
                     pkg_config.to_string(),
                     readline.to_string(),
                 ],
-                vec![],
+                &[],
                 script,
-                vec![],
+                &[],
             )
             .await?,
         ];

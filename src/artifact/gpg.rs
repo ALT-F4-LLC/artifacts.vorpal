@@ -121,26 +121,26 @@ impl<'a> Gpg<'a> {
 
             make
             make install",
-            libassuan = get_env_key(&libassuan.to_string()),
-            libgcrypt = get_env_key(&libgcrypt.to_string()),
-            libgpg_error = get_env_key(&libgpg_error.to_string()),
-            libksba = get_env_key(&libksba.to_string()),
-            npth = get_env_key(&npth.to_string()),
+            libassuan = get_env_key(libassuan),
+            libgcrypt = get_env_key(libgcrypt),
+            libgpg_error = get_env_key(libgpg_error),
+            libksba = get_env_key(libksba),
+            npth = get_env_key(npth),
         };
 
         let steps = vec![
             step::shell(
                 context,
-                vec![
+                &[
                     libassuan.to_string(),
                     libgcrypt.to_string(),
                     libgpg_error.to_string(),
                     libksba.to_string(),
                     npth.to_string(),
                 ],
-                vec![],
+                &[],
                 script,
-                vec![],
+                &[],
             )
             .await?,
         ];

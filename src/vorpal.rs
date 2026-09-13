@@ -26,7 +26,8 @@ use vorpal_sdk::context::get_context;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let context = &mut get_context().await?;
+    let mut owned_context = get_context().await?;
+    let context = &mut owned_context;
 
     // Artifacts
 
@@ -119,5 +120,5 @@ async fn main() -> Result<()> {
         .build(context)
         .await?;
 
-    context.run().await
+    owned_context.run().await
 }

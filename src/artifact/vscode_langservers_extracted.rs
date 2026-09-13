@@ -135,7 +135,7 @@ impl<'a> VscodeLangserversExtracted<'a> {
             ArtifactSource::new("vlse-vscode-uri", "https://registry.npmjs.org/vscode-uri/-/vscode-uri-3.1.0.tgz").build(),
         ];
 
-        let env_node = get_env_key(&node.to_string());
+        let env_node = get_env_key(node);
 
         let pkg_dir = format!("$VORPAL_OUTPUT/lib/node_modules/{name}");
 
@@ -214,8 +214,7 @@ impl<'a> VscodeLangserversExtracted<'a> {
 
         let step_script = format!("{step_script}\n{selftest_setup}");
 
-        let steps =
-            vec![step::shell(context, vec![node.to_string()], vec![], step_script, vec![]).await?];
+        let steps = vec![step::shell(context, &[node.to_string()], &[], step_script, &[]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 

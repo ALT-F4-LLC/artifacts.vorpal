@@ -130,11 +130,11 @@ impl<'a> Ttyd<'a> {
                     popd
 
                     chmod +x \"$VORPAL_OUTPUT/bin/ttyd\"",
-                    cmake = get_env_key(&cmake.to_string()),
-                    json_c = get_env_key(&json_c.to_string()),
-                    libuv = get_env_key(&libuv.to_string()),
-                    libwebsockets = get_env_key(&libwebsockets.to_string()),
-                    mbedtls = get_env_key(&mbedtls.to_string()),
+                    cmake = get_env_key(cmake),
+                    json_c = get_env_key(json_c),
+                    libuv = get_env_key(libuv),
+                    libwebsockets = get_env_key(libwebsockets),
+                    mbedtls = get_env_key(mbedtls),
                 };
 
                 let sources = vec![ArtifactSource::new(name, &ttyd_path).build()];
@@ -152,7 +152,7 @@ impl<'a> Ttyd<'a> {
             _ => return Err(anyhow::anyhow!("Unsupported system for ttyd artifact")),
         };
 
-        let steps = vec![step::shell(context, step_artifacts, vec![], step_script, vec![]).await?];
+        let steps = vec![step::shell(context, &step_artifacts, &[], step_script, &[]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 

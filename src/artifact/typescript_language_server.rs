@@ -151,8 +151,8 @@ impl<'a> TypescriptLanguageServer<'a> {
 
         let source = ArtifactSource::new(name, &source_path).build();
 
-        let env_node = get_env_key(&node.to_string());
-        let env_typescript = get_env_key(&typescript.to_string());
+        let env_node = get_env_key(node);
+        let env_typescript = get_env_key(typescript);
 
         let step_script = formatdoc! {"
             mkdir -pv \"$VORPAL_OUTPUT/bin\" \"$VORPAL_OUTPUT/lib/node_modules/typescript-language-server\"
@@ -203,10 +203,10 @@ impl<'a> TypescriptLanguageServer<'a> {
         let steps = vec![
             step::shell(
                 context,
-                vec![node.to_string(), typescript.to_string()],
-                vec![],
+                &[node.to_string(), typescript.to_string()],
+                &[],
                 step_script,
-                vec![],
+                &[],
             )
             .await?,
         ];

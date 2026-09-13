@@ -67,7 +67,7 @@ impl Awscli2 {
 
         let source = ArtifactSource::new(name, &source_path).build();
 
-        let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+        let steps = vec![step::shell(context, &[], &[], step_script, &[]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 

@@ -56,17 +56,17 @@ impl<'a> Ffmpeg<'a> {
 
             make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
             make install",
-            pkg_config = get_env_key(&pkg_config.to_string()),
-            x264 = get_env_key(&x264.to_string()),
+            pkg_config = get_env_key(&pkg_config),
+            x264 = get_env_key(x264),
         };
 
         let steps = vec![
             step::shell(
                 context,
-                vec![x264.to_string(), pkg_config.to_string()],
-                vec![],
+                &[x264.to_string(), pkg_config.to_string()],
+                &[],
                 step_script,
-                vec![],
+                &[],
             )
             .await?,
         ];

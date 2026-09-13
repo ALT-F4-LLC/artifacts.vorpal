@@ -36,7 +36,7 @@ impl<'a> File<'a> {
             name = self.name,
         };
 
-        let step = step::shell(context, vec![], vec![], step_script, vec![]).await?;
+        let step = step::shell(context, &[], &[], step_script, &[]).await?;
 
         Artifact::new(self.name, vec![step], self.systems)
             .build(context)

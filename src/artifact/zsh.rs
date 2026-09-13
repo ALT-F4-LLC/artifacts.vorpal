@@ -50,11 +50,10 @@ impl<'a> Zsh<'a> {
 
             make
             make install",
-            ncurses = get_env_key(&ncurses.to_string()),
+            ncurses = get_env_key(ncurses),
         };
 
-        let steps =
-            vec![step::shell(context, vec![ncurses.to_string()], vec![], script, vec![]).await?];
+        let steps = vec![step::shell(context, &[ncurses.to_string()], &[], script, &[]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 

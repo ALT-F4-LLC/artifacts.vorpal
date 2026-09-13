@@ -37,7 +37,7 @@ impl<'a> OpenapiGeneratorCli<'a> {
 
         let source = ArtifactSource::new(name, &source_path).build();
 
-        let env_openjdk = get_env_key(&openjdk.to_string());
+        let env_openjdk = get_env_key(openjdk);
 
         let step_script = formatdoc! {"
             mkdir -p \"$VORPAL_OUTPUT/bin\"
@@ -68,10 +68,10 @@ impl<'a> OpenapiGeneratorCli<'a> {
         let steps = vec![
             step::shell(
                 context,
-                vec![openjdk.to_string()],
-                environments.to_vec(),
+                &[openjdk.to_string()],
+                &environments,
                 step_script,
-                vec![],
+                &[],
             )
             .await?,
         ];

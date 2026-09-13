@@ -62,11 +62,7 @@ impl<'a> Libwebsockets<'a> {
 
         let source = ArtifactSource::new(name, &path).build();
 
-        let cmake_prefix_path = format!(
-            "{};{}",
-            get_env_key(&libuv.to_string()),
-            get_env_key(&mbedtls.to_string()),
-        );
+        let cmake_prefix_path = format!("{};{}", get_env_key(libuv), get_env_key(mbedtls),);
 
         let script = formatdoc! {"
             mkdir -pv \"$VORPAL_OUTPUT\"
@@ -110,12 +106,12 @@ impl<'a> Libwebsockets<'a> {
 
             make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu) install
             popd",
-            cmake = get_env_key(&cmake.to_string()),
+            cmake = get_env_key(cmake),
         };
 
         let step_artifacts = vec![cmake.to_string(), libuv.to_string(), mbedtls.to_string()];
 
-        let steps = vec![step::shell(context, step_artifacts, vec![], script, vec![]).await?];
+        let steps = vec![step::shell(context, &step_artifacts, &[], script, &[]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 

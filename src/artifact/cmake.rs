@@ -44,7 +44,7 @@ impl Cmake {
             },
         };
 
-        let steps = vec![step::shell(context, vec![], vec![], script, vec![]).await?];
+        let steps = vec![step::shell(context, &[], &[], script, &[]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 

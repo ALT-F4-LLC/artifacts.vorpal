@@ -129,7 +129,7 @@ impl<'a> YamlLanguageServer<'a> {
             ArtifactSource::new("yls-yaml", "https://registry.npmjs.org/yaml/-/yaml-2.8.3.tgz").build(),
         ];
 
-        let env_node = get_env_key(&node.to_string());
+        let env_node = get_env_key(node);
 
         let pkg_dir = format!("$VORPAL_OUTPUT/lib/node_modules/{name}");
 
@@ -195,8 +195,7 @@ impl<'a> YamlLanguageServer<'a> {
 
         let step_script = format!("{step_script}\n{selftest_setup}");
 
-        let steps =
-            vec![step::shell(context, vec![node.to_string()], vec![], step_script, vec![]).await?];
+        let steps = vec![step::shell(context, &[node.to_string()], &[], step_script, &[]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 

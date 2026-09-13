@@ -48,19 +48,11 @@ impl<'a> Libksba<'a> {
 
             make
             make install",
-            libgpg_error = get_env_key(&libgpg_error.to_string()),
+            libgpg_error = get_env_key(libgpg_error),
         };
 
-        let steps = vec![
-            step::shell(
-                context,
-                vec![libgpg_error.to_string()],
-                vec![],
-                script,
-                vec![],
-            )
-            .await?,
-        ];
+        let steps =
+            vec![step::shell(context, &[libgpg_error.to_string()], &[], script, &[]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 

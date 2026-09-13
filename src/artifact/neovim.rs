@@ -37,7 +37,7 @@ impl Neovim {
             cp -Rv * \"$VORPAL_OUTPUT/.\"",
         };
 
-        let steps = vec![step::shell(context, vec![], vec![], step_script, vec![]).await?];
+        let steps = vec![step::shell(context, &[], &[], step_script, &[]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 

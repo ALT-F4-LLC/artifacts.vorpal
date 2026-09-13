@@ -117,7 +117,7 @@ impl<'a> DockerfileLanguageServer<'a> {
             ArtifactSource::new("dls-vscode-jsonrpc", "https://registry.npmjs.org/vscode-jsonrpc/-/vscode-jsonrpc-8.0.2.tgz").build(),
         ];
 
-        let env_node = get_env_key(&node.to_string());
+        let env_node = get_env_key(node);
 
         let pkg_dir =
             "$VORPAL_OUTPUT/lib/node_modules/dockerfile-language-server-nodejs".to_string();
@@ -167,8 +167,7 @@ impl<'a> DockerfileLanguageServer<'a> {
 
         let step_script = format!("{step_script}\n{selftest_setup}");
 
-        let steps =
-            vec![step::shell(context, vec![node.to_string()], vec![], step_script, vec![]).await?];
+        let steps = vec![step::shell(context, &[node.to_string()], &[], step_script, &[]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 

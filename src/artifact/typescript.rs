@@ -35,7 +35,7 @@ impl<'a> Typescript<'a> {
 
         let source = ArtifactSource::new(name, &source_path).build();
 
-        let env_node = get_env_key(&node.to_string());
+        let env_node = get_env_key(node);
 
         let step_script = formatdoc! {"
             mkdir -pv \"$VORPAL_OUTPUT/bin\" \"$VORPAL_OUTPUT/lib/node_modules/typescript\"
@@ -59,8 +59,7 @@ impl<'a> Typescript<'a> {
             chmod +x \"$VORPAL_OUTPUT/bin/tsc\" \"$VORPAL_OUTPUT/bin/tsserver\""
         };
 
-        let steps =
-            vec![step::shell(context, vec![node.to_string()], vec![], step_script, vec![]).await?];
+        let steps = vec![step::shell(context, &[node.to_string()], &[], step_script, &[]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 

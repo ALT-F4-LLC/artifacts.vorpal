@@ -54,11 +54,10 @@ impl<'a> Mbedtls<'a> {
 
             make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu) install
             popd",
-            cmake = get_env_key(&cmake.to_string()),
+            cmake = get_env_key(cmake),
         };
 
-        let steps =
-            vec![step::shell(context, vec![cmake.to_string()], vec![], script, vec![]).await?];
+        let steps = vec![step::shell(context, &[cmake.to_string()], &[], script, &[]).await?];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 
