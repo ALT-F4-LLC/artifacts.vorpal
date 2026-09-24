@@ -2762,34 +2762,10 @@ platform = "x86_64-darwin"
 
 [[sources]]
 name = "herdr"
-path = "https://github.com/ogulcancelik/herdr/releases/download/v0.8.2/herdr-linux-aarch64"
+path = "https://github.com/herdrdev/herdr/releases/download/v0.9.1/herdr-macos-aarch64"
 includes = []
 excludes = []
-digest = "1e3a86d815445de8f18bc0fe013fb1aab30eb059dc65b311ff4d2b5e51a440a5"
-platform = "aarch64-linux"
-
-[[sources]]
-name = "herdr"
-path = "https://github.com/ogulcancelik/herdr/releases/download/v0.8.2/herdr-macos-x86_64"
-includes = []
-excludes = []
-digest = "2c49d12c71da74ddbcfbd1ce04a1ff4150d281ae40ff647d6a03ba322a09fc02"
-platform = "x86_64-darwin"
-
-[[sources]]
-name = "herdr"
-path = "https://github.com/ogulcancelik/herdr/releases/download/v0.8.2/herdr-linux-x86_64"
-includes = []
-excludes = []
-digest = "6d3a8f517b62996e54951e355f8d3ae3cc71c3785041ea4a19c36ba40c63f45b"
-platform = "x86_64-linux"
-
-[[sources]]
-name = "herdr"
-path = "https://github.com/ogulcancelik/herdr/releases/download/v0.8.2/herdr-macos-aarch64"
-includes = []
-excludes = []
-digest = "8820e2338c57f8870e3e48ffd86f3ffd9845ef46b275f5091de8d0d31ce3e934"
+digest = "b5f51b22c76acbd25fcb5cb05e47f9198a86526e8aa04ee7fd7f232bd844b9ee"
 platform = "aarch64-darwin"
 
 [[sources]]

@@ -16,7 +16,7 @@ impl Herdr {
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         let name = "herdr";
-        let version = "0.8.2";
+        let version = "0.9.1";
 
         let source_system = match context.get_system() {
             Aarch64Darwin => "macos-aarch64",
@@ -27,7 +27,7 @@ impl Herdr {
         };
 
         let source_path = format!(
-            "https://github.com/ogulcancelik/herdr/releases/download/v{version}/{name}-{source_system}"
+            "https://github.com/herdrdev/herdr/releases/download/v{version}/{name}-{source_system}"
         );
 
         let source = ArtifactSource::new(name, &source_path).build();
