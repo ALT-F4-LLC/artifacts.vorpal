@@ -1,4 +1,5 @@
 pub mod abtop;
+pub mod agento11y;
 pub mod argocd;
 pub mod awscli2;
 pub mod bash_language_server;
