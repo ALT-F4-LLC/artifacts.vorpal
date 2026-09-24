@@ -79,8 +79,8 @@ impl<'a> Nnn<'a> {
                 "},
                 format!(
                     "LDLIBS=\"$PWD/cfgetospeed.o {readline}/lib/libreadline.a {ncurses}/lib/libncursesw.a {ncurses}/lib/libtinfow.a -lpthread\"",
-                    ncurses = get_env_key(&ncurses.to_string()),
-                    readline = get_env_key(&readline.to_string()),
+                    ncurses = get_env_key(ncurses),
+                    readline = get_env_key(readline),
                 ),
             ),
             _ => (String::new(), String::new()),
@@ -99,9 +99,9 @@ impl<'a> Nnn<'a> {
             {linux_shim}
             make PREFIX=\"$VORPAL_OUTPUT\" {make_args}
             make PREFIX=\"$VORPAL_OUTPUT\" {make_args} install",
-            ncurses = get_env_key(&ncurses.to_string()),
-            pkg_config = get_env_key(&pkg_config.to_string()),
-            readline = get_env_key(&readline.to_string()),
+            ncurses = get_env_key(ncurses),
+            pkg_config = get_env_key(pkg_config),
+            readline = get_env_key(readline),
         };
 
         let steps = vec![
