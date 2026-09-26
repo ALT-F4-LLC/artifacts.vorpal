@@ -101,12 +101,15 @@ jobs:
   build:
     needs:
       - prepare
-      - setup
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        runner: ${{ fromJSON(needs.setup.outputs.runners) }}
+        runner:
+          - macos-latest
+          - macos-latest-large
+          - ubuntu-latest
+          - ubuntu-latest-arm64
     steps:
       - uses: actions/checkout@v7
 
