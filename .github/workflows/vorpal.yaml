@@ -45,39 +45,26 @@ jobs:
       - name: Run cargo build
         run: make build
 
-  setup:
-    runs-on: ubuntu-latest
-    outputs:
-      runners: ${{ steps.set.outputs.runners }}
-    steps:
-      - id: set
-        env:
-          INCLUDE_SELFHOSTED: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-        run: |
-          if [[ "$INCLUDE_SELFHOSTED" == "true" ]]; then
-            echo 'runners=["altf4llc","macos-latest","macos-latest-large","ubuntu-latest","ubuntu-latest-arm64"]' >> "$GITHUB_OUTPUT"
-          else
-            echo 'runners=["macos-latest","macos-latest-large","ubuntu-latest","ubuntu-latest-arm64"]' >> "$GITHUB_OUTPUT"
-          fi
-
   prepare:
     needs:
       - check
-      - setup
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        runner: ${{ fromJSON(needs.setup.outputs.runners) }}
+        runner:
+          - macos-latest
+          - macos-latest-large
+          - ubuntu-latest
+          - ubuntu-latest-arm64
     steps:
       - uses: actions/checkout@v7
 
-      - if: ${{ !contains(matrix.runner, 'altf4llc') }}
-        uses: ALT-F4-LLC/setup-vorpal-action@0.2.0
+      - uses: ALT-F4-LLC/setup-vorpal-action@0.2.0
         with:
           registry-backend: "s3"
           registry-backend-s3-bucket: "altf4llc-vorpal-registry"
-          version: "0.4.0"
+          version: "0.4.1"
         env:
           AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}"
           AWS_DEFAULT_REGION: "${{ vars.AWS_DEFAULT_REGION }}"
@@ -123,12 +110,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - if: ${{ !contains(matrix.runner, 'altf4llc') }}
-        uses: ALT-F4-LLC/setup-vorpal-action@0.2.0
+      - uses: ALT-F4-LLC/setup-vorpal-action@0.2.0
         with:
           registry-backend: "s3"
           registry-backend-s3-bucket: "altf4llc-vorpal-registry"
-          version: "0.4.0"
+          version: "0.4.1"
         env:
           AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}"
           AWS_DEFAULT_REGION: "${{ vars.AWS_DEFAULT_REGION }}"
