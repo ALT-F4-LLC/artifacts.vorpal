@@ -49,6 +49,14 @@ digest = "a4f01bc2f0151dde397517bdfcdab4bd88b0781deee0f9d69f949b0af743fbae"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "agento11y"
+path = "https://github.com/grafana/agento11y/releases/download/plugins/agento11y/v0.48.0/agento11y_0.48.0_linux_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "c65d13ec0a2477b76027c2bb9f6f28dafffab41209a87911baee36c66876a297"
+platform = "aarch64-linux"
+
+[[sources]]
 name = "argocd"
 path = "https://github.com/argoproj/argo-cd/releases/download/v3.2.3/argocd-darwin-amd64"
 includes = []
@@ -2767,6 +2775,14 @@ includes = []
 excludes = []
 digest = "8c47e48f689bd861177c77171f491f4301e938ce39e8d6c1e88f27af7c347e7b"
 platform = "x86_64-darwin"
+
+[[sources]]
+name = "herdr"
+path = "https://github.com/herdrdev/herdr/releases/download/v0.9.1/herdr-linux-aarch64"
+includes = []
+excludes = []
+digest = "7189f63c5132b235d053e3fb03c6ac9b2768c120fd0d22338d6bb9f1c7c3bde8"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "herdr"
