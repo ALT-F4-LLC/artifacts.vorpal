@@ -2,6 +2,7 @@ pub mod abtop;
 pub mod agento11y;
 pub mod argocd;
 pub mod awscli2;
+pub mod azure_cli;
 pub mod bash_language_server;
 pub mod bat;
 pub mod beads;

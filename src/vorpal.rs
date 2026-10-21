@@ -1,7 +1,7 @@
 use anyhow::Result;
 use vorpal_artifacts::{
     artifact::{
-        abtop::Abtop, agento11y::Agento11y, argocd::Argocd, awscli2::Awscli2,
+        abtop::Abtop, agento11y::Agento11y, argocd::Argocd, awscli2::Awscli2, azure_cli::AzureCli,
         bash_language_server::BashLanguageServer, bat::Bat, beads::Beads, bottom::Bottom,
         cmake::Cmake, crane::Crane, cue::Cue, delta::Delta, direnv::Direnv,
         dockerfile_language_server::DockerfileLanguageServer, doppler::Doppler, eksctl::Eksctl,
@@ -36,6 +36,7 @@ async fn main() -> Result<()> {
     Agento11y::new().build(context).await?;
     Argocd::new().build(context).await?;
     Awscli2::new().build(context).await?;
+    AzureCli::new().build(context).await?;
     BashLanguageServer::new().build(context).await?;
     Bat::new().build(context).await?;
     Beads::new().build(context).await?;
