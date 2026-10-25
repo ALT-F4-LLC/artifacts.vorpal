@@ -137,6 +137,14 @@ digest = "3c8cc464308328399f37c580ba5a9a1584547a539fcd9c47e8a35035aa6e953a"
 platform = "aarch64-linux"
 
 [[sources]]
+name = "azure-cli"
+path = "https://github.com/Azure/azure-cli/releases/download/azure-cli-2.91.0/azure-cli-2.91.0-macos-arm64.tar.gz"
+includes = []
+excludes = []
+digest = "f520feb179af545bdada34bb6a2ef3baab82854ab97a38e0fd311e22b598822f"
+platform = "aarch64-darwin"
+
+[[sources]]
 name = "bash"
 path = "https://sdk.vorpal.build/source/bash-5.3.tar.gz"
 includes = []
@@ -1538,35 +1546,11 @@ platform = "aarch64-darwin"
 
 [[sources]]
 name = "bottom"
-path = "https://github.com/ClementTsang/bottom/releases/download/0.11.1/bottom_x86_64-unknown-linux-musl.tar.gz"
+path = "https://github.com/ClementTsang/bottom/releases/download/0.14.9/bottom_aarch64-apple-darwin.tar.gz"
 includes = []
 excludes = []
-digest = "21dff7913b3ac0da4e7c8f0381f54fb56ec9c9046b8d92dc181e7e9aa9410b21"
-platform = "x86_64-linux"
-
-[[sources]]
-name = "bottom"
-path = "https://github.com/ClementTsang/bottom/releases/download/0.11.1/bottom_x86_64-apple-darwin.tar.gz"
-includes = []
-excludes = []
-digest = "ac639e7311b3eb2fcc8d22c9b0bb82424081965404a9f760dede1ab64cfa630d"
-platform = "x86_64-darwin"
-
-[[sources]]
-name = "bottom"
-path = "https://github.com/ClementTsang/bottom/releases/download/0.11.1/bottom_aarch64-apple-darwin.tar.gz"
-includes = []
-excludes = []
-digest = "baefba5765f348b83567b41101960588d2ae04512ecaf4f65ecd01ad3b67dfcc"
+digest = "87aef67daf81ae9424be6c88204b18c0fd7bd9b4920d8a45c3667c481b6a47a1"
 platform = "aarch64-darwin"
-
-[[sources]]
-name = "bottom"
-path = "https://github.com/ClementTsang/bottom/releases/download/0.11.1/bottom_aarch64-unknown-linux-gnu.tar.gz"
-includes = []
-excludes = []
-digest = "ca2abfdadc1c5df2c87cf8fbcf56ef0d7b38ac29277ace74d4ff257c516d3894"
-platform = "aarch64-linux"
 
 [[sources]]
 name = "cargo"
@@ -1695,6 +1679,14 @@ includes = []
 excludes = []
 digest = "4c173c7e4aa8cd6a0d33ac0040085a6b241d238abdf4a805981ee10b38c36af1"
 platform = "aarch64-linux"
+
+[[sources]]
+name = "cpython"
+path = "https://sdk.vorpal.build/source/cpython-3.13.14-aarch64-apple-darwin.tar.gz"
+includes = []
+excludes = []
+digest = "7193a82cc223204f5d520df8577737851d51eff07763a416e579c5253985362f"
+platform = "aarch64-darwin"
 
 [[sources]]
 name = "crane"
