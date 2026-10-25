@@ -16,7 +16,7 @@ impl Bottom {
 
     pub async fn build(self, context: &mut ConfigContext) -> Result<String> {
         let name = "bottom";
-        let source_version = "0.11.1";
+        let source_version = "0.14.9";
 
         let source_system = match context.get_system() {
             Aarch64Darwin => "aarch64-apple-darwin",
