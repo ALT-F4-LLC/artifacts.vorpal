@@ -6,15 +6,15 @@ use vorpal_artifacts::{
         cmake::Cmake, crane::Crane, cue::Cue, delta::Delta, direnv::Direnv,
         dockerfile_language_server::DockerfileLanguageServer, doppler::Doppler, eksctl::Eksctl,
         fd::Fd, ffmpeg::Ffmpeg, fluxcd::Fluxcd, fzf::Fzf, glow::Glow, golangci_lint::GolangciLint,
-        gpg::Gpg, gum::Gum, helm::Helm, herdr::Herdr, hunk::Hunk, jj::Jj, jq::Jq, json_c::JsonC,
-        just::Just, k9s::K9s, kind::Kind, kn::Kn, kubectl::Kubectl, kubeseal::Kubeseal,
-        lazygit::Lazygit, libassuan::Libassuan, libevent::Libevent, libgcrypt::Libgcrypt,
-        libgpg_error::LibgpgError, libksba::Libksba, libuv::Libuv, libwebsockets::Libwebsockets,
-        lima::Lima, lua_language_server::LuaLanguageServer, mbedtls::Mbedtls, ncurses::Ncurses,
-        neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth, op::Op,
-        openapi_generator_cli::OpenapiGeneratorCli, opencode::Opencode, openjdk::Openjdk, pi::Pi,
-        pkg_config::PkgConfig, readline::Readline, ripgrep::Ripgrep, sccache::Sccache, sesh::Sesh,
-        skopeo::Skopeo, sqlite3::Sqlite3, starship::Starship, talosctl::Talosctl,
+        govulncheck::Govulncheck, gpg::Gpg, gum::Gum, helm::Helm, herdr::Herdr, hunk::Hunk, jj::Jj,
+        jq::Jq, json_c::JsonC, just::Just, k9s::K9s, kind::Kind, kn::Kn, kubectl::Kubectl,
+        kubeseal::Kubeseal, lazygit::Lazygit, libassuan::Libassuan, libevent::Libevent,
+        libgcrypt::Libgcrypt, libgpg_error::LibgpgError, libksba::Libksba, libuv::Libuv,
+        libwebsockets::Libwebsockets, lima::Lima, lua_language_server::LuaLanguageServer,
+        mbedtls::Mbedtls, ncurses::Ncurses, neovim::Neovim, nginx::Nginx, nnn::Nnn, npth::Npth,
+        op::Op, openapi_generator_cli::OpenapiGeneratorCli, opencode::Opencode, openjdk::Openjdk,
+        pi::Pi, pkg_config::PkgConfig, readline::Readline, ripgrep::Ripgrep, sccache::Sccache,
+        sesh::Sesh, skopeo::Skopeo, sqlite3::Sqlite3, starship::Starship, talosctl::Talosctl,
         terraform::Terraform, terraform_ls::TerraformLs, tmux::Tmux, tree_sitter::TreeSitter,
         ttyd::Ttyd, typescript::Typescript, typescript_language_server::TypescriptLanguageServer,
         umoci::Umoci, uv::Uv, vhs::Vhs, virtctl::Virtctl,
@@ -55,6 +55,7 @@ async fn main() -> Result<()> {
     Fzf::new().build(context).await?;
     Glow::new().build(context).await?;
     GolangciLint::new().build(context).await?;
+    Govulncheck::new().build(context).await?;
     Gpg::new().build(context).await?;
     Gum::new().build(context).await?;
     Helm::new().build(context).await?;

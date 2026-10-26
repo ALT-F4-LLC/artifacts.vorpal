@@ -22,6 +22,7 @@ pub mod fluxcd;
 pub mod fzf;
 pub mod glow;
 pub mod golangci_lint;
+pub mod govulncheck;
 pub mod gpg;
 pub mod gum;
 pub mod helm;
