@@ -2689,6 +2689,14 @@ digest = "ebdf9b0c5a2c603d942fc89b86ec223287990f86f23a735066b7290a50ba9fc3"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "govulncheck"
+path = "https://github.com/golang/vuln/archive/refs/tags/v1.9.0.tar.gz"
+includes = []
+excludes = []
+digest = "ebdf9b0c5a2c603d942fc89b86ec223287990f86f23a735066b7290a50ba9fc3"
+platform = "x86_64-linux"
+
+[[sources]]
 name = "gpg"
 path = "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.5.16.tar.bz2"
 includes = []
