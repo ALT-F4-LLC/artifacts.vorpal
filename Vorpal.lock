@@ -2585,6 +2585,14 @@ digest = "5eb87258163e30b4bf75ff75a52829797ab6ebd68bdae902910e88ebe80eb2bc"
 platform = "aarch64-darwin"
 
 [[sources]]
+name = "gitleaks"
+path = "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_arm64.tar.gz"
+includes = []
+excludes = []
+digest = "a68aa6f700c45b2643ade305352cd54b87bb3beff929961a9481d2dbfe1f9ec9"
+platform = "aarch64-linux"
+
+[[sources]]
 name = "glibc"
 path = "https://sdk.vorpal.build/source/glibc-2.42.tar.gz"
 includes = []
@@ -4327,6 +4335,14 @@ includes = []
 excludes = []
 digest = "0010b2eb53fd52a2560f064df82fb7ae669e491f504735bb185b49437af52eca"
 platform = "x86_64-linux"
+
+[[sources]]
+name = "rumdl"
+path = "https://github.com/rvben/rumdl/releases/download/v0.3.2/rumdl-v0.3.2-aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "d4598d74b9d1922fe92efa3d9db41f6c321b1a3e7a3564e0fff298a54df81d0e"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "rumdl"
