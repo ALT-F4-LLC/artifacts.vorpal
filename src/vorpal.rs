@@ -14,11 +14,12 @@ use vorpal_artifacts::{
         lua_language_server::LuaLanguageServer, mbedtls::Mbedtls, ncurses::Ncurses, neovim::Neovim,
         nginx::Nginx, nnn::Nnn, npth::Npth, op::Op, openapi_generator_cli::OpenapiGeneratorCli,
         opencode::Opencode, openjdk::Openjdk, pi::Pi, pkg_config::PkgConfig, readline::Readline,
-        ripgrep::Ripgrep, sccache::Sccache, sesh::Sesh, skopeo::Skopeo, sqlite3::Sqlite3,
-        starship::Starship, talosctl::Talosctl, terraform::Terraform, terraform_ls::TerraformLs,
-        tmux::Tmux, tree_sitter::TreeSitter, ttyd::Ttyd, typescript::Typescript,
-        typescript_language_server::TypescriptLanguageServer, umoci::Umoci, uv::Uv, vhs::Vhs,
-        virtctl::Virtctl, vscode_langservers_extracted::VscodeLangserversExtracted, x264::X264,
+        ripgrep::Ripgrep, rumdl::Rumdl, sccache::Sccache, sesh::Sesh, skopeo::Skopeo,
+        sqlite3::Sqlite3, starship::Starship, talosctl::Talosctl, terraform::Terraform,
+        terraform_ls::TerraformLs, tmux::Tmux, tree_sitter::TreeSitter, ttyd::Ttyd,
+        typescript::Typescript, typescript_language_server::TypescriptLanguageServer, umoci::Umoci,
+        uv::Uv, vhs::Vhs, virtctl::Virtctl,
+        vscode_langservers_extracted::VscodeLangserversExtracted, x264::X264,
         yaml_language_server::YamlLanguageServer, yq::Yq, zoxide::Zoxide, zsh::Zsh,
     },
     ProjectEnvironment, DEFAULT_SYSTEMS,
@@ -95,6 +96,7 @@ async fn main() -> Result<()> {
     PkgConfig::new().build(context).await?;
     Readline::new().build(context).await?;
     Ripgrep::new().build(context).await?;
+    Rumdl::new().build(context).await?;
     Sccache::new().build(context).await?;
     Sesh::new().build(context).await?;
     Skopeo::new().build(context).await?;

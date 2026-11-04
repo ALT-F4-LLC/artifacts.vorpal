@@ -62,6 +62,7 @@ pub mod pi;
 pub mod pkg_config;
 pub mod readline;
 pub mod ripgrep;
+pub mod rumdl;
 pub mod sccache;
 pub mod sesh;
 pub mod skopeo;
