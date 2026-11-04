@@ -20,6 +20,7 @@ pub mod ffmpeg;
 pub mod file;
 pub mod fluxcd;
 pub mod fzf;
+pub mod gitleaks;
 pub mod glow;
 pub mod golangci_lint;
 pub mod govulncheck;
