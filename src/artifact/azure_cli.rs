@@ -56,8 +56,16 @@ impl AzureCli {
             cpython = get_env_key(&cpython),
         };
 
-        let steps =
-            vec![step::shell(context, &[cpython.to_string()], &[], step_script, &[]).await?];
+        let steps = vec![
+            step::shell(
+                context,
+                std::slice::from_ref(&cpython),
+                &[],
+                step_script,
+                &[],
+            )
+            .await?,
+        ];
 
         let systems = vec![Aarch64Darwin, Aarch64Linux, X8664Darwin, X8664Linux];
 
