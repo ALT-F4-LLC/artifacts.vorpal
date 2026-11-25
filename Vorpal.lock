@@ -1602,10 +1602,10 @@ platform = "aarch64-darwin"
 
 [[sources]]
 name = "cargo"
-path = "https://sdk.vorpal.build/source/cargo-1.93.1-aarch64-unknown-linux-gnu.tar.gz"
+path = "https://sdk.vorpal.build/source/cargo-1.100.0-aarch64-unknown-linux-gnu.tar.gz"
 includes = []
 excludes = []
-digest = "6b773215302a46b6cfd565539dabc0af9dad01bdd9c37587e7041907ab5b9212"
+digest = "4df6a5ca4ba533ec671f662968ae0a65970022a105889537b4d03ffad224c562"
 platform = "aarch64-linux"
 
 [[sources]]
@@ -1626,10 +1626,10 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "clippy"
-path = "https://sdk.vorpal.build/source/clippy-1.93.1-aarch64-unknown-linux-gnu.tar.gz"
+path = "https://sdk.vorpal.build/source/clippy-1.100.0-aarch64-unknown-linux-gnu.tar.gz"
 includes = []
 excludes = []
-digest = "4c20fc23ed2870442608ced8a9e9c314a4b27fe78fed356e0092efd377c44681"
+digest = "2a6b809e86f75793fbe191ad7c1a4f0c2fa86f6c080600f0b6da1f341b4aa599"
 platform = "aarch64-linux"
 
 [[sources]]
@@ -1722,14 +1722,6 @@ platform = "x86_64-darwin"
 
 [[sources]]
 name = "cpython"
-path = "https://sdk.vorpal.build/source/cpython-3.13.14-aarch64-unknown-linux-gnu.tar.gz"
-includes = []
-excludes = []
-digest = "4c173c7e4aa8cd6a0d33ac0040085a6b241d238abdf4a805981ee10b38c36af1"
-platform = "aarch64-linux"
-
-[[sources]]
-name = "cpython"
 path = "https://sdk.vorpal.build/source/cpython-3.14.7-aarch64-apple-darwin.tar.gz"
 includes = []
 excludes = []
@@ -1743,6 +1735,14 @@ includes = []
 excludes = []
 digest = "772e9c56c2ef9d7b7e827f9564e1c7461bad37c33cacd3fab50958da4e923fe6"
 platform = "x86_64-linux"
+
+[[sources]]
+name = "cpython"
+path = "https://sdk.vorpal.build/source/cpython-3.14.7-aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "e92f5a1ffabd0b17262eebbd7d639f4e78dac88635c06db90e495e5c9f502ce6"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "crane"
@@ -2554,10 +2554,10 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "git"
-path = "https://sdk.vorpal.build/source/git-2.53.0.tar.gz"
+path = "https://sdk.vorpal.build/source/git-2.56.1.tar.gz"
 includes = []
 excludes = []
-digest = "4c08acf32a9dd52cb4f64d1835bade4128af51dd85742245987643cde0aeb9b1"
+digest = "40bf26a1c4760295ea03e4021324e2734979714a6734836399337160bb068af5"
 platform = "aarch64-linux"
 
 [[sources]]
@@ -2690,6 +2690,14 @@ platform = "x86_64-darwin"
 
 [[sources]]
 name = "go"
+path = "https://sdk.vorpal.build/source/go1.27.4.linux-arm64.tar.gz"
+includes = []
+excludes = []
+digest = "83927ade2c71f392ebce7d6120b905dd803864ac191589e88b597523de7197fa"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "go"
 path = "https://sdk.vorpal.build/source/go1.27.4.linux-amd64.tar.gz"
 includes = []
 excludes = []
@@ -2698,19 +2706,19 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "go"
-path = "https://sdk.vorpal.build/source/go1.26.0.linux-arm64.tar.gz"
-includes = []
-excludes = []
-digest = "bcee4e23358013d48b6ad5eb2152dc64dc320d7a6dfac8ed56767f2243b0213a"
-platform = "aarch64-linux"
-
-[[sources]]
-name = "go"
 path = "https://sdk.vorpal.build/source/go1.27.4.darwin-arm64.tar.gz"
 includes = []
 excludes = []
 digest = "c2ad2e6b4a1530a9724a109a1d49135754859761c91a260f795a436bff473ede"
 platform = "aarch64-darwin"
+
+[[sources]]
+name = "golangci-lint"
+path = "https://github.com/golangci/golangci-lint/releases/download/v2.15.0/golangci-lint-2.15.0-linux-arm64.tar.gz"
+includes = []
+excludes = []
+digest = "2e57861162d518e90f6e5718d3d9500fa6b3b1be2d7391a3d9ec44b7197876f1"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "golangci-lint"
@@ -3890,10 +3898,10 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "nodejs"
-path = "https://sdk.vorpal.build/source/node-v22.22.0-linux-arm64.tar.gz"
+path = "https://sdk.vorpal.build/source/node-v26.13.1-linux-arm64.tar.gz"
 includes = []
 excludes = []
-digest = "34c6e1d1b1d2da8e90f2a3480f1d3e57a73c80900a27fccfac9e15f1a44809be"
+digest = "1b7e63202e8e65b44e6ee5501e0d28ce3ca70c64c92a941eb4cb761bd62c7edc"
 platform = "aarch64-linux"
 
 [[sources]]
@@ -4202,10 +4210,10 @@ platform = "x86_64-darwin"
 
 [[sources]]
 name = "protoc"
-path = "https://sdk.vorpal.build/source/protoc-34.0-linux-aarch_64.zip"
+path = "https://sdk.vorpal.build/source/protoc-36.2-linux-aarch_64.zip"
 includes = []
 excludes = []
-digest = "7c9aae2782708d82aee85e682d364a8cc11f352d55b5fe8ccfc8a6f3ab950d30"
+digest = "620cbaa30d1ec9f9f10e22356cb12053def79fbe3e4b3e6aa9a052bcf1ca1397"
 platform = "aarch64-linux"
 
 [[sources]]
@@ -4354,14 +4362,6 @@ platform = "aarch64-darwin"
 
 [[sources]]
 name = "rust-analyzer"
-path = "https://sdk.vorpal.build/source/rust-analyzer-1.93.1-aarch64-unknown-linux-gnu.tar.gz"
-includes = []
-excludes = []
-digest = "5223513027a92ae11735b44130ac325b97ec0a0192dcf39c6a2c153fa888e05b"
-platform = "aarch64-linux"
-
-[[sources]]
-name = "rust-analyzer"
 path = "https://sdk.vorpal.build/source/rust-analyzer-1.93.1-x86_64-apple-darwin.tar.gz"
 includes = []
 excludes = []
@@ -4378,6 +4378,14 @@ platform = "aarch64-darwin"
 
 [[sources]]
 name = "rust-analyzer"
+path = "https://sdk.vorpal.build/source/rust-analyzer-1.100.0-aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "9ca6a850cfc214265c3eac4cbd91dad2ed3f6d843ef8aae657b58eb98379ffed"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "rust-analyzer"
 path = "https://sdk.vorpal.build/source/rust-analyzer-1.100.0-x86_64-unknown-linux-gnu.tar.gz"
 includes = []
 excludes = []
@@ -4390,15 +4398,15 @@ path = "https://sdk.vorpal.build/source/rust-src-1.93.1.tar.gz"
 includes = []
 excludes = []
 digest = "52da4bcd8bd8e2d0ae2635e1503efa8f5838bd18958b983d52336d73896e7172"
-platform = "aarch64-linux"
+platform = "x86_64-darwin"
 
 [[sources]]
 name = "rust-src"
-path = "https://sdk.vorpal.build/source/rust-src-1.93.1.tar.gz"
+path = "https://sdk.vorpal.build/source/rust-src-1.100.0.tar.gz"
 includes = []
 excludes = []
-digest = "52da4bcd8bd8e2d0ae2635e1503efa8f5838bd18958b983d52336d73896e7172"
-platform = "x86_64-darwin"
+digest = "bf8591ba7bac8036b8f7700d665270a6333512d1c72f29208ee47716f46c1348"
+platform = "aarch64-linux"
 
 [[sources]]
 name = "rust-src"
@@ -4426,6 +4434,14 @@ platform = "x86_64-darwin"
 
 [[sources]]
 name = "rust-std"
+path = "https://sdk.vorpal.build/source/rust-std-1.100.0-aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "7c8a90c2cfe54d4c427f61ce39c022cf984245f6d166e730c7e4ba3148ea5cb1"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "rust-std"
 path = "https://sdk.vorpal.build/source/rust-std-1.100.0-x86_64-unknown-linux-gnu.tar.gz"
 includes = []
 excludes = []
@@ -4434,27 +4450,11 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "rust-std"
-path = "https://sdk.vorpal.build/source/rust-std-1.93.1-aarch64-unknown-linux-gnu.tar.gz"
-includes = []
-excludes = []
-digest = "a1f91e63d9d4183645c49505752051c052b9b59a0a949de04673132bdcd85345"
-platform = "aarch64-linux"
-
-[[sources]]
-name = "rust-std"
 path = "https://sdk.vorpal.build/source/rust-std-1.100.0-aarch64-apple-darwin.tar.gz"
 includes = []
 excludes = []
 digest = "ba9622e7acdaa17c1b703c62fab7dda992083004686fc945471b353865d28a67"
 platform = "aarch64-darwin"
-
-[[sources]]
-name = "rustc"
-path = "https://sdk.vorpal.build/source/rustc-1.93.1-aarch64-unknown-linux-gnu.tar.gz"
-includes = []
-excludes = []
-digest = "02c90dcbfd3609d669f037e58b2197b73e67519712cebd016bf38e146df41db1"
-platform = "aarch64-linux"
 
 [[sources]]
 name = "rustc"
@@ -4474,6 +4474,14 @@ platform = "x86_64-darwin"
 
 [[sources]]
 name = "rustc"
+path = "https://sdk.vorpal.build/source/rustc-1.100.0-aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "da637a2aa875a886ce19c3aa521d9f56a90ba33029a6882c16510479af3b40bd"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "rustc"
 path = "https://sdk.vorpal.build/source/rustc-1.100.0-x86_64-unknown-linux-gnu.tar.gz"
 includes = []
 excludes = []
@@ -4490,6 +4498,14 @@ platform = "x86_64-linux"
 
 [[sources]]
 name = "rustfmt"
+path = "https://sdk.vorpal.build/source/rustfmt-1.100.0-aarch64-unknown-linux-gnu.tar.gz"
+includes = []
+excludes = []
+digest = "3190b052eeab36f13bd68a8854db77de92ed584e026f552ec15378e83cfdac83"
+platform = "aarch64-linux"
+
+[[sources]]
+name = "rustfmt"
 path = "https://sdk.vorpal.build/source/rustfmt-1.93.1-x86_64-apple-darwin.tar.gz"
 includes = []
 excludes = []
@@ -4503,14 +4519,6 @@ includes = []
 excludes = []
 digest = "6800f617e0d78b135df555b78e82005419fba606c0dcc2b3d7c83ea2777f760f"
 platform = "aarch64-darwin"
-
-[[sources]]
-name = "rustfmt"
-path = "https://sdk.vorpal.build/source/rustfmt-1.93.1-aarch64-unknown-linux-gnu.tar.gz"
-includes = []
-excludes = []
-digest = "7df0c4d99214e09a0826f9d4cd6259341be8cb324dd5c3d78103705374b76e6c"
-platform = "aarch64-linux"
 
 [[sources]]
 name = "sccache"
